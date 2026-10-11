@@ -12,14 +12,18 @@ type View = ChainId | 'all'
 interface Result {
   address: string
   histories: ChainHistory[]
+  /** True while the read is still running and the histories are partial snapshots. */
+  reading: boolean
 }
 
 export default function App() {
   const [busy, setBusy] = useState(false)
+  const [stopping, setStopping] = useState(false)
   const [progress, setProgress] = useState<Record<string, string>>({})
   const [result, setResult] = useState<Result | null>(null)
   const [view, setView] = useState<View>('all')
   const abortRef = useRef<AbortController | null>(null)
+  const runRef = useRef(0)
   const resultsRef = useRef<HTMLElement>(null)
 
   useEffect(() => () => abortRef.current?.abort(), [])
@@ -28,33 +32,45 @@ export default function App() {
     abortRef.current?.abort()
     const ac = new AbortController()
     abortRef.current = ac
+    const run = ++runRef.current
     setBusy(true)
+    setStopping(false)
     setResult(null)
     setProgress({})
+    setView('all')
+    // Snapshots arrive per chain while the read runs, so a long history shows as it is read.
+    const live = new Map<ChainId, ChainHistory>()
     const histories = await Promise.all(
       CHAINS.map((chain) =>
         readChain(
           chain,
           address,
           (name, msg) => {
+            if (runRef.current !== run) return
             if (import.meta.env.DEV) console.debug(`[walletscope] ${name}: ${msg}`)
             setProgress((p) => ({ ...p, [name]: msg }))
           },
           ac.signal,
+          (h) => {
+            if (runRef.current !== run) return
+            live.set(h.chainId, h)
+            setResult({ address, histories: CHAINS.flatMap((c) => live.get(c.id) ?? []), reading: true })
+          },
         ),
       ),
     )
-    if (ac.signal.aborted) return
-    setResult({ address, histories })
-    setView('all')
+    // A newer read has replaced this one; its result is the one that counts.
+    if (runRef.current !== run) return
+    setResult({ address, histories, reading: false })
     setBusy(false)
+    setStopping(false)
     requestAnimationFrame(() => resultsRef.current?.focus())
   }
 
+  // Stopping aborts the explorer requests; the read resolves with what it has and the dashboard keeps it.
   const cancel = () => {
     abortRef.current?.abort()
-    setBusy(false)
-    setProgress({})
+    setStopping(true)
   }
 
   const selected = useMemo(() => {
@@ -71,6 +87,21 @@ export default function App() {
 
   const now = Math.floor(Date.now() / 1000)
   const usd = (eth: number) => (ethPrice ? ` · ${fmtUsd(eth * ethPrice)}` : '')
+
+  // Coverage of the selected chains, for the card labels: are the lists complete, and how many rows were read?
+  const answered = selected.filter((h) => !h.error)
+  const allFailed = selected.length > 0 && answered.length === 0
+  const cut = answered.some((h) => h.coverage.truncated) || (result?.reading ?? false)
+  const txRead = answered.reduce((n, h) => n + h.coverage.txFetched, 0)
+  const tokRead = answered.reduce((n, h) => n + h.coverage.tokenFetched, 0)
+  const sumKnown = (pick: (h: ChainHistory) => number | null) =>
+    answered.every((h) => pick(h) !== null) ? answered.reduce((n, h) => n + (pick(h) ?? 0), 0) : null
+  const txTotal = sumKnown((h) => h.coverage.txTotal)
+  const tokTotal = sumKnown((h) => h.coverage.tokenTotal)
+  const readOf = (read: number, total: number | null, noun: string) =>
+    total !== null && total > read ? `${fmtInt(read)} of ${fmtInt(total)} ${noun} read` : `${fmtInt(read)} ${noun} read, more remain`
+  const newest = (base: string) => (cut ? `${base}, newest ${fmtInt(txRead)} transactions` : base)
+  const emptyHistory = answered.length > 0 && metrics !== null && metrics.txCount === 0
 
   return (
     <>
@@ -101,10 +132,10 @@ export default function App() {
       <main id="main" className="wrap">
         <section className="intro" aria-labelledby="intro-title">
           <h1 id="intro-title" className="intro-title">
-            Read any wallet’s story
+            Look up a wallet’s age, gas, trades and profit
           </h1>
           <p className="intro-lede">
-            Paste an address to see its age, gas, token trades and realized profit across three chains.
+            Paste an address. Walletscope reads it on Ethereum, Base and Robinhood Chain from their public explorers.
           </p>
           <AddressForm busy={busy} onSubmit={start} onCancel={cancel} />
         </section>
@@ -112,6 +143,7 @@ export default function App() {
         <div className="status" role="status" aria-live="polite" aria-atomic="true">
           {busy && (
             <ul className="status-list">
+              {stopping && <li>Stopping. The rows read so far stay on the dashboard.</li>}
               {CHAINS.map((c) => (
                 <li key={c.id}>
                   <span className="status-chain">{c.name}</span> {progress[c.name] ?? 'Waiting'}
@@ -121,8 +153,11 @@ export default function App() {
           )}
           {!busy && result && metrics && (
             <p>
-              Finished reading {shortAddress(result.address)}. {fmtInt(metrics.txCount)} transactions found across the
-              chains that answered.
+              {allFailed
+                ? `Could not reach the explorers for ${shortAddress(result.address)}.`
+                : result.histories.some((h) => h.coverage.cutBy === 'stopped')
+                  ? `Stopped reading ${shortAddress(result.address)}. The newest rows read so far are shown.`
+                  : `Finished reading ${shortAddress(result.address)} on the chains that answered.`}
             </p>
           )}
         </div>
@@ -138,6 +173,7 @@ export default function App() {
                 </h2>
                 <p className="dash-sub">
                   {view === 'all' ? 'All three chains combined' : `${CHAIN_BY_ID[view].name} only`}
+                  {result.reading ? ' · still reading, newest rows first' : ''}
                   {ethPrice ? ` · USD at today’s ETH price ${fmtUsd(ethPrice)}` : ''}
                 </p>
               </div>
@@ -154,9 +190,16 @@ export default function App() {
               </div>
             </div>
 
-            <CoverageNotes histories={selected} address={result.address} />
-
-            {metrics.txCount === 0 ? (
+            {allFailed ? (
+              <div className="empty">
+                <p className="empty-title">Could not read this address</p>
+                <p className="empty-body">
+                  {view === 'all'
+                    ? 'No explorer answered. Check your connection and press Read history again.'
+                    : `${CHAIN_BY_ID[view].name}’s explorer did not answer. Check your connection and press Read history again, or choose another chain above.`}
+                </p>
+              </div>
+            ) : emptyHistory ? (
               <div className="empty">
                 <p className="empty-title">No activity found</p>
                 <p className="empty-body">
@@ -173,27 +216,31 @@ export default function App() {
                     value={metrics.firstSeen ? formatAge(walletAge(metrics.firstSeen, now)) : '—'}
                     detail={
                       metrics.firstSeen
-                        ? `${selected.some((h) => h.coverage.truncated && !h.firstSeenHint) ? 'Earliest read ' : 'First seen '}${fmtDate(metrics.firstSeen)}`
+                        ? `${cut && !answered.some((h) => h.firstSeenHint) ? 'Earliest read ' : 'First seen '}${fmtDate(metrics.firstSeen)}`
                         : undefined
                     }
                   />
                   <MetricCard
-                    label="Total gas spent"
+                    label={newest(cut ? 'Gas spent' : 'Total gas spent')}
                     value={fmtEth(metrics.gasEth)}
-                    detail={`${fmtInt(metrics.txCount)} transactions${usd(metrics.gasEth)}`}
+                    detail={
+                      cut
+                        ? `${readOf(txRead, txTotal, 'transactions')}${usd(metrics.gasEth)}`
+                        : `Fees on ${fmtInt(metrics.signedCount)} transactions this wallet signed${usd(metrics.gasEth)}`
+                    }
                   />
                   <MetricCard
-                    label="Token buy volume"
+                    label={newest('Token buy volume')}
                     value={fmtEth(metrics.buyEth)}
-                    detail={`ETH paid for tokens${usd(metrics.buyEth)}`}
+                    detail={cut ? `${readOf(tokRead, tokTotal, 'token transfers')}${usd(metrics.buyEth)}` : `ETH paid for tokens${usd(metrics.buyEth)}`}
                   />
                   <MetricCard
-                    label="Token sell volume"
+                    label={newest('Token sell volume')}
                     value={fmtEth(metrics.sellEth)}
-                    detail={`ETH received for tokens${usd(metrics.sellEth)}`}
+                    detail={cut ? `${readOf(tokRead, tokTotal, 'token transfers')}${usd(metrics.sellEth)}` : `ETH received for tokens${usd(metrics.sellEth)}`}
                   />
                   <MetricCard
-                    label="Profit / loss"
+                    label={newest('Profit / loss')}
                     value={fmtEth(metrics.pnlEth, { sign: true })}
                     trend={metrics.pnlEth > 0 ? 'up' : metrics.pnlEth < 0 ? 'down' : 'flat'}
                     detail={`Sells − buys − gas, realized${usd(metrics.pnlEth)}`}
@@ -233,6 +280,8 @@ export default function App() {
               </>
             )}
 
+            <CoverageNotes histories={selected} address={result.address} reading={result.reading} />
+
             <details className="method">
               <summary>How these numbers are calculated</summary>
               <ul>
@@ -255,10 +304,12 @@ export default function App() {
                   still held are not priced. USD figures use the explorer’s current ETH price, not historical prices.
                 </li>
                 <li>
-                  Data comes from the public Blockscout explorers for each chain, read directly in your browser. Up to
-                  1,000 transactions, 1,000 token transfers and 500 internal transfers are read per chain, newest
-                  first. When a wallet has more, the coverage line above says so and the wallet age is taken from the
-                  explorer’s record of its first transaction when that lookup succeeds.
+                  Data comes from the public Blockscout explorers for each chain, read directly in your browser, newest
+                  rows first, until each list is exhausted. A long history takes a while because the explorers allow
+                  about three pages a second; the dashboard updates as rows arrive, and Stop reading keeps what has been
+                  read. While a list is incomplete, each card says how many rows it covers, and the wallet age is taken
+                  from the explorer’s record of the first transaction when that lookup succeeds. Pending transactions
+                  are not counted.
                 </li>
               </ul>
             </details>
@@ -267,13 +318,13 @@ export default function App() {
       </main>
 
       <footer className="footer wrap">
-        <p>Walletscope reads public explorer data in your browser. Nothing is stored and no wallet is connected.</p>
+        <p>Walletscope reads public explorer data in your browser. Nothing is stored.</p>
       </footer>
     </>
   )
 }
 
-function CoverageNotes({ histories, address }: { histories: ChainHistory[]; address: string }) {
+function CoverageNotes({ histories, address, reading }: { histories: ChainHistory[]; address: string; reading: boolean }) {
   const notes = histories.flatMap((h) => {
     const chain = CHAIN_BY_ID[h.chainId]
     if (h.error) {
@@ -299,10 +350,16 @@ function CoverageNotes({ histories, address }: { histories: ChainHistory[]; addr
         ? `${fmtInt(c.tokenFetched)} of ${fmtInt(c.tokenTotal)} token transfers`
         : `${fmtInt(c.tokenFetched)} token transfers`,
     )
+    const cutNote = reading
+      ? ' Still reading, newest first.'
+      : c.cutBy === 'stopped'
+        ? ' Newest rows shown; the read was stopped before it reached the start.'
+        : c.cutBy === 'explorer'
+          ? ' Newest rows shown; the explorer stopped answering part way.'
+          : ''
     return [
       <li key={h.chainId} className={`coverage-item${c.truncated ? ' coverage-partial' : ''}`}>
-        <span className="coverage-chain">{chain.name}</span> {parts.join(', ')}
-        {c.truncated ? '. Most recent history shown; the read stopped at the per-chain limit.' : '.'}
+        <span className="coverage-chain">{chain.name}</span> {parts.join(', ')}.{cutNote}
         {c.internalsUnavailable ? ' Internal transfers were not returned, so ETH received through contracts is missing from sell volume.' : ''}
       </li>,
     ]

@@ -2,20 +2,23 @@
 // Lists come newest first, 50 rows a page, with a cursor in `next_page_params`.
 // The public instances allow about 180 v2 requests a minute per client, and only a handful of
 // legacy `/api?module=account` calls an hour, so the legacy route is used for one thing only:
-// the very first transaction of a wallet whose history is longer than the page caps.
+// the very first transaction of a wallet whose read was stopped before it reached the start.
 import type { Chain } from './chains'
 import type { ChainHistory, Coverage, InternalTx, TokenTx, Tx } from './metrics'
 
 export const PAGE_SIZE = 50
-/** Page caps bound the request budget; coverage reports when a list was cut. */
-export const MAX_PAGES = { transactions: 20, 'token-transfers': 20, 'internal-transactions': 6 } as const
 /** A single explorer request is abandoned after this long. */
 export const REQUEST_TIMEOUT_MS = 20000
-/** Paging of one list stops, and reports a cut, when a chain has been reading this long. */
-export const CHAIN_BUDGET_MS = 60000
-type ListName = keyof typeof MAX_PAGES
+/** The first-transaction lookup after a stopped read is given this long; the visitor is waiting. */
+export const FIRST_TX_TIMEOUT_MS = 8000
+/** Partial histories are reported to the page at most this often per chain. */
+export const PARTIAL_INTERVAL_MS = 2000
+type ListName = 'transactions' | 'token-transfers' | 'internal-transactions'
 
 export type Progress = (chainName: string, message: string) => void
+export type Partial = (history: ChainHistory) => void
+
+const isAbort = (e: unknown) => e instanceof DOMException && e.name === 'AbortError'
 
 const sleep = (ms: number, signal?: AbortSignal) =>
   new Promise<void>((resolve, reject) => {
@@ -27,9 +30,9 @@ const sleep = (ms: number, signal?: AbortSignal) =>
   })
 
 /** Back off and retry on 429 and 5xx, honouring the explorer's reset header when it sends one. */
-async function getJson<T>(url: string, signal?: AbortSignal, retries = 4): Promise<T> {
+async function getJson<T>(url: string, signal?: AbortSignal, retries = 4, timeoutMs = REQUEST_TIMEOUT_MS): Promise<T> {
   for (let attempt = 0; ; attempt++) {
-    const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+    const timeout = AbortSignal.timeout(timeoutMs)
     const combined = signal ? AbortSignal.any([signal, timeout]) : timeout
     const res = await fetch(url, { signal: combined, headers: { accept: 'application/json' } }).catch((e: unknown) => {
       if (signal?.aborted) throw e
@@ -50,31 +53,51 @@ interface Page<T> {
   next_page_params: Record<string, string | number> | null
 }
 
+interface ListResult<T> {
+  rows: T[]
+  /** True when the explorer still had rows when paging ended. */
+  truncated: boolean
+  /** Why paging ended early: the visitor stopped it, or the explorer failed part way. */
+  cutBy: 'stopped' | 'explorer' | null
+}
+
+/**
+ * Page one list until the explorer reports no next page. There is no page cap: a long history
+ * is read in full unless the visitor stops the read, in which case the rows so far are kept.
+ * An explorer failure after some rows were read also keeps the rows and reports the cut.
+ */
 async function pageAll<T>(
   chain: Chain,
   address: string,
   list: ListName,
   signal: AbortSignal | undefined,
-  deadline: number,
-  onPage: (count: number) => void,
-): Promise<{ rows: T[]; truncated: boolean }> {
+  onPage: (rows: T[]) => void,
+): Promise<ListResult<T>> {
   const rows: T[] = []
   let cursor: Record<string, string | number> | null = null
-  for (let page = 1; page <= MAX_PAGES[list]; page++) {
-    if (page > 1 && Date.now() > deadline) return { rows, truncated: true }
+  for (;;) {
+    if (signal?.aborted) return { rows, truncated: true, cutBy: 'stopped' }
     const qs: string = cursor
       ? '?' +
         Object.entries(cursor)
           .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
           .join('&')
       : ''
-    const data: Page<T> = await getJson<Page<T>>(`${chain.explorer}/api/v2/addresses/${address}/${list}${qs}`, signal)
+    let data: Page<T>
+    try {
+      data = await getJson<Page<T>>(`${chain.explorer}/api/v2/addresses/${address}/${list}${qs}`, signal)
+    } catch (e) {
+      if (signal?.aborted || isAbort(e)) return { rows, truncated: true, cutBy: 'stopped' }
+      // An address the explorer has never seen answers 404: that is an empty history, not a failure.
+      if (rows.length === 0 && e instanceof Error && e.message === 'HTTP 404') return { rows, truncated: false, cutBy: null }
+      if (rows.length === 0) throw e
+      return { rows, truncated: true, cutBy: 'explorer' }
+    }
     rows.push(...(data.items ?? []))
-    onPage(rows.length)
+    onPage(rows)
     cursor = data.next_page_params
-    if (!cursor) return { rows, truncated: false }
+    if (!cursor) return { rows, truncated: false, cutBy: null }
   }
-  return { rows, truncated: true }
 }
 
 interface Party {
@@ -124,13 +147,16 @@ const num = (s: string | undefined | null): number | null => {
   const n = Number(s)
   return Number.isFinite(n) ? n : null
 }
-const unix = (iso: string | null): number => (iso ? Math.floor(new Date(iso).getTime() / 1000) : 0)
+const unix = (iso: string): number => Math.floor(new Date(iso).getTime() / 1000)
+/** Pending rows have no timestamp and no block; they have no place on a timeline, so they are dropped. */
+const mined = <R extends { timestamp: string | null }>(rows: R[]): Array<R & { timestamp: string }> =>
+  rows.filter((r): r is R & { timestamp: string } => typeof r.timestamp === 'string' && r.timestamp !== '')
 
 /** One legacy call for the oldest transaction; the legacy route has a tiny hourly quota. */
-async function firstTransactionTime(chain: Chain, address: string, signal?: AbortSignal): Promise<number | null> {
+async function firstTransactionTime(chain: Chain, address: string): Promise<number | null> {
   try {
     const url = `${chain.explorer}/api?module=account&action=txlist&address=${address}&sort=asc&page=1&offset=1`
-    const data = await getJson<LegacyFirst>(url, signal, 0)
+    const data = await getJson<LegacyFirst>(url, undefined, 0, FIRST_TX_TIMEOUT_MS)
     const first = Array.isArray(data.result) ? data.result[0] : undefined
     return first ? Number(first.timeStamp) || null : null
   } catch {
@@ -138,11 +164,53 @@ async function firstTransactionTime(chain: Chain, address: string, signal?: Abor
   }
 }
 
+const toTxs = (rows: RawTx[]): Tx[] =>
+  mined(rows).map((r) => ({
+    hash: r.hash,
+    timestamp: unix(r.timestamp),
+    from: r.from?.hash ?? '',
+    to: r.to?.hash ?? '',
+    value: r.value ?? '0',
+    gasUsed: r.gas_used ?? '0',
+    gasPrice: r.gas_price ?? '0',
+    fee: r.fee?.value ?? null,
+    isError: r.status === 'error' || (!!r.result && r.result !== 'success' && r.result !== 'pending'),
+  }))
+
+const toInternals = (rows: RawInternal[]): InternalTx[] =>
+  mined(rows)
+    .filter((r) => r.success !== false)
+    .map((r) => ({
+      hash: r.transaction_hash,
+      timestamp: unix(r.timestamp),
+      from: r.from?.hash ?? '',
+      to: r.to?.hash ?? '',
+      value: r.value ?? '0',
+    }))
+
+const toTokenTxs = (rows: RawToken[]): TokenTx[] =>
+  mined(rows).map((r) => ({
+    hash: r.transaction_hash,
+    timestamp: unix(r.timestamp),
+    from: r.from?.hash ?? '',
+    to: r.to?.hash ?? '',
+    value: r.total?.value ?? '0',
+    decimals: Number(r.total?.decimals ?? r.token?.decimals) || 0,
+    symbol: r.token?.symbol ?? '',
+    contract: r.token?.address_hash ?? '',
+  }))
+
+/**
+ * Read one chain. `progress` receives short status lines; `partial`, when given, receives the
+ * history read so far every couple of seconds so a long read can be shown while it runs.
+ * Stopping the read through `signal` keeps the rows read so far and marks the coverage as cut.
+ */
 export async function readChain(
   chain: Chain,
   address: string,
   progress: Progress,
   signal?: AbortSignal,
+  partial?: Partial,
 ): Promise<ChainHistory> {
   const empty: Coverage = {
     txTotal: null,
@@ -152,95 +220,87 @@ export async function readChain(
     internalFetched: 0,
     internalsUnavailable: false,
     truncated: false,
+    cutBy: null,
   }
   try {
     progress(chain.name, 'Connecting')
     const [counters, stats] = await Promise.all([
-      getJson<Counters>(`${chain.explorer}/api/v2/addresses/${address}/counters`, signal, 1).catch(() => ({}) as Counters),
+      getJson<Counters>(`${chain.explorer}/api/v2/addresses/${address}/counters`, signal, 2).catch(() => ({}) as Counters),
       getJson<Stats>(`${chain.explorer}/api/v2/stats`, signal, 1).catch(() => ({}) as Stats),
     ])
-    // The three lists page in parallel; their combined page caps stay inside the v2 request budget.
-    const counts = { tx: 0, tok: 0 }
-    const report = () =>
-      progress(chain.name, `${counts.tx.toLocaleString()} transactions, ${counts.tok.toLocaleString()} token transfers read`)
-    const deadline = Date.now() + CHAIN_BUDGET_MS
+    const txTotal = num(counters.transactions_count)
+    const tokenTotal = num(counters.token_transfers_count)
+    const coinPriceUsd = num(stats.coin_price)
+
+    // The three lists page in parallel. Each keeps its rows in one array so a partial
+    // snapshot can be built from all three at any moment.
+    const current = { tx: [] as RawTx[], tok: [] as RawToken[], int: [] as RawInternal[] }
+    let lastPartial = 0
+    const snapshot = (cut: Coverage['cutBy'], internalsUnavailable: boolean): ChainHistory => {
+      const txs = toTxs(current.tx)
+      const tokenTxs = toTokenTxs(current.tok)
+      const internals = toInternals(current.int)
+      return {
+        chainId: chain.id,
+        txs,
+        internals,
+        tokenTxs,
+        coverage: {
+          txTotal,
+          tokenTotal,
+          txFetched: txs.length,
+          tokenFetched: tokenTxs.length,
+          internalFetched: internals.length,
+          internalsUnavailable,
+          truncated: cut !== null,
+          cutBy: cut,
+        },
+        firstSeenHint: null,
+        coinPriceUsd,
+        error: null,
+      }
+    }
+    const report = () => {
+      const txt = `${current.tx.length.toLocaleString()}${txTotal && txTotal > current.tx.length ? ` of ${txTotal.toLocaleString()}` : ''} transactions`
+      const tok = `${current.tok.length.toLocaleString()}${tokenTotal && tokenTotal > current.tok.length ? ` of ${tokenTotal.toLocaleString()}` : ''} token transfers`
+      progress(chain.name, `${txt}, ${tok} read`)
+      const now = Date.now()
+      if (partial && now - lastPartial >= PARTIAL_INTERVAL_MS) {
+        lastPartial = now
+        partial(snapshot('stopped', false))
+      }
+    }
     const [txRes, tokRes, intRes] = await Promise.all([
-      pageAll<RawTx>(chain, address, 'transactions', signal, deadline, (n) => {
-        counts.tx = n
+      pageAll<RawTx>(chain, address, 'transactions', signal, (rows) => {
+        current.tx = rows
         report()
       }),
-      pageAll<RawToken>(chain, address, 'token-transfers', signal, deadline, (n) => {
-        counts.tok = n
+      pageAll<RawToken>(chain, address, 'token-transfers', signal, (rows) => {
+        current.tok = rows
         report()
       }),
       // Internal transfers are slow to index for busy wallets; the read goes on without them.
-      pageAll<RawInternal>(chain, address, 'internal-transactions', signal, deadline, () => undefined).catch(
-        (e: unknown) => {
-          if (signal?.aborted) throw e
-          return null
-        },
-      ),
+      pageAll<RawInternal>(chain, address, 'internal-transactions', signal, (rows) => {
+        current.int = rows
+      }).catch((e: unknown) => {
+        if (signal?.aborted || isAbort(e)) return { rows: [], truncated: true, cutBy: 'stopped' } as ListResult<RawInternal>
+        return null
+      }),
     ])
 
-    const txs: Tx[] = txRes.rows.map((r) => ({
-      hash: r.hash,
-      timestamp: unix(r.timestamp),
-      from: r.from?.hash ?? '',
-      to: r.to?.hash ?? '',
-      value: r.value ?? '0',
-      gasUsed: r.gas_used ?? '0',
-      gasPrice: r.gas_price ?? '0',
-      fee: r.fee?.value ?? null,
-      isError: r.status === 'error' || (!!r.result && r.result !== 'success' && r.result !== 'pending'),
-    }))
-    const internals: InternalTx[] = (intRes?.rows ?? [])
-      .filter((r) => r.success !== false)
-      .map((r) => ({
-        hash: r.transaction_hash,
-        timestamp: unix(r.timestamp),
-        from: r.from?.hash ?? '',
-        to: r.to?.hash ?? '',
-        value: r.value ?? '0',
-      }))
-    const tokenTxs: TokenTx[] = tokRes.rows.map((r) => ({
-      hash: r.transaction_hash,
-      timestamp: unix(r.timestamp),
-      from: r.from?.hash ?? '',
-      to: r.to?.hash ?? '',
-      value: r.total?.value ?? '0',
-      decimals: Number(r.total?.decimals ?? r.token?.decimals) || 0,
-      symbol: r.token?.symbol ?? '',
-      contract: r.token?.address_hash ?? '',
-    }))
+    const cuts = [txRes.cutBy, tokRes.cutBy, intRes?.cutBy ?? null]
+    const cutBy: Coverage['cutBy'] = cuts.includes('stopped') ? 'stopped' : cuts.includes('explorer') ? 'explorer' : null
+    const history = snapshot(cutBy, intRes === null)
 
-    const truncated = txRes.truncated || tokRes.truncated || (intRes?.truncated ?? false)
-    let firstSeenHint: number | null = null
-    if (truncated) {
+    if (cutBy !== null && history.txs.length > 0) {
       progress(chain.name, 'Looking up the first transaction')
-      firstSeenHint = await firstTransactionTime(chain, address, signal)
+      history.firstSeenHint = await firstTransactionTime(chain, address)
     }
 
-    progress(chain.name, 'Done')
-    return {
-      chainId: chain.id,
-      txs,
-      internals,
-      tokenTxs,
-      coverage: {
-        txTotal: num(counters.transactions_count),
-        tokenTotal: num(counters.token_transfers_count),
-        txFetched: txs.length,
-        tokenFetched: tokenTxs.length,
-        internalFetched: internals.length,
-        internalsUnavailable: intRes === null,
-        truncated,
-      },
-      firstSeenHint,
-      coinPriceUsd: num(stats.coin_price),
-      error: null,
-    }
+    progress(chain.name, cutBy === 'stopped' ? 'Stopped' : 'Done')
+    return history
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err)
+    const message = isAbort(err) ? 'the read was stopped before it connected' : err instanceof Error ? err.message : String(err)
     progress(chain.name, `Unavailable (${message})`)
     return {
       chainId: chain.id,

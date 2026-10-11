@@ -44,8 +44,10 @@ export interface Coverage {
   internalFetched: number
   /** True when the explorer could not return internal transfers; sells paid out through contracts are then missed. */
   internalsUnavailable?: boolean
-  /** True when any list hit its page cap before the explorer ran out of rows. */
+  /** True when any list ended before the explorer ran out of rows. */
   truncated: boolean
+  /** Why the read ended early: the visitor stopped it, or the explorer failed part way. */
+  cutBy?: 'stopped' | 'explorer' | null
 }
 
 export interface ChainHistory {
@@ -78,7 +80,10 @@ export interface Metrics {
   buyEth: number
   sellEth: number
   pnlEth: number
+  /** Distinct transaction hashes seen in any list (transactions, internal and token transfers). */
   txCount: number
+  /** Transactions the wallet signed, which are the ones it paid gas for. */
+  signedCount: number
   tradeCount: number
   series: SeriesPoint[]
 }
@@ -108,6 +113,8 @@ interface TxEvent {
   ethOut: number
   ethIn: number
   gas: number
+  /** The wallet sent this transaction. */
+  signed: boolean
   tokensIn: boolean
   tokensOut: boolean
 }
@@ -128,7 +135,7 @@ export function buildEvents(wallet: string, history: Pick<ChainHistory, 'txs' | 
   const get = (hash: string, t: number): TxEvent => {
     let e = events.get(hash)
     if (!e) {
-      e = { hash, t, ethOut: 0, ethIn: 0, gas: 0, tokensIn: false, tokensOut: false }
+      e = { hash, t, ethOut: 0, ethIn: 0, gas: 0, signed: false, tokensIn: false, tokensOut: false }
       events.set(hash, e)
     }
     if (t && (!e.t || t < e.t)) e.t = t
@@ -138,6 +145,7 @@ export function buildEvents(wallet: string, history: Pick<ChainHistory, 'txs' | 
     const e = get(tx.hash, tx.timestamp)
     const fromWallet = same(tx.from, wallet)
     if (fromWallet) {
+      e.signed = true
       e.gas += tx.fee ? weiToEth(tx.fee) : weiToEth(tx.gasUsed) * weiToEth(tx.gasPrice) * WEI
       if (!tx.isError) e.ethOut += weiToEth(tx.value)
     }
@@ -168,6 +176,7 @@ export function computeMetrics(wallet: string, histories: ChainHistory[]): Metri
   let buy = 0
   let sell = 0
   let trades = 0
+  let signed = 0
   const series: SeriesPoint[] = []
   let firstSeen: number | null = null
   for (const h of histories) {
@@ -177,6 +186,7 @@ export function computeMetrics(wallet: string, histories: ChainHistory[]): Metri
   for (const e of events) {
     if (e.t && (firstSeen === null || e.t < firstSeen)) firstSeen = e.t
     gas += e.gas
+    if (e.signed) signed++
     if (e.tokensIn && e.ethOut > 0) {
       buy += e.ethOut
       trades++
@@ -185,6 +195,8 @@ export function computeMetrics(wallet: string, histories: ChainHistory[]): Metri
       sell += e.ethIn
       trades++
     }
+    // An event with no time (a pending row that slipped through) counts in the totals but has no place on the timeline.
+    if (!e.t) continue
     const bucket = Math.floor(e.t / DAY) * DAY
     const point: SeriesPoint = { t: bucket, gas, buy, sell, pnl: sell - buy - gas }
     const last = series[series.length - 1]
@@ -199,6 +211,7 @@ export function computeMetrics(wallet: string, histories: ChainHistory[]): Metri
     sellEth: sell,
     pnlEth: sell - buy - gas,
     txCount: events.length,
+    signedCount: signed,
     tradeCount: trades,
     series,
   }

@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "node --test test/scratch/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "contrast": "node test/contrast.mjs",
+    "verify": "node test/verify.mjs",
+    "og": "node test/make-og.mjs"
   },
   "dependencies": {
     "react": "^19.1.0",
@@ -18,6 +21,7 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.5.0",
+    "playwright": "^1.64.0",
     "typescript": "^5.8.0",
     "vite": "^6.3.0"
   }

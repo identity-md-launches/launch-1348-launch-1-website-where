@@ -405,7 +405,7 @@ a {
 .coverage {
   list-style: none;
   padding: var(--space-3) var(--space-4);
-  margin-block-end: var(--space-6);
+  margin-block-start: var(--space-6);
   display: grid;
   gap: var(--space-1);
   font-size: var(--text-sm);
@@ -507,6 +507,7 @@ a {
   text-wrap: pretty;
 }
 
+/* The SVG's viewBox matches the measured card width, so it is drawn at 1 unit = 1 px and never scaled. */
 .chart-svg {
   display: block;
   width: 100%;

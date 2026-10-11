@@ -47,11 +47,22 @@ export function AddressForm({ busy, onSubmit, onCancel }: Props) {
           aria-describedby={error ? `${id}-error` : `${id}-hint`}
         />
         {busy ? (
-          <button type="button" className="button button-secondary" onClick={onCancel}>
+          // Distinct keys so React mounts a fresh node for each button. With a shared node the
+          // click handler flipped it to type="submit" before the browser's activation step ran,
+          // which submitted the form and restarted the read. preventDefault guards the same path.
+          <button
+            key="stop"
+            type="button"
+            className="button button-secondary"
+            onClick={(e) => {
+              e.preventDefault()
+              onCancel()
+            }}
+          >
             Stop reading
           </button>
         ) : (
-          <button type="submit" className="button button-primary">
+          <button key="read" type="submit" className="button button-primary">
             Read history
           </button>
         )}
