@@ -1,0 +1,5 @@
+node_modules/
+.vite/
+*.log
+.playwright-mcp/
+test/scratch/out/
