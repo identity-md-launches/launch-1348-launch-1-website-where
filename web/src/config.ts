@@ -7,7 +7,7 @@ import { chain, RPC_URLS } from "./chain";
 
 export const SITE_NAME = "SwarmSweep";
 export const SITE_DESCRIPTION =
-  "Find verified swarm tokens in your Ethereum wallet. Sell supported holdings for IMD; 2% of successful proceeds go to the treasury.";
+  "Find live Uniswap v4 routes for your Ethereum swarm tokens. Select tokens and sell for IMD without registration; 2% of proceeds go to the treasury.";
 export const SITE_URL = "./";
 export const SITE_ICON_URL = "./favicon.svg";
 

@@ -1,0 +1,443 @@
+{
+  "checks": [
+    {
+      "passed": true,
+      "message": "320: primary action on first screen"
+    },
+    {
+      "passed": true,
+      "message": "320: all positive holdings visible"
+    },
+    {
+      "passed": true,
+      "message": "320: selection controls remain visible"
+    },
+    {
+      "passed": true,
+      "message": "320: unavailable route disabled with reason"
+    },
+    {
+      "passed": true,
+      "message": "320: failed quote disabled"
+    },
+    {
+      "passed": true,
+      "message": "320: no automatic sell selection"
+    },
+    {
+      "passed": true,
+      "message": "320: select all only includes quoted tokens"
+    },
+    {
+      "passed": true,
+      "message": "320: clear selection"
+    },
+    {
+      "passed": true,
+      "message": "320: only chosen token reaches review"
+    },
+    {
+      "passed": true,
+      "message": "320: selected BETA is reviewed"
+    },
+    {
+      "passed": true,
+      "message": "320: unselected ALPHA excluded"
+    },
+    {
+      "passed": true,
+      "message": "320: approval destination explained"
+    },
+    {
+      "passed": true,
+      "message": "320: fee explained"
+    },
+    {
+      "passed": true,
+      "message": "320: Escape closes review"
+    },
+    {
+      "passed": true,
+      "message": "320: focus restored"
+    },
+    {
+      "passed": true,
+      "message": "320: keyboard selects one token"
+    },
+    {
+      "passed": true,
+      "message": "320: confirmed transfer outcome shown"
+    },
+    {
+      "passed": true,
+      "message": "320: exactly one selected sale sent to router"
+    },
+    {
+      "passed": true,
+      "message": "320: no legacy registration or sale request"
+    },
+    {
+      "passed": true,
+      "message": "320: no page overflow"
+    },
+    {
+      "passed": true,
+      "message": "320: no script or resource errors"
+    },
+    {
+      "passed": true,
+      "message": "390: primary action on first screen"
+    },
+    {
+      "passed": true,
+      "message": "390: all positive holdings visible"
+    },
+    {
+      "passed": true,
+      "message": "390: selection controls remain visible"
+    },
+    {
+      "passed": true,
+      "message": "390: unavailable route disabled with reason"
+    },
+    {
+      "passed": true,
+      "message": "390: failed quote disabled"
+    },
+    {
+      "passed": true,
+      "message": "390: no automatic sell selection"
+    },
+    {
+      "passed": true,
+      "message": "rendered color tokens meet 4.5:1 for all six text/surface pairs"
+    },
+    {
+      "passed": true,
+      "message": "390: select all only includes quoted tokens"
+    },
+    {
+      "passed": true,
+      "message": "390: clear selection"
+    },
+    {
+      "passed": true,
+      "message": "390: only chosen token reaches review"
+    },
+    {
+      "passed": true,
+      "message": "390: selected BETA is reviewed"
+    },
+    {
+      "passed": true,
+      "message": "390: unselected ALPHA excluded"
+    },
+    {
+      "passed": true,
+      "message": "390: approval destination explained"
+    },
+    {
+      "passed": true,
+      "message": "390: fee explained"
+    },
+    {
+      "passed": true,
+      "message": "390: Escape closes review"
+    },
+    {
+      "passed": true,
+      "message": "390: focus restored"
+    },
+    {
+      "passed": true,
+      "message": "390: keyboard selects one token"
+    },
+    {
+      "passed": true,
+      "message": "390: confirmed transfer outcome shown"
+    },
+    {
+      "passed": true,
+      "message": "390: exactly one selected sale sent to router"
+    },
+    {
+      "passed": true,
+      "message": "390: no legacy registration or sale request"
+    },
+    {
+      "passed": true,
+      "message": "390: no page overflow"
+    },
+    {
+      "passed": true,
+      "message": "390: no script or resource errors"
+    },
+    {
+      "passed": true,
+      "message": "768: primary action on first screen"
+    },
+    {
+      "passed": true,
+      "message": "768: all positive holdings visible"
+    },
+    {
+      "passed": true,
+      "message": "768: selection controls remain visible"
+    },
+    {
+      "passed": true,
+      "message": "768: unavailable route disabled with reason"
+    },
+    {
+      "passed": true,
+      "message": "768: failed quote disabled"
+    },
+    {
+      "passed": true,
+      "message": "768: no automatic sell selection"
+    },
+    {
+      "passed": true,
+      "message": "768: selection label does not overlap token"
+    },
+    {
+      "passed": true,
+      "message": "768: select all only includes quoted tokens"
+    },
+    {
+      "passed": true,
+      "message": "768: clear selection"
+    },
+    {
+      "passed": true,
+      "message": "768: only chosen token reaches review"
+    },
+    {
+      "passed": true,
+      "message": "768: selected BETA is reviewed"
+    },
+    {
+      "passed": true,
+      "message": "768: unselected ALPHA excluded"
+    },
+    {
+      "passed": true,
+      "message": "768: approval destination explained"
+    },
+    {
+      "passed": true,
+      "message": "768: fee explained"
+    },
+    {
+      "passed": true,
+      "message": "768: Escape closes review"
+    },
+    {
+      "passed": true,
+      "message": "768: focus restored"
+    },
+    {
+      "passed": true,
+      "message": "768: keyboard selects one token"
+    },
+    {
+      "passed": true,
+      "message": "768: confirmed transfer outcome shown"
+    },
+    {
+      "passed": true,
+      "message": "768: exactly one selected sale sent to router"
+    },
+    {
+      "passed": true,
+      "message": "768: no legacy registration or sale request"
+    },
+    {
+      "passed": true,
+      "message": "768: no page overflow"
+    },
+    {
+      "passed": true,
+      "message": "768: no script or resource errors"
+    },
+    {
+      "passed": true,
+      "message": "1440: primary action on first screen"
+    },
+    {
+      "passed": true,
+      "message": "1440: all positive holdings visible"
+    },
+    {
+      "passed": true,
+      "message": "1440: selection controls remain visible"
+    },
+    {
+      "passed": true,
+      "message": "1440: unavailable route disabled with reason"
+    },
+    {
+      "passed": true,
+      "message": "1440: failed quote disabled"
+    },
+    {
+      "passed": true,
+      "message": "1440: no automatic sell selection"
+    },
+    {
+      "passed": true,
+      "message": "1440: selection label does not overlap token"
+    },
+    {
+      "passed": true,
+      "message": "1440: select all only includes quoted tokens"
+    },
+    {
+      "passed": true,
+      "message": "1440: clear selection"
+    },
+    {
+      "passed": true,
+      "message": "1440: only chosen token reaches review"
+    },
+    {
+      "passed": true,
+      "message": "1440: selected BETA is reviewed"
+    },
+    {
+      "passed": true,
+      "message": "1440: unselected ALPHA excluded"
+    },
+    {
+      "passed": true,
+      "message": "1440: approval destination explained"
+    },
+    {
+      "passed": true,
+      "message": "1440: fee explained"
+    },
+    {
+      "passed": true,
+      "message": "1440: Escape closes review"
+    },
+    {
+      "passed": true,
+      "message": "1440: focus restored"
+    },
+    {
+      "passed": true,
+      "message": "1440: keyboard selects one token"
+    },
+    {
+      "passed": true,
+      "message": "1440: confirmed transfer outcome shown"
+    },
+    {
+      "passed": true,
+      "message": "1440: exactly one selected sale sent to router"
+    },
+    {
+      "passed": true,
+      "message": "1440: no legacy registration or sale request"
+    },
+    {
+      "passed": true,
+      "message": "1440: no page overflow"
+    },
+    {
+      "passed": true,
+      "message": "1440: no script or resource errors"
+    },
+    {
+      "passed": true,
+      "message": "empty wallet has distinct message"
+    },
+    {
+      "passed": true,
+      "message": "RPC failure never claims empty wallet"
+    },
+    {
+      "passed": true,
+      "message": "quote failure preserves holdings"
+    },
+    {
+      "passed": true,
+      "message": "quote failure blocks sale"
+    },
+    {
+      "passed": true,
+      "message": "Refresh recovers live route"
+    },
+    {
+      "passed": true,
+      "message": "320: long symbol and 39-digit amount fit"
+    },
+    {
+      "passed": true,
+      "message": "320: long quote and minimum fit review"
+    },
+    {
+      "passed": true,
+      "message": "320: wrong chain clears selection and blocks sale"
+    },
+    {
+      "passed": true,
+      "message": "390: long symbol and 39-digit amount fit"
+    },
+    {
+      "passed": true,
+      "message": "390: long quote and minimum fit review"
+    },
+    {
+      "passed": true,
+      "message": "390: wrong chain clears selection and blocks sale"
+    },
+    {
+      "passed": true,
+      "message": "1440: long symbol and 39-digit amount fit"
+    },
+    {
+      "passed": true,
+      "message": "1440: long quote and minimum fit review"
+    },
+    {
+      "passed": true,
+      "message": "1440: wrong chain clears selection and blocks sale"
+    }
+  ],
+  "failures": [],
+  "measurements": {
+    "contrast": [
+      {
+        "foreground": "--color-text",
+        "background": "--color-bg",
+        "ratio": 17.71667226761056
+      },
+      {
+        "foreground": "--color-text-secondary",
+        "background": "--color-bg-surface",
+        "ratio": 5.972712626889563
+      },
+      {
+        "foreground": "--color-on-accent",
+        "background": "--color-accent",
+        "ratio": 8.523948537844058
+      },
+      {
+        "foreground": "--color-accent",
+        "background": "--color-accent-soft",
+        "ratio": 7.1696935377196285
+      },
+      {
+        "foreground": "--color-ok",
+        "background": "--color-ok-soft",
+        "ratio": 7.430359076050511
+      },
+      {
+        "foreground": "--color-bad",
+        "background": "--color-bad-soft",
+        "ratio": 6.661408926846873
+      }
+    ]
+  }
+}

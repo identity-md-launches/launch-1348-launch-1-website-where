@@ -12,6 +12,8 @@ type Props = {
   pricing: Pricing | null;
   selected: Set<string>;
   onToggle: (address: string) => void;
+  onSelectAll: () => void;
+  onClear: () => void;
   onClaim: (token: SwarmToken) => void;
   claiming: string | null;
   busy: boolean;
@@ -63,15 +65,38 @@ function StatusCell({ t }: { t: SwarmToken }) {
     );
   if (t.sellable)
     return (
-      <span className="pill pill-route">{t.routeLabel ?? "Route found"}</span>
+      <>
+        <span className="pill pill-route">{t.routeLabel ?? "Route found"}</span>
+        {t.liveRoute && t.liveRoute.amountIn < t.balance && (
+          <span className="note partial-route">
+            Partial balance: sell {fmtAmount(t.liveRoute.amountIn, t.decimals)}{" "}
+            {t.symbol}. The rest stays in your wallet.
+          </span>
+        )}
+        {t.liveRoute && (
+          <details className="route-details">
+            <summary>Pool details</summary>
+            <span className="note">
+              Quoted at block {t.liveRoute.blockNumber.toString()}. Refreshed
+              before review.
+            </span>
+            {t.liveRoute.pools.map((p) => (
+              <span className="note mono" key={p.id}>
+                {p.id}
+              </span>
+            ))}
+          </details>
+        )}
+      </>
     );
   return (
     <>
       <span className="pill pill-muted">No sell route found</span>
       <span className="note">
-        {t.routeLabel
-          ? `${t.routeLabel}: ${STATUS_TEXT[t.status] ?? "not sellable"}`
-          : (STATUS_TEXT[t.status] ?? "Not sellable")}
+        {t.routeReason ??
+          (t.routeLabel
+            ? `${t.routeLabel}: ${STATUS_TEXT[t.status] ?? "not sellable"}`
+            : (STATUS_TEXT[t.status] ?? "Not sellable"))}
       </span>
     </>
   );
@@ -82,6 +107,8 @@ export function TokenList({
   pricing,
   selected,
   onToggle,
+  onSelectAll,
+  onClear,
   onClaim,
   claiming,
   busy,
@@ -92,9 +119,36 @@ export function TokenList({
 }: Props) {
   return (
     <div className="list" role="region" aria-labelledby="tokens-heading">
-      <h2 id="tokens-heading" className="h3">
+      <h2 id="tokens-heading" className="h3" tabIndex={-1}>
         Swarm tokens in this wallet
       </h2>
+      {tokens.length > 0 && (
+        <div className="selection-tools">
+          <p className="hint">
+            Select tokens using the checkboxes. Partial routes sell only the
+            quoted amount.
+          </p>
+          <div className="selection-actions">
+            <button
+              className="btn btn-small"
+              disabled={busy || !tokens.some((t) => t.sellable && !t.result)}
+              onClick={onSelectAll}
+            >
+              Select all routes
+            </button>
+            <button
+              className="btn btn-small"
+              disabled={busy || selected.size === 0}
+              onClick={onClear}
+            >
+              Clear selection
+            </button>
+            <span role="status" className="hint">
+              {selected.size} selected
+            </span>
+          </div>
+        </div>
+      )}
       <table className="tokens">
         <thead>
           <tr>
@@ -103,8 +157,8 @@ export function TokenList({
             </th>
             <th>Token</th>
             <th className="num">Balance</th>
-            <th className="num">Value</th>
-            <th>Status</th>
+            <th className="num">IMD quote</th>
+            <th>Live sell route</th>
           </tr>
         </thead>
         <tbody>
@@ -148,15 +202,18 @@ export function TokenList({
                 data-result={t.result?.kind ?? ""}
               >
                 <td className="col-pick">
-                  {t.sellable && t.result === undefined && (
-                    <input
-                      id={id}
-                      type="checkbox"
-                      checked={selected.has(t.address.toLowerCase())}
-                      onChange={() => onToggle(t.address)}
-                      disabled={!pickable}
-                      aria-label={`Select ${t.symbol}`}
-                    />
+                  {t.result === undefined && (
+                    <label className="pick-label">
+                      <input
+                        id={id}
+                        type="checkbox"
+                        checked={selected.has(t.address.toLowerCase())}
+                        onChange={() => onToggle(t.address)}
+                        disabled={!pickable}
+                        aria-label={`Select ${t.symbol}`}
+                      />
+                      <span>Select</span>
+                    </label>
                   )}
                 </td>
                 <td data-label="Token">
@@ -205,22 +262,26 @@ export function TokenList({
                     </span>
                   )}
                 </td>
-                <td className="num" data-label="Value">
+                <td className="num" data-label="IMD quote">
                   {t.sellable ? (
                     <>
                       <span className="value-usd">
-                        {pricing ? fmtUsd(usd) : "USD n/a"}
+                        {fmtAmount(t.expectedImd)} {IMD_SYMBOL}
                       </span>
                       <span className="note">
-                        {fmtAmount(t.expectedImd)} {IMD_SYMBOL}
+                        Before 2% fee{pricing ? ` · ${fmtUsd(usd)}` : ""}
                       </span>
                     </>
                   ) : (
-                    <span className="note">USD unavailable</span>
+                    <span className="note">No quote</span>
                   )}
                 </td>
-                <td data-label="Status" className="status">
-                  <StatusCell t={t} />
+                <td data-label="Live sell route" className="status">
+                  {loading && !t.liveRoute && !t.routeReason ? (
+                    <span className="note">Checking pools…</span>
+                  ) : (
+                    <StatusCell t={t} />
+                  )}
                   {t.result?.txHash && t.result.kind !== "pending" && (
                     <a
                       className="note"

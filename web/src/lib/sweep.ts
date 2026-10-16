@@ -13,7 +13,6 @@ import { erc20Abi } from "../abi/erc20.ts";
 import {
   BPS,
   DEADLINE_SECONDS,
-  DEFAULT_MAX_TOKENS_PER_SALE,
   FEE_BPS,
   IMD_ADDRESS,
   IMD_DECIMALS,
@@ -28,11 +27,19 @@ import {
   type LaunchToken,
 } from "./discovery.ts";
 import { short } from "./format.ts";
+import {
+  findRoute,
+  loadPools,
+  routeLabel,
+  type LiveRoute,
+  type PoolSnapshot,
+} from "./routes.ts";
+import { planDirectSale, executeDirectSale } from "./directSale.ts";
 
 /** SwarmExit.Status, in declaration order. */
 export const STATUS_TEXT = [
   "Sellable",
-  "Not registered with SwarmExit for selling",
+  "No connected pool path found",
   "No balance",
   "No sale route configured",
   "IMD route not configured",
@@ -48,6 +55,8 @@ export type SellRoute = { venue: number; tokenOut: Address };
 
 export type SwarmToken = {
   address: Address;
+  liveRoute?: LiveRoute;
+  routeReason?: string;
   symbol: string;
   decimals: number | null;
   readError?: string;
@@ -68,7 +77,12 @@ export type SwarmToken = {
 export type SaleResult =
   | { kind: "sold"; imdOut: bigint; txHash: Hash }
   | { kind: "unsold"; reason: string; txHash?: Hash; held?: boolean }
-  | { kind: "pending"; reason: string; txHash: Hash };
+  | {
+      kind: "pending";
+      phase?: "approval" | "sale";
+      reason: string;
+      txHash: Hash;
+    };
 
 export type Pricing = { imdUsd: number; ethUsd: number };
 
@@ -156,7 +170,12 @@ async function loadPricing(
 export async function loadWallet(
   client: PublicClient,
   account: Address,
-  options: { snapshot?: Snapshot; progress?: (text: string) => void } = {},
+  options: {
+    snapshot?: Snapshot;
+    poolSnapshot?: PoolSnapshot;
+    progress?: (text: string) => void;
+    onHoldings?: (tokens: SwarmToken[]) => void;
+  } = {},
 ): Promise<WalletState> {
   const discovery = await discoverLaunches(
     client,
@@ -165,32 +184,14 @@ export async function loadWallet(
   );
   const { blockNumber } = discovery;
   const warnings = [...discovery.warnings];
-  let paused: boolean | null = null;
-  let maxPerSale = DEFAULT_MAX_TOKENS_PER_SALE;
-  let minImdOut = 0n;
-  let saleReady = false;
-  try {
-    const settings = await Promise.all([
-      client.readContract({ ...exit, functionName: "paused", blockNumber }),
-      client.readContract({
-        ...exit,
-        functionName: "MAX_TOKENS_PER_SALE",
-        blockNumber,
-      }),
-      client.readContract({ ...exit, functionName: "minImdOut", blockNumber }),
-    ]);
-    [paused, minImdOut] = [settings[0], settings[2]];
-    maxPerSale = Number(settings[1]);
-    if (!Number.isSafeInteger(maxPerSale) || maxPerSale < 1 || maxPerSale > 50)
-      throw new Error("Invalid sale batch limit");
-    saleReady = true;
-  } catch (e) {
-    warnings.push(`Sale settings unavailable; selling disabled: ${message(e)}`);
-  }
+  // Direct routes have no SwarmExit registry, owner pause, or configured minimum.
+  const paused = false;
+  const maxPerSale = 1;
+  const minImdOut = 1n;
   const priced = await loadPricing(client, account);
   const tokens: SwarmToken[] = [];
   let balancesRead = 0;
-  let registered = 0;
+  const registered = 0;
   let failedBalances = 0;
   // Keep requests below provider call/gas limits. A failed aggregate falls back to isolated calls.
   for (let offset = 0; offset < discovery.tokens.length; offset += 32) {
@@ -300,48 +301,6 @@ export async function loadWallet(
         } catch {
           /* The address remains the identity. */
         }
-        try {
-          const [{ result }, route] = await Promise.all([
-            client.simulateContract({
-              ...exit,
-              functionName: "preview",
-              args: [account, [launch.address]],
-              account,
-              blockNumber,
-            }),
-            client.readContract({
-              ...exit,
-              functionName: "tokenRoute",
-              args: [launch.address],
-              blockNumber,
-            }),
-          ]);
-          const p = result[0];
-          if (!p || !same(p.token, launch.address))
-            throw new Error("Invalid preview response");
-          token.status = Number(p.status);
-          if (!saleReady || paused)
-            token.readError ??= saleReady
-              ? "Selling is paused by the contract owner."
-              : "Sale settings are unavailable. Retry discovery.";
-          if (token.status !== 1) registered++;
-          token.route =
-            route.venue === 0
-              ? null
-              : { venue: route.venue, tokenOut: route.tokenOut };
-          token.routeLabel = describeRoute(token.route);
-          token.expectedImd = p.expectedImd;
-          token.sellable =
-            saleReady &&
-            !paused &&
-            decimals !== null &&
-            p.sellable &&
-            p.balance === balance &&
-            balance > 0n;
-        } catch (e) {
-          token.readError = `Sell route unavailable: ${message(e)}`;
-          warnings.push(`Sell preview unavailable for ${launch.address}.`);
-        }
         tokens.push(token);
       }),
     );
@@ -355,6 +314,48 @@ export async function loadWallet(
       "RPC failure: no token balances could be read. Your wallet has not been reported empty.",
     );
   tokens.sort((a, b) => a.address.localeCompare(b.address));
+  options.onHoldings?.([...tokens]);
+  options.progress?.("Finding live Uniswap v4 sell routes…");
+  const market = await loadPools(
+    client,
+    discovery.tokens,
+    blockNumber,
+    options.poolSnapshot,
+  );
+  warnings.push(...market.warnings);
+  let checked = 0;
+  for (let offset = 0; offset < tokens.length; offset += 4) {
+    await Promise.all(
+      tokens.slice(offset, offset + 4).map(async (token) => {
+        if (token.balance > 0n && token.decimals !== null) {
+          const result = await findRoute(
+            client,
+            account,
+            token.address,
+            token.balance,
+            market.pools,
+            blockNumber,
+          );
+          token.liveRoute = result.route ?? undefined;
+          token.routeReason = result.reason ?? undefined;
+          token.sellable = !!result.route;
+          token.expectedImd = result.route?.amountOut ?? 0n;
+          token.routeLabel = result.route ? routeLabel(result.route) : null;
+          token.status = result.route ? 0 : 5;
+          if (result.incomplete)
+            warnings.push(
+              `Route search incomplete for ${token.address}: ${result.reason}`,
+            );
+        }
+        checked++;
+        options.progress?.(
+          `Checking live routes ${checked} of ${tokens.length}…`,
+        );
+      }),
+    );
+    options.onHoldings?.(tokens.map((t) => ({ ...t })));
+  }
+
   return {
     tokens,
     pricing: priced.pricing,
@@ -387,7 +388,7 @@ const settles = (o: Outcome | undefined, floor: bigint) =>
  * so the simulated outputs are the real quote. A token whose sale would fail is left out; if the
  * whole call reverts, each token is simulated alone to find the culprits and the rest is rerun.
  */
-export async function planSale(
+export async function planLegacySale(
   client: PublicClient,
   account: Address,
   chosen: SwarmToken[],
@@ -493,12 +494,18 @@ export async function planSale(
 }
 
 export type Progress =
-  | { step: "approve"; token: SwarmToken; index: number; total: number }
+  | {
+      step: "approve";
+      token: SwarmToken;
+      index: number;
+      total: number;
+      approval?: "token" | "permit";
+    }
   | { step: "sign"; batch: number; batches: number; gasWei?: bigint }
   | { step: "mine"; hash: Hash; batch: number; batches: number };
 
 /** Approves what is missing, sends sellAll in batches, and reports what happened to each token. */
-export async function executeSale(
+export async function executeLegacySale(
   wallet: WalletClient,
   client: PublicClient,
   account: Address,
@@ -689,7 +696,9 @@ export async function executeSale(
       const k = token.address.toLowerCase();
       const held = tokenLogs.find((log) => log.eventName === "RefundHeld");
       const sold = tokenLogs.find((log) => log.eventName === "TokenSold");
-      const refunded = tokenLogs.find((log) => log.eventName === "TokenRefunded");
+      const refunded = tokenLogs.find(
+        (log) => log.eventName === "TokenRefunded",
+      );
       const skipped = tokenLogs.find((log) => log.eventName === "TokenSkipped");
       // _refund emits RefundHeld before TokenRefunded when the transfer fails.
       // Interpret the whole token outcome so event order cannot imply delivery.
@@ -701,7 +710,11 @@ export async function executeSale(
           held: true,
         });
       else if (sold)
-        results.set(k, { kind: "sold", imdOut: sold.args.imdOut, txHash: hash });
+        results.set(k, {
+          kind: "sold",
+          imdOut: sold.args.imdOut,
+          txHash: hash,
+        });
       else if (refunded)
         results.set(k, {
           kind: "unsold",
@@ -713,7 +726,8 @@ export async function executeSale(
         results.set(k, {
           kind: "unsold",
           reason:
-            STATUS_TEXT[Number(skipped.args.status)] ?? "Skipped by the contract.",
+            STATUS_TEXT[Number(skipped.args.status)] ??
+            "Skipped by the contract.",
           txHash: hash,
         });
     }
@@ -745,4 +759,25 @@ export async function claimRefund(
   const receipt = await client.waitForTransactionReceipt({ hash });
   if (receipt.status !== "success") throw new Error("Refund claim reverted.");
   return hash;
+}
+
+/** Public sale flow: permissionless pool routes, with no registry configuration. */
+export async function planSale(
+  client: PublicClient,
+  account: Address,
+  chosen: SwarmToken[],
+  _minImdOut = 1n,
+  _maxPerSale = 1,
+): Promise<Plan> {
+  return planDirectSale(client, account, chosen);
+}
+export async function executeSale(
+  wallet: WalletClient,
+  client: PublicClient,
+  account: Address,
+  plan: Plan,
+  _maxPerSale: number,
+  onProgress: (p: Progress) => void,
+) {
+  return executeDirectSale(wallet, client, account, plan, onProgress);
 }

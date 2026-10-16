@@ -3,19 +3,21 @@ import { createPortal } from "react-dom";
 import { EXPLORER_URL, IMD_SYMBOL, TREASURY_ADDRESS } from "../config";
 import { fmtAmount, fmtUsd, short } from "../lib/format";
 import { usdValue, type Plan, type Pricing, type Progress } from "../lib/sweep";
+import { minimumOut } from "../lib/directSale";
 
 type Props = {
   plan: Plan;
   pricing: Pricing | null;
   progress: Progress | null;
   error: string | null;
+  returnFocus?: HTMLElement | null;
   onConfirm: () => void;
   onClose: () => void;
 };
 
 function progressText(p: Progress): string {
   if (p.step === "approve")
-    return `Approve ${p.token.symbol} in your wallet (${p.index} of ${p.total})…`;
+    return `${p.approval === "permit" ? "Authorize the router for" : "Approve Permit2 to spend"} ${p.token.symbol} in your wallet (${p.index} of ${p.total})…`;
   if (p.step === "sign")
     return `Confirm sale ${p.batch} of ${p.batches} in your wallet.${p.gasWei ? ` Estimated gas: ${fmtAmount(p.gasWei)} ETH.` : ""}`;
   return p.batches > 1
@@ -28,6 +30,7 @@ export function ConfirmDialog({
   pricing,
   progress,
   error,
+  returnFocus,
   onConfirm,
   onClose,
 }: Props) {
@@ -40,7 +43,8 @@ export function ConfirmDialog({
   closeRef.current = onClose;
   runningRef.current = running;
   useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
+    const previous =
+      returnFocus ?? (document.activeElement as HTMLElement | null);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !runningRef.current) closeRef.current();
       if (e.key === "Tab") {
@@ -69,7 +73,11 @@ export function ConfirmDialog({
     return () => {
       removeEventListener("keydown", onKey);
       document.getElementById("page")?.removeAttribute("inert");
-      previous?.focus();
+      requestAnimationFrame(() => {
+        if (previous?.isConnected && !previous.matches(":disabled"))
+          previous.focus();
+        else document.getElementById("tokens-heading")?.focus();
+      });
     };
   }, []);
 
@@ -100,7 +108,7 @@ export function ConfirmDialog({
 
         <p className="plan-note">
           {plan.requiresApproval
-            ? "Quote before approval. After approval, we simulate again and send only if each token meets the minimum below."
+            ? "Live quote before approval. After approval, the complete sale is simulated before you sign."
             : "Simulated quote. Network conditions can change before the transaction settles."}
         </p>
         {n > 0 ? (
@@ -109,17 +117,31 @@ export function ConfirmDialog({
               <tr>
                 <th>Token</th>
                 <th className="num">Amount</th>
-                <th className="num">{IMD_SYMBOL}</th>
+                <th className="num">{IMD_SYMBOL} gross</th>
               </tr>
             </thead>
             <tbody>
               {plan.items.map(({ token, imdOut }) => (
                 <tr key={token.address}>
-                  <td>{token.symbol}</td>
-                  <td className="num">
-                    {fmtAmount(token.balance, token.decimals)}
+                  <td>
+                    {token.symbol}
+                    {token.liveRoute &&
+                      token.liveRoute.amountIn < token.balance && (
+                        <span className="note">Partial balance</span>
+                      )}
                   </td>
-                  <td className="num">{fmtAmount(imdOut)}</td>
+                  <td className="num">
+                    {fmtAmount(
+                      token.liveRoute?.amountIn ?? token.balance,
+                      token.decimals,
+                    )}
+                  </td>
+                  <td className="num">
+                    {fmtAmount(imdOut)}
+                    <span className="note">
+                      Minimum {fmtAmount(minimumOut(imdOut))}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -133,9 +155,7 @@ export function ConfirmDialog({
 
         {plan.excluded.length > 0 && (
           <div className="excluded">
-            <p className="plan-note">
-              Left out, because the dry run shows the sale would fail:
-            </p>
+            <p className="plan-note">Left out of this sale:</p>
             <ul>
               {plan.excluded.map(({ token, reason }) => (
                 <li key={token.address}>
@@ -191,10 +211,10 @@ export function ConfirmDialog({
           {plan.gasNote}
         </p>
         <p className="plan-note">
-          Your wallet asks you to approve each token once, then to confirm the
-          sale. You pay the gas. The minimum accepted is 3% under these amounts.
-          Failed sales incur no sale fee. Refused refunds remain claimable;
-          transfer taxes and network gas may still cost you.
+          Your wallet may ask for a token approval to Permit2 and a separate
+          router authorization, limited to this amount and 10 minutes. Then
+          confirm one sale per token. Minimum proceeds are 3% below each quote.
+          A reverted sale charges no sale fee; network gas is still paid.
         </p>
 
         <p className="status-line" role="status" aria-live="polite">

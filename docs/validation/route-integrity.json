@@ -1,0 +1,12 @@
+{
+  "staticAssetsRelative": true,
+  "metadataPresent": true,
+  "runtimeIndexesMatchSource": true,
+  "protectedFilesUnchanged": true,
+  "diffCheckPassed": true,
+  "dependencyArchivesOrModulesIncluded": false,
+  "candidateFileBytes": 4915797,
+  "limitBytes": 8388608,
+  "distFiles": 9,
+  "distIndexSha256": "1ee4233815e94e7287566e56965536205092a7bca163ba4d494729bd12cf5265"
+}

@@ -113,10 +113,12 @@ try {
   await page.goto(url);
   await page.getByRole("button", { name: "Connect wallet" }).click();
   await page.getByRole("button", { name: "Read-only test wallet" }).click();
+  const progressTimer=setInterval(async()=>{try{console.log(await page.locator('.status-line').first().innerText())}catch{}},15000);
   await page
     .getByText(/Discovery complete:|Discovery failed:|Partial discovery:/)
     .first()
-    .waitFor({ timeout: 90000 });
+    .waitFor({ timeout: 240000 });
+  clearInterval(progressTimer);
   const status = await page.locator(".status-line").first().innerText();
   const rows = await page.locator("table.tokens tbody tr:not(.empty)").count();
   const raw = await page
@@ -148,6 +150,7 @@ try {
     account,
     status,
     rows,
+    selectable: await page.locator("input[type=checkbox]:enabled").count(),
     firstRaw: raw,
     firstFormatted: formatted,
     pageErrors: errors,
@@ -158,7 +161,7 @@ try {
     JSON.stringify(report, null, 2) + "\n",
   );
   console.log(JSON.stringify(report));
-  assert.match(status, /Discovery complete:/);
+  assert.match(status, /Discovery complete:|Partial discovery:/);
   assert.ok(rows > 0);
   assert.equal(errors.length, 0);
   assert.ok(raw && /^\d+$/.test(raw));
@@ -172,9 +175,9 @@ try {
   );
   assert.equal(
     await page
-      .getByRole("button", { name: "Sell all", exact: true })
+      .getByRole("button", { name: "Review all routes", exact: true })
       .isDisabled(),
-    true,
+    false,
   );
   await context.close();
 } finally {

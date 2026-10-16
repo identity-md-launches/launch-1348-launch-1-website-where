@@ -1,0 +1,1479 @@
+{
+  "chainId": 1,
+  "account": "0x0ace1dbe8aab293cd58d5e3ea38814f0ccb74782",
+  "publicRpcSource": "https://ethereum-rpc.publicnode.com",
+  "blockNumber": "26203183",
+  "seconds": 75.409,
+  "held": 164,
+  "quoted": 40,
+  "registered": "0",
+  "warnings": [
+    "Some live quotes unavailable for 0x05931b5d7c0f5fbb2315a87ed48e3167483b1b67. Refresh to retry.",
+    "Some live quotes unavailable for 0x10104fdc10e6d562d9bb63379e085e1d61bde229. Refresh to retry.",
+    "Some live quotes unavailable for 0x1553a3d4ae3efa98fb9a0e261602bc4d4d580452. Refresh to retry.",
+    "Some live quotes unavailable for 0x1782f228c9e36f86252f2c2ea61c01f99dbfa2b5. Refresh to retry.",
+    "Some live quotes unavailable for 0x1c76f5aa4cab77f39d90789e91e88eaac509cc03. Refresh to retry.",
+    "Some live quotes unavailable for 0x4b3d4fa5e6c043cc56651da83bd857a2cc355b01. Refresh to retry.",
+    "Some live quotes unavailable for 0x4dc25f4a5beecfdd7ef3dde1c250cbcc29497753. Refresh to retry.",
+    "Some live quotes unavailable for 0x4f2bacee5f2e7ce3f48dfbd635d96e9a8fcbe478. Refresh to retry.",
+    "Some live quotes unavailable for 0x58d249d70f9c2508fbe50bf7bf749db0f248645c. Refresh to retry.",
+    "Some live quotes unavailable for 0x990ad3eccc7874f18464366e7caa893d915b5cdd. Refresh to retry.",
+    "Some live quotes unavailable for 0xa80b26cd940acc90db6aa2b7deb8a34221149e92. Refresh to retry.",
+    "Some live quotes unavailable for 0xad455ee2800b314588b5178df0dcbbc5dad7e1c7. Refresh to retry.",
+    "Some live quotes unavailable for 0xd2aef07b4a807062c1c9f01713def52172548eca. Refresh to retry.",
+    "Some live quotes unavailable for 0xda04288b2ddc365037799a3db8fa39bd6f672adf. Refresh to retry.",
+    "Some live quotes unavailable for 0xedbafd7dbae2abc3119276814e8b738496edba0c. Refresh to retry.",
+    "Some live quotes unavailable for 0xe7b5b05cfebb11d08033020acdeb89fe672b0855. Refresh to retry.",
+    "Some live quotes unavailable for 0xf72be203206125dbb4cff37fa5fd1a20b9df9a73. Refresh to retry.",
+    "Some live quotes unavailable for 0xfd1c234972768c23bb21d655966e0b122dd67a2c. Refresh to retry."
+  ],
+  "tokens": [
+    {
+      "address": "0x01b3b98599608a41d46a3c5c34ed736329b7c6b2",
+      "symbol": "GENESIS",
+      "balance": "90497737556561085972851",
+      "amountIn": "707013574660633484162",
+      "expectedImd": "1755707602754236",
+      "sellable": true,
+      "pools": [
+        "0x1edbbfadea899dc0768f2088c8614c66db9ae4c55fd86ab2fdee34ec41a6fbe6"
+      ]
+    },
+    {
+      "address": "0x047ceafe0e715b7af38b65dd7185c60d9420594c",
+      "symbol": "1MD",
+      "balance": "103896103896103896103897",
+      "amountIn": "103896103896103896103897",
+      "expectedImd": "992819222739760",
+      "sellable": true,
+      "pools": [
+        "0xf31597c2652bc7ffbf409926006f98922eb8e3bc241e2002c3ffae8025f8b7e0",
+        "0x57de437b8c7fc243a8dcd635cbae5eadf07fc28c5900a9bc0629ed9252b35f92"
+      ]
+    },
+    {
+      "address": "0x05931b5d7c0f5fbb2315a87ed48e3167483b1b67",
+      "symbol": "PACHU",
+      "balance": "111888111888111888111889",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x0692a2313f31852b041dd733d89126a714a6fcd1",
+      "symbol": "LOOT",
+      "balance": "79286422200198216055501",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x083e1581e8e8f646926259956e10dc6dd8836468",
+      "symbol": "SORN",
+      "balance": "78817733990147783251232",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x0baf064693b5d0ec4fd12374f74f452b44250d2f",
+      "symbol": "PMD",
+      "balance": "78662733529990167158309",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x0eee1f96f745845c24f62afd200875cfa4a411b8",
+      "symbol": "SIMDTEST",
+      "balance": "99255583126550868486353",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x0fd888a99f30b2d60d5cf7ad73540c02ada15d28",
+      "symbol": "RISK",
+      "balance": "92592592592592592592593",
+      "amountIn": "5787037037037037037037",
+      "expectedImd": "14227177267350238",
+      "sellable": true,
+      "pools": [
+        "0xd716520fdc50c34f27375c219037d48a978a80ad1b9d69ad1bae273c62fc3ef1"
+      ]
+    },
+    {
+      "address": "0x10104fdc10e6d562d9bb63379e085e1d61bde229",
+      "symbol": "SPEPE",
+      "balance": "98643649815043156596795",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x10c930d707e6d83708e69516c8d594be7cfb5654",
+      "symbol": "PEPES",
+      "balance": "125588697017268445839875",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x13118c8e8ff0e5a1d96b96239954718acb16e946",
+      "symbol": "WORKER",
+      "balance": "101522842639593908629442",
+      "amountIn": "24785850253807106598",
+      "expectedImd": "65749108114797",
+      "sellable": true,
+      "pools": [
+        "0x7cbb8029aafdb1686b7a61dd8ea54eff3fdbd0dc205562dd6d2ab980b5d0493b"
+      ]
+    },
+    {
+      "address": "0x1553a3d4ae3efa98fb9a0e261602bc4d4d580452",
+      "symbol": "HARVEST",
+      "balance": "98643649815043156596795",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x15881793f74ed4c7e41ce79b5ded4bb5a3f178c3",
+      "symbol": "IFO",
+      "balance": "79207920792079207920793",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x170c31f33c840a043f607563c25e8c1953b9107a",
+      "symbol": "TEYO",
+      "balance": "80889787664307381193125",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x1782f228c9e36f86252f2c2ea61c01f99dbfa2b5",
+      "symbol": "KITE",
+      "balance": "80563947633434038267876",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x180074fbbefae999cdaa29332144eb71098fdc64",
+      "symbol": "NUKE",
+      "balance": "89686098654708520179373",
+      "amountIn": "43792040358744394618",
+      "expectedImd": "108747488206413",
+      "sellable": true,
+      "pools": [
+        "0x1f747ea9aa4853b10b4e1adbc32dda14652ba7098d81acfe8069379b9db17f71"
+      ]
+    },
+    {
+      "address": "0x18150e743cf534346bc20df5e6f6ed06ea35a71c",
+      "symbol": "DOLAR",
+      "balance": "100882723833543505674654",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x19daa15bddcce57e75921d6ab72832cedd2054bc",
+      "symbol": "SIMDTEST",
+      "balance": "98522167487684729064040",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x1a8fbf1b3577d0b573f8540a3ae0450bf251a14c",
+      "symbol": "BITES",
+      "balance": "790513833992094861661",
+      "amountIn": "771986166007905138",
+      "expectedImd": "191054330984870",
+      "sellable": true,
+      "pools": [
+        "0x46d5199bc09715c419025cf2552ca3a84663b84789f3fdc7759015b56956cbd9"
+      ]
+    },
+    {
+      "address": "0x1b9c1f26f591ccccef7762edfefad39bf107da4c",
+      "symbol": "INFER",
+      "balance": "89285714285714285714286",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x1c76f5aa4cab77f39d90789e91e88eaac509cc03",
+      "symbol": "CADENCEIMD",
+      "balance": "88202866593164277839030",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x1ca173188918409e15034c8696ce052b15cc7005",
+      "symbol": "COINSTARK",
+      "balance": "79286422200198216055501",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x1fbd6a2acfc22b995dba27c0fd216ce4f7e6a60b",
+      "symbol": "LOOM",
+      "balance": "78048780487804878048781",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x2609adebbf7a4e49fcd3b8ca8de633e12c50bf9a",
+      "symbol": "VERDICT",
+      "balance": "87815587266739846322723",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x260b97dd95e22e738ac2f1aa52700183ca3923ff",
+      "symbol": "SWARMLER",
+      "balance": "77220077220077220077221",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x285778eb64709afb6bde3e6a46bec1286ee59b52",
+      "symbol": "POLYNEUM",
+      "balance": "76997112608277189605390",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x2d3f5de0282d0127facdb64ae1bf778981f4aa75",
+      "symbol": "SWARMPEPES",
+      "balance": "111888111888111888111889",
+      "amountIn": "54632867132867132867",
+      "expectedImd": "135668204249552",
+      "sellable": true,
+      "pools": [
+        "0x96d1430ffbb0d4463ecc5c26153841363196e6d9a5b442f3c666e5cb813d076b"
+      ]
+    },
+    {
+      "address": "0x2e06a88d87e67503105051c940163a625d5e1e19",
+      "symbol": "ZEUS",
+      "balance": "89786756453423120089787",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x2e708fd7ddb6f2c1a69372fc9c3d1f77c14f5632",
+      "symbol": "SPECTRA",
+      "balance": "89887640449438202247191",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x307225e352b98198076df3c7ca2bd8dae2aa0b23",
+      "symbol": "LOOM",
+      "balance": "78277886497064579256361",
+      "amountIn": "78277886497064579256361",
+      "expectedImd": "9031653161235807",
+      "sellable": true,
+      "pools": [
+        "0x39ea3b0807f24962b2f59c172d509b048fd62e40935fa8768f8114e871a6ed95",
+        "0x57de437b8c7fc243a8dcd635cbae5eadf07fc28c5900a9bc0629ed9252b35f92"
+      ]
+    },
+    {
+      "address": "0x30ef39086948a8508f9d184926ab3cc5cde7941b",
+      "symbol": "SIMDTEST",
+      "balance": "98643649815043156596795",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x3190c988b635c28f307687f93d699333fdc3190c",
+      "symbol": "IMDUSD",
+      "balance": "119940029985007496251874",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x31ca73d03093357df8ddaaa73dbe1970f4eead6c",
+      "symbol": "TDEMO",
+      "balance": "89786756453423120089787",
+      "amountIn": "87682379349046015712",
+      "expectedImd": "305185860655745",
+      "sellable": true,
+      "pools": [
+        "0x1e747d67b78b47a1c9d888eab27d12ef16555d2fd4a96e31afeae413de0854b4",
+        "0xb07d640fd9e2eb9dc81b953c8e4fd006bdfeaf276010fb5418eb763ca15abfb3"
+      ]
+    },
+    {
+      "address": "0x32949824bcad5af19c3748590a9ab4a2b6fce69a",
+      "symbol": "SIMDTEST",
+      "balance": "103761348897535667963684",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x380cfcb68f13e6be8b27f34d24690764ad84a3ac",
+      "symbol": "STARKNET",
+      "balance": "78201368523949169110460",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x384f51225544c64eed731b501a0962eff5acc5fe",
+      "symbol": "TEST",
+      "balance": "89086859688195991091314",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x3b34c6ff567ac521ce1a46cd7cc572a0d5c65f59",
+      "symbol": "PERK",
+      "balance": "77294685990338164251208",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x3b6d536d8adf4335a79d8605b3bcc17160ea56d6",
+      "symbol": "PEPE",
+      "balance": "126782884310618066561015",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x3e2e5f24433a4d176b0a1ab9c7fdbedbed440bd1",
+      "symbol": "SFP",
+      "balance": "89186176142697881828317",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x40ee61fdabe76d966a29ea406233ed80eb318410",
+      "symbol": "CETS",
+      "balance": "106666666666666666666667",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x41340effe45c2f919f5fb1c55cb0068ed12cd139",
+      "symbol": "VERDICT",
+      "balance": "88593576965669988925803",
+      "amountIn": "88593576965669988925803",
+      "expectedImd": "11202933489214062",
+      "sellable": true,
+      "pools": [
+        "0x342a125a653c210ee96cce278bc5615f2082cec9cab399dda8c135ebafb1b08c",
+        "0x57de437b8c7fc243a8dcd635cbae5eadf07fc28c5900a9bc0629ed9252b35f92"
+      ]
+    },
+    {
+      "address": "0x42418ad73e20cf0c8bc8a29fe1bc26b5de312a1f",
+      "symbol": "PRIO",
+      "balance": "92378752886836027713626",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x450e5910decee15c3ac056e3ed66cb5ea3dd33be",
+      "symbol": "CABAL",
+      "balance": "101522842639593908629442",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x462bc29829dce787e3c8b32f5c032a49234f0e2b",
+      "symbol": "NECTAR",
+      "balance": "80080080080080080080081",
+      "amountIn": "80080080080080080080081",
+      "expectedImd": "74641458597507",
+      "sellable": true,
+      "pools": [
+        "0x675d527df07a50d29eed260cea745916d66978b51f71f9fa95935bf0ca05d2ac",
+        "0x415829f72e9f54531c26eae76f107618540e898a45d6ae35959e143f5faca704"
+      ]
+    },
+    {
+      "address": "0x481f878b29c276f77050723eba9ae1375ad85bb6",
+      "symbol": "VERDICT",
+      "balance": "84925690021231422505308",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x4a09888667f7bcf5ff990b213e6e09ac442e24f7",
+      "symbol": "DAEMON",
+      "balance": "128000000000000000000000",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x4a207d33f42dc819eccfa74091ad33ced0fa4b2f",
+      "symbol": "SHITPAPER",
+      "balance": "89887640449438202247191",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x4a3c2cf66b44ba4c7e2b1eb4ca5738d63cc47845",
+      "symbol": "PONZI",
+      "balance": "80808080808080808080809",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x4b3d4fa5e6c043cc56651da83bd857a2cc355b01",
+      "symbol": "HI",
+      "balance": "124416796267496111975117",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x4c574e03ff68efff585a411f3e4faa7fa21f889a",
+      "symbol": "SPAD",
+      "balance": "93567251461988304093568",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x4d7d8f402581bf084df65737a656b5f917763615",
+      "symbol": "CRAWLHIVE",
+      "balance": "76408787010506208213945",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x4dc25f4a5beecfdd7ef3dde1c250cbcc29497753",
+      "symbol": "AINSEM",
+      "balance": "111888111888111888111889",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x4f2bacee5f2e7ce3f48dfbd635d96e9a8fcbe478",
+      "symbol": "PAWN",
+      "balance": "98522167487684729064040",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x501381d5156693e71aa5e69bf05dfb418401975f",
+      "symbol": "GOONCAT",
+      "balance": "85653104925053533190579",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x52b4f1a53d5919d08c6c60b31bd97dd901c88879",
+      "symbol": "IMDUSD",
+      "balance": "107382550335570469798658",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x53d0ea0a685220718dc6a0a6e4617194c6f37921",
+      "symbol": "INFER",
+      "balance": "1762651572198618283817",
+      "amountIn": "1762651572198618283817",
+      "expectedImd": "486359462057412285",
+      "sellable": true,
+      "pools": [
+        "0x1f03dd2c202cf17b58305b73ae2f8b3143e9c056ed9c9e8dbd4924b350431e95"
+      ]
+    },
+    {
+      "address": "0x54554595f31773de25e92f92e41410e6888f3565",
+      "symbol": "SPALACE",
+      "balance": "88888888888888888888889",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x562f83ebb80a84c6570aeb8f088fbff2a82ca8e4",
+      "symbol": "MIRROR",
+      "balance": "98643649815043156596795",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x58980b5f31238a552e93ec6dc5a58cbc53447f09",
+      "symbol": "SIMDTEST",
+      "balance": "102432778489116517285532",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x58d249d70f9c2508fbe50bf7bf749db0f248645c",
+      "symbol": "COINBITC",
+      "balance": "80000000000000000000000",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x5a90820d0ea07e030a909491ab6b0cb5d5deeffe",
+      "symbol": "CRAWL",
+      "balance": "76190476190476190476191",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x5b9aa7a7443964e80045ea9033e5ebf4f44979e4",
+      "symbol": "STRATA",
+      "balance": "120481927710843373493976",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x5e5b866b079d4063ba080b758aef127ccd570fea",
+      "symbol": "SNITCH",
+      "balance": "80402010050251256281407",
+      "amountIn": "80402010050251256281407",
+      "expectedImd": "2939795153383193",
+      "sellable": true,
+      "pools": [
+        "0xd384ff8bbef8870bba7b0de56250d91bcbd55f3abfb2a406900ed48776dd979e",
+        "0x415829f72e9f54531c26eae76f107618540e898a45d6ae35959e143f5faca704"
+      ]
+    },
+    {
+      "address": "0x60bc25c265de869e3d407676fed997d1f1902fe9",
+      "symbol": "ORACLE",
+      "balance": "90293453724604966139955",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x619047eceb1dab6d0a6e33ab326b3a17b1e119d8",
+      "symbol": "BRAIN",
+      "balance": "78817733990147783251232",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x61aec2f5fc07011f84f67c8ef83f28dd7d76cf56",
+      "symbol": "BLOX",
+      "balance": "79365079365079365079366",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x6604559d43eaae9510fa702d949c8be15b586db9",
+      "symbol": "SIMDTEST",
+      "balance": "99009900990099009900991",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x6abb57b52a2d12c1af47cd5819154034cf35bc3e",
+      "symbol": "PULSE",
+      "balance": "79522862823061630218688",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x6b8de03a43c697e67a5e67e214b3aba385febdd3",
+      "symbol": "TESTER",
+      "balance": "91954022988505747126437",
+      "amountIn": "91954022988505747126437",
+      "expectedImd": "3556298694667771",
+      "sellable": true,
+      "pools": [
+        "0x79586819cf10b3a54c6514ee0504342073299a59ba6b7e093541671782d5f4d6",
+        "0x415829f72e9f54531c26eae76f107618540e898a45d6ae35959e143f5faca704"
+      ]
+    },
+    {
+      "address": "0x6bf2954376b7ce1d5e0e77e2155fc0e9fac64ec2",
+      "symbol": "INFER",
+      "balance": "98643649815043156596795",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x7010197ad6189d1c85f66ad1bb0d876ac42a4d3b",
+      "symbol": "VERDICT",
+      "balance": "76335877862595419847329",
+      "amountIn": "18636688931297709923",
+      "expectedImd": "46279940864135",
+      "sellable": true,
+      "pools": [
+        "0x07466f5ad687b1b2857fc048fc32053ed4cff6061a663b95aaf6c60645439fb0"
+      ]
+    },
+    {
+      "address": "0x7094b1ba79e7eb3fab7caa8aa9b45976cd120807",
+      "symbol": "SCOOP",
+      "balance": "81135902636916835699798",
+      "amountIn": "316937119675456389452",
+      "expectedImd": "787041297486327",
+      "sellable": true,
+      "pools": [
+        "0x74013d446f8183b12997fe4bd86b94fff9c92e4d93acb40ed9711ceadf08fe04"
+      ]
+    },
+    {
+      "address": "0x73ddb09750c1bbcde03722b497dac6ded00f0fa0",
+      "symbol": "CADENCE",
+      "balance": "79760717846460618145564",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x7413073711e68a182567efaf11505c80a1a5761a",
+      "symbol": "IMD6900",
+      "balance": "118694362017804154302671",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x7558cfdfac2d310ff740206ec6e13529b82f2a9b",
+      "symbol": "VERDICT",
+      "balance": "80402010050251256281407",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x75652f324aa507cefbcbc321379612d0345d270b",
+      "symbol": "PEPES",
+      "balance": "139372822299651567944251",
+      "amountIn": "139372822299651567944251",
+      "expectedImd": "8659677511405977",
+      "sellable": true,
+      "pools": [
+        "0x04e3e1c387dd8a7bdcbac6902acc31b1bce33c0339c67109291fb0734b3422ca",
+        "0x415829f72e9f54531c26eae76f107618540e898a45d6ae35959e143f5faca704"
+      ]
+    },
+    {
+      "address": "0x77a583f52fb071a8efd267c0549f9efdc79fa0bd",
+      "symbol": "SDOG",
+      "balance": "97799511002444987775062",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x77c44164af8c82e949b11cdbd63ac26ade11d164",
+      "symbol": "SITR",
+      "balance": "88987764182424916573972",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x7a427b94547232356cf212fd1c668e8eb4069a46",
+      "symbol": "EMVO",
+      "balance": "112359550561797752808989",
+      "amountIn": "56179775280898876404494",
+      "expectedImd": "139523982562555498",
+      "sellable": true,
+      "pools": [
+        "0xe96d9c90fd213939b751880328c5f93874fa604e977d457b98eaf824018e3343"
+      ]
+    },
+    {
+      "address": "0x7c52ad935e14874995ba90d62d0a4238df2b84bf",
+      "symbol": "DCA",
+      "balance": "78740157480314960629922",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x7cf6fd992e6ff892caa8651f6d4e93859e1c1c71",
+      "symbol": "HIC",
+      "balance": "78585461689587426326130",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x7d0b936d5c32daeac84da80e7706930ffd716332",
+      "symbol": "INFER",
+      "balance": "89285714285714285714286",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x7eb429ca085e861f9b010c8e42574abbcacd9d57",
+      "symbol": "MEAT",
+      "balance": "89086859688195991091314",
+      "amountIn": "89086859688195991091314",
+      "expectedImd": "306107037708191942",
+      "sellable": true,
+      "pools": [
+        "0x737521d4ea19dd78f4aede00987f3ae006bf455a6050b56e9e2b2280a5389de3",
+        "0xb07d640fd9e2eb9dc81b953c8e4fd006bdfeaf276010fb5418eb763ca15abfb3"
+      ]
+    },
+    {
+      "address": "0x81b56b0da7bf1b553123a55da538515aa6e06941",
+      "symbol": "AMBI",
+      "balance": "89887640449438202247191",
+      "amountIn": "351123595505617977528",
+      "expectedImd": "871935466606820",
+      "sellable": true,
+      "pools": [
+        "0xc531d723d326360eb864c2f2ec194a014b94e169be5ffc84540787378a4f751f"
+      ]
+    },
+    {
+      "address": "0x824140446efa72526fb691221cf2a472b96c79bd",
+      "symbol": "DCA",
+      "balance": "78895463510848126232742",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No connected Uniswap v4 path to IMD found. Refresh to check new pools."
+    },
+    {
+      "address": "0x84cf85502450ea7452c9b90c947b33233eb01473",
+      "symbol": "BIC",
+      "balance": "78817733990147783251232",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x876a1beabe50fec6bc64e9e586f3efcc1da44231",
+      "symbol": "HMM",
+      "balance": "77294685990338164251208",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x891720c9638c5fbfe624a4cd9378ebea1a1e7737",
+      "symbol": "BLOX",
+      "balance": "80563947633434038267876",
+      "amountIn": "10070493454179254783484",
+      "expectedImd": "35139608354364106",
+      "sellable": true,
+      "pools": [
+        "0x4536d88489bd52e1975ed8d0b0cc503a3f8fbe60cd23d6b75336cd34c5566c15",
+        "0xb07d640fd9e2eb9dc81b953c8e4fd006bdfeaf276010fb5418eb763ca15abfb3"
+      ]
+    },
+    {
+      "address": "0x895d3bc005b32aa49905b02387203d46836fde93",
+      "symbol": "SPEPE",
+      "balance": "93786635404454865181712",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x8a4d48595c25b69c98a143ca502bdb46f8edf2a7",
+      "symbol": "COMB",
+      "balance": "80240722166499498495487",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x8d035d90cfa100bfda2347b417fcddb24fba9b8f",
+      "symbol": "SIMDTEST",
+      "balance": "101265822784810126582279",
+      "amountIn": "24723101265822784810",
+      "expectedImd": "61394150321367",
+      "sellable": true,
+      "pools": [
+        "0x410fcd82b370c50eea52c4b342c7b0c488e4af2fa0ba174e81b78219a044ccdb"
+      ]
+    },
+    {
+      "address": "0x8daedf407696693cbfb4c33b33e3a62dbae7ceaf",
+      "symbol": "COMD",
+      "balance": "78662733529990167158309",
+      "amountIn": "39331366764995083579154",
+      "expectedImd": "97676890821465465",
+      "sellable": true,
+      "pools": [
+        "0x37898a6ad140cfb3d942c13ad1260f3a0386c03e6d49e82cc6090ca210382216"
+      ]
+    },
+    {
+      "address": "0x903b9aab922859e83f16e07cc1f8cdd53edb323e",
+      "symbol": "DROP",
+      "balance": "79840319361277445109781",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x91104bf62146bc35d2bd65de13c5b2bacde40c60",
+      "symbol": "LARP",
+      "balance": "77444336882865440464666",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x931fd96a22bca8e1008d18ed827d5c042932be17",
+      "symbol": "VIMD",
+      "balance": "76117982873453853472883",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x97a1da580b28eb284e5239f6fb658f686dad9944",
+      "symbol": "COINDESK",
+      "balance": "77519379844961240310078",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x990ad3eccc7874f18464366e7caa893d915b5cdd",
+      "symbol": "IMB",
+      "balance": "126984126984126984126985",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0x999a3853ba4305f432ba6d39d9204cca121bf793",
+      "symbol": "PEGZEUS",
+      "balance": "120845921450151057401813",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x9c01088768451b0d84371e7e0d2bb4f941fdeeef",
+      "symbol": "SWARMLER",
+      "balance": "91848450057405281285879",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0x9d0a5da56f73b6bfe1a73806dd8131c136c44812",
+      "symbol": "IMD6900",
+      "balance": "110344827586206896551725",
+      "amountIn": "13793103448275862068965",
+      "expectedImd": "34253176461922731",
+      "sellable": true,
+      "pools": [
+        "0xd212219d7fa270f34a7d1206f7eeba6a3dd9938557e913700f81af1e7412dd07"
+      ]
+    },
+    {
+      "address": "0x9e2648fed2a741ce147e21cb5733d9e125d6be13",
+      "symbol": "PIXEL",
+      "balance": "93786635404454865181712",
+      "amountIn": "2930832356389214536928",
+      "expectedImd": "7278075879545211",
+      "sellable": true,
+      "pools": [
+        "0xf1d329603a06c34faab19d72ec04642ff3bd85a4aa6033706ff8a5ac1a9797cf"
+      ]
+    },
+    {
+      "address": "0x9f49f75b507ee66ff3622519872f01ddf730372f",
+      "symbol": "QUANTUM",
+      "balance": "97680097680097680097681",
+      "amountIn": "23847680097680097680",
+      "expectedImd": "83211869427490",
+      "sellable": true,
+      "pools": [
+        "0x1d6516f21c566f0bd17153a27d1016e2f30842b8732961fac0a585b56cbce10e",
+        "0xb07d640fd9e2eb9dc81b953c8e4fd006bdfeaf276010fb5418eb763ca15abfb3"
+      ]
+    },
+    {
+      "address": "0xa0d0b45c36979c66f7da2b8c0eebcc83d1e6cef5",
+      "symbol": "BLOX",
+      "balance": "77294685990338164251208",
+      "amountIn": "1207729468599033816425",
+      "expectedImd": "2999131427642499",
+      "sellable": true,
+      "pools": [
+        "0x04363c6768da1a9b748e1d8d3f77cbc930d97cec38bdc07aa150f37eb3404a9d"
+      ]
+    },
+    {
+      "address": "0xa409e9ff658124b79fb296cb99b0e438645f10a0",
+      "symbol": "OFFSETS",
+      "balance": "82219938335046248715314",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xa80b26cd940acc90db6aa2b7deb8a34221149e92",
+      "symbol": "COINBASE",
+      "balance": "80889787664307381193125",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0xa830fbb26f9d3910b6450fce431b708b103cce70",
+      "symbol": "SIMDTEST",
+      "balance": "98522167487684729064040",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xa998ecb3497dcf6f3ad1d965fce5722a2a70a2a1",
+      "symbol": "IHOOKS",
+      "balance": "93786635404454865181712",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xaa67d6baa0100bbe1d2e498320477b0629d0eab2",
+      "symbol": "NUKE",
+      "balance": "90293453724604966139955",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xaaeaafc29fe7327413921f6c7234026fc555b271",
+      "symbol": "PSS",
+      "balance": "93896713615023474178404",
+      "amountIn": "2934272300469483568075",
+      "expectedImd": "7286636944180273",
+      "sellable": true,
+      "pools": [
+        "0xdfc800840d41952d64a25ec61f954dbd8222c40cf17198631803068bb3d4d85f"
+      ]
+    },
+    {
+      "address": "0xaafb904cba91f9a8947c87dc0ea97fba0767eb3c",
+      "symbol": "SFP",
+      "balance": "89086859688195991091314",
+      "amountIn": "173997772828507795100",
+      "expectedImd": "432083656647307",
+      "sellable": true,
+      "pools": [
+        "0xe156cbce53fdb4952c2580a8c8264612c6b9502ac908eef912eec5e72cddbcc5"
+      ]
+    },
+    {
+      "address": "0xab992a93d710a90c5e52a396414ac3d144fadf9a",
+      "symbol": "SWARMCORE",
+      "balance": "81466395112016293279023",
+      "amountIn": "636456211812627291242",
+      "expectedImd": "1580496242025727",
+      "sellable": true,
+      "pools": [
+        "0xfef643ebad43c9d898eef7d4c904696f1e826b475cde5ebe924b30e8e534969d"
+      ]
+    },
+    {
+      "address": "0xac972f1cd22c5b9b2afd70be735e214c4ab801fb",
+      "symbol": "VERDICT",
+      "balance": "81135902636916835699798",
+      "amountIn": "81135902636916835699798",
+      "expectedImd": "2631347883030104",
+      "sellable": true,
+      "pools": [
+        "0x9e94b5859799ad8c88b89cae0c4831c4e253b4c8fa110d2792f8274c7e72e93f",
+        "0x415829f72e9f54531c26eae76f107618540e898a45d6ae35959e143f5faca704"
+      ]
+    },
+    {
+      "address": "0xad455ee2800b314588b5178df0dcbbc5dad7e1c7",
+      "symbol": "QOBS",
+      "balance": "107095046854082998661312",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0xb3ca44f083d49f0864412141bf5382e4248795bd",
+      "symbol": "PLEA",
+      "balance": "76775431861804222648753",
+      "amountIn": "76775431861804222648753",
+      "expectedImd": "191121637080296234",
+      "sellable": true,
+      "pools": [
+        "0xfc1b2eaa9d6ac1b83677e7260396c7af842363339e71e045f7832421ec98ee7f"
+      ]
+    },
+    {
+      "address": "0xb5abdb30485e006019a25cc6f9a19e0a7a221d4a",
+      "symbol": "PROOF",
+      "balance": "89086859688195991091314",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xb7c08cafb38737f4e9c56ad7230dae9ff4ee590e",
+      "symbol": "SIMDTEST",
+      "balance": "99378881987577639751553",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xb9c80d4927b988b7e2bc34553075ea70444fd4d4",
+      "symbol": "BRAIN",
+      "balance": "94339622641509433962265",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xbb9315f92d088e3601ab177e70b4303f1f5f6557",
+      "symbol": "SFPT",
+      "balance": "89086859688195991091314",
+      "amountIn": "44543429844097995545657",
+      "expectedImd": "110619303642271098",
+      "sellable": true,
+      "pools": [
+        "0xeb01cd3a9f344a50003c020da11d56b280b54d95e64ea367d9ce2cfc4abc58fd"
+      ]
+    },
+    {
+      "address": "0xbdf0411f92a9dc1c9ba79cd6eb0223373309243a",
+      "symbol": "OFFSETS",
+      "balance": "80563947633434038267876",
+      "amountIn": "80563947633434038267876",
+      "expectedImd": "9564734595892783",
+      "sellable": true,
+      "pools": [
+        "0x3d92b62384d4e677fe2b66f516bbe2955292a0cfb8bca126c46cf0351ec3d076",
+        "0x415829f72e9f54531c26eae76f107618540e898a45d6ae35959e143f5faca704"
+      ]
+    },
+    {
+      "address": "0xbe31a30cec279bd45b0c147f298e46e625ac3f4e",
+      "symbol": "PEBBLE",
+      "balance": "91116173120728929384966",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xbfb24d83420a948af681a60a69bd30503d15dea8",
+      "symbol": "DCA",
+      "balance": "79681274900398406374502",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No connected Uniswap v4 path to IMD found. Refresh to check new pools."
+    },
+    {
+      "address": "0xc244d8e912c095aa2bb56e911a30c44e38369e78",
+      "symbol": "Brain",
+      "balance": "93896713615023474178404",
+      "amountIn": "733568075117370892018",
+      "expectedImd": "1821652411375874",
+      "sellable": true,
+      "pools": [
+        "0xd673c2374b553664310ac4c38358f63bf538351743eedb0d05f864de6d0860bb"
+      ]
+    },
+    {
+      "address": "0xc280a6159698f73253274d2064c07f7aaeae122d",
+      "symbol": "PIXEL",
+      "balance": "92059838895281933256617",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xc65dd15ab56e6df80f31341a15db519aaa1b45ab",
+      "symbol": "VQI",
+      "balance": "93023255813953488372093",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xd189ddeef8827f8fcd9c5c9321191c62ed0f783d",
+      "symbol": "IMDOG",
+      "balance": "126984126984126984126985",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xd1decf65337d2be11c5a86594ee6cf17ce529bbc",
+      "symbol": "CORE",
+      "balance": "106382978723404255319149",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xd1f91ee80ca01ecedd7bc8172b3441ec8c508286",
+      "symbol": "STRIKE",
+      "balance": "131147540983606557377050",
+      "amountIn": "128073770491803278688",
+      "expectedImd": "318041916481455",
+      "sellable": true,
+      "pools": [
+        "0xbdb7a7d527b63be0782cc773fedffe1efa1ae7b3ff02e8091b824f1c8f2c4f20"
+      ]
+    },
+    {
+      "address": "0xd2aef07b4a807062c1c9f01713def52172548eca",
+      "symbol": "SWARM",
+      "balance": "93348891481913652275380",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0xd2e546680e04e972f6108ebed6627fb097c86217",
+      "symbol": "UI",
+      "balance": "111888111888111888111889",
+      "amountIn": "1748251748251748251748",
+      "expectedImd": "4341403757149556",
+      "sellable": true,
+      "pools": [
+        "0xedd73256c1f7590304e45d17b6a8349a3813e261bc7993504e3d2e82865f9219"
+      ]
+    },
+    {
+      "address": "0xd3da84d79d63467c3c0e80a06f921eeb4db6a9c4",
+      "symbol": "BSIMD",
+      "balance": "100628930817610062893082",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xd51c3c76c512b26203a3f97263671aadf51987df",
+      "symbol": "POLYNEUM",
+      "balance": "81549439347604485219165",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xd852098e83e6a8a35eb3eb6976567b0660c86494",
+      "symbol": "PRIO",
+      "balance": "95351609058402860548272",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xd960609fa3d82465d5438649ca7d271df567ed61",
+      "symbol": "SPECTRA",
+      "balance": "988875154511742892460",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xda04288b2ddc365037799a3db8fa39bd6f672adf",
+      "symbol": "IMDOG",
+      "balance": "79286422200198216055501",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0xdc8a5f58d8acbed38581224088c96ff24a2214fb",
+      "symbol": "TDEMO",
+      "balance": "88987764182424916573972",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xdeb797f3727ee92e12af9ed65ccd6b0cdcf91723",
+      "symbol": "SIMDTEST",
+      "balance": "98887515451174289245983",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xe354d0b15b228761a7c5a7f7e3af0f381be88868",
+      "symbol": "BRIEFS",
+      "balance": "89485458612975391498882",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xe4372e859950cf56a58f972c87e74e1f079dcbdf",
+      "symbol": "SI",
+      "balance": "112044817927170868347339",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xe52ab551160a74afed336c1fbf0f5d39b6fd4bba",
+      "symbol": "PANIC",
+      "balance": "103761348897535667963684",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xe56b182670503c3bf73e79ca5710c175907a0560",
+      "symbol": "STRATA",
+      "balance": "112044817927170868347339",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xe7b5b05cfebb11d08033020acdeb89fe672b0855",
+      "symbol": "HX",
+      "balance": "107382550335570469798658",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0xe9a39c7f3c5af1e71dfa1ea3f289473271a4bfd8",
+      "symbol": "IMDOG",
+      "balance": "107671601615074024226111",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xed447669c94026126a0fe457c19e893cdba06ee5",
+      "symbol": "CLAUS",
+      "balance": "89186176142697881828317",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xedbafd7dbae2abc3119276814e8b738496edba0c",
+      "symbol": "ADAM",
+      "balance": "112044817927170868347339",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0xedebd47038e9f64f57c75eee33a50ae4a7471b47",
+      "symbol": "HVD",
+      "balance": "76555023923444976076555",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xee74e6ee48c0dc38bb46af59fdff427563ed3c2c",
+      "symbol": "UI",
+      "balance": "119402985074626865671642",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xf00e6cdf014239a1ee0147b3b7fa8860c1e0cd9e",
+      "symbol": "RETURN",
+      "balance": "79129574678536102868448",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xf0655276faefe9cd76d91f8f9ee50172f37d45c4",
+      "symbol": "DRONE",
+      "balance": "105960264900662251655630",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xf08b07b740df2aaa939eea6b7bf66b44908341b9",
+      "symbol": "DIVIDENDS",
+      "balance": "102040816326530612244898",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xf1237ba13ac6234573c9eea6c8559eaea4b31163",
+      "symbol": "PAVE",
+      "balance": "76190476190476190476191",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xf14dd0ec22aadc9f9e24d0f83f3d4d68592f4dbc",
+      "symbol": "PEPE",
+      "balance": "89485458612975391498882",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No connected Uniswap v4 path to IMD found. Refresh to check new pools."
+    },
+    {
+      "address": "0xf3ca98baf1b9832162198a4e06608418f8c2faf6",
+      "symbol": "IMD",
+      "balance": "127186009538950715421304",
+      "amountIn": "127186009538950715421304",
+      "expectedImd": "1443296308495811",
+      "sellable": true,
+      "pools": [
+        "0x229e9ffb379276eaf3b1b79d53654e4af8f10ed0dcae75209ec33a2f2615e068",
+        "0x57de437b8c7fc243a8dcd635cbae5eadf07fc28c5900a9bc0629ed9252b35f92"
+      ]
+    },
+    {
+      "address": "0xf55b01958f805f680cc72b48e022eb80e607d58e",
+      "symbol": "WHY",
+      "balance": "125786163522012578616353",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xf695f8af05df5801db66422071975542e5c47285",
+      "symbol": "SEAL",
+      "balance": "79207920792079207920793",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xf6b5c641811e6a290327c4dea2efa45ceade0795",
+      "symbol": "OFFSETS",
+      "balance": "80889787664307381193125",
+      "amountIn": "80889787664307381193125",
+      "expectedImd": "33182867541109486",
+      "sellable": true,
+      "pools": [
+        "0xb6c7d5e8e14d54fb7682f02bd0ef4a4b63ad22fab2d0d38c83e708b1aa04e02e",
+        "0x415829f72e9f54531c26eae76f107618540e898a45d6ae35959e143f5faca704"
+      ]
+    },
+    {
+      "address": "0xf72be203206125dbb4cff37fa5fd1a20b9df9a73",
+      "symbol": "MIRROR",
+      "balance": "77519379844961240310078",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0xf78bbd3604a36147e526b1d748e27b6774a6492f",
+      "symbol": "LARP",
+      "balance": "76408787010506208213945",
+      "amountIn": "4775549188156638013371",
+      "expectedImd": "11859144531049215",
+      "sellable": true,
+      "pools": [
+        "0x1041718e5b6b2357a1fd8b7369bd2c4990c6bd751ba462dcc7097a65c536cb7c"
+      ]
+    },
+    {
+      "address": "0xf945fef6f3dd3c045a8f2f3cdc09332e72d82f7e",
+      "symbol": "SWORE",
+      "balance": "89186176142697881828317",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xf9b6283ae778754cb336e6cc16d1ba9858c9e553",
+      "symbol": "SPONGEBOT",
+      "balance": "88987764182424916573972",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xfc91be74314a8bc65820c29a985ac64860c05299",
+      "symbol": "SIMDTEST",
+      "balance": "99378881987577639751553",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xfd1c234972768c23bb21d655966e0b122dd67a2c",
+      "symbol": "PRIO",
+      "balance": "89786756453423120089787",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
+    },
+    {
+      "address": "0xfda9bb7e9605910b4cf999777c0b71edc366767d",
+      "symbol": "IMDT",
+      "balance": "97560975609756097560976",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xfe76f26b64dbc50772c222819795491bab64cc89",
+      "symbol": "VERDICT",
+      "balance": "79129574678536102868448",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    },
+    {
+      "address": "0xfea12e3f0530ca4cce63cfac0f6e02a67d766197",
+      "symbol": "MONKEY",
+      "balance": "6029110645879732739421",
+      "expectedImd": "0",
+      "sellable": false,
+      "reason": "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling."
+    }
+  ]
+}

@@ -2,8 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { encodeEventTopics, encodeAbiParameters } from "viem";
 import {
-  planSale,
-  executeSale,
+  planLegacySale as planSale,
+  executeLegacySale as executeSale,
   feeSplit,
   claimRefund,
 } from "../src/lib/sweep.ts";

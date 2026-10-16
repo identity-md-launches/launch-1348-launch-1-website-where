@@ -1,0 +1,29 @@
+{
+  "kind": "disposable local mainnet fork",
+  "blockNumber": "26203183",
+  "mainnetTransactionsSent": 0,
+  "checks": [
+    {
+      "kind": "reverted sale retains input and charges no fee",
+      "passed": true
+    },
+    {
+      "kind": "hook",
+      "token": "0x01b3b98599608a41d46a3c5c34ed736329b7c6b2",
+      "symbol": "GENESIS",
+      "received": "1720593450699152",
+      "fee": "35114152055084",
+      "remaining": "89790723981900452488689",
+      "passed": true
+    },
+    {
+      "kind": "bridge",
+      "token": "0x047ceafe0e715b7af38b65dd7185c60d9420594c",
+      "symbol": "1MD",
+      "received": "969562568544633",
+      "fee": "19786991194788",
+      "remaining": "0",
+      "passed": true
+    }
+  ]
+}

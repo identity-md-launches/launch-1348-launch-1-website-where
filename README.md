@@ -1,20 +1,26 @@
 # SwarmSweep
 
-SwarmSweep finds verified Swarm-launched tokens in a connected **Ethereum mainnet** wallet and lets the user sell holdings supported by the existing SwarmExit contract. Positive balances remain visible when selling is unavailable. A 2% fee applies to successful IMD sale proceeds.
+Find Ethereum Swarm token holdings, select individual tokens, and discover live Uniswap v4 sell routes to IMD **without registering tokens with SwarmExit**. The existing wallet discovery and wallet connectors are retained. The application is in `web/`; the finished static site is in root `dist/`. The root package still belongs to the earlier Walletscope application: use the `web/` commands below.
 
-**Verified result, 2026-10-16:** the supplied wallet `0x0acE1DBE8AAb293cd58D5e3Ea38814f0ccb74782` holds **163** of the **220** discovered Ethereum token contracts. All 220 balances were read successfully; independent ERC-20 calls matched every positive balance and decimals value. The production browser also displayed 163 holdings using public RPCs, with no failed requests or page errors. See [VALIDATION.md](VALIDATION.md) and the [complete balance record](docs/validation/live-discovery.json).
+## What was fixed
 
-**Review revision:** all five reported defects were reproduced and fixed: held-refund event precedence, precise-amount mobile overflow, isolated RPC recovery, desktop route clipping, and mobile EIP-6963 wallet selection. The rebuilt export passed **42 regression tests**, **129 Chromium interaction checks**, typecheck, production build and **16/16 design-probe checks**. Fresh mainnet verification again detected 163 holdings. Results and remaining deployment limits are in [the revision validation](VALIDATION.md#review-revision), with a response for each finding in [.imd-responses.json](.imd-responses.json).
+The previous frontend read balances independently but still called SwarmExit `preview` and `tokenRoute` to decide whether a token could be sold. Its deployed sale registry is empty. That produced the registration message and hid every selection checkbox.
 
-## Root cause and source provenance
+The new sale path reads actual Uniswap v4 pool initialization events, quotes routes through the deployed v4 Quoter, and sends reviewed swaps to Uniswap Universal Router. No token registration, owner configuration, new contract or deployment is needed. SwarmExit remains available only for existing refund claims and optional legacy USD pricing; neither gates route discovery or direct sales.
 
-The linked [merged SwarmSweep implementation](https://github.com/identity-md-launches/launch-1682-build-protocol-enables-user/pull/2), commit `e6a695d9a368642617f5c801a7759494caf0b81d`, called SwarmExit's `previewAll(wallet)` to discover tokens. That function only iterates the contract owner's sale registry. On Ethereum, `swarmTokenCount()` is **0**, so the original page reported no tokens even though the wallet holds 163 verified launch tokens. This was reproduced in Chromium using the merged export and real Ethereum reads.
+At Ethereum block **26,203,183**, the supplied wallet `0x0acE1DBE8AAb293cd58D5e3Ea38814f0ccb74782` held **164** identified tokens. The new search returned **40 live quotes**, including **26 partial-balance quotes**, while SwarmExit still reported **zero registered tokens**. A quote is not a guarantee that execution will succeed. Pools with insufficient liquidity, unsupported hook rules or an incomplete bounded search stay visible with an explanation. See [VALIDATION.md](VALIDATION.md) for actual checks and limitations.
 
-This task's initial checkout contained the separate Walletscope history dashboard. The requested merged implementation was retrieved from the explicit repository URL and retained in its original `web/` layout. The existing root package/build configuration and dependencies remain unchanged. **Build SwarmSweep from `web/`; the old root package scripts still belong to Walletscope.** The root `dist/` now contains SwarmSweep's complete production export. No on-chain contract was changed or deployed.
+## Using the site
 
-## Install, develop, build and preview
+1. Connect an Ethereum wallet. Holdings appear while live routes are being checked.
+2. Use each token's **Select** checkbox, **Select all routes**, or **Clear selection**. Tokens start unselected. Unavailable routes keep visible, disabled checkboxes and an explanatory status.
+3. **Review selected** includes only those tokens. **Review all routes** reviews all currently quoted tokens. The summary estimate follows the selection.
+4. Review the amount, gross IMD, minimum output, 2% treasury fee and estimated net. A **Partial balance** route sells the displayed smaller amount; the rest remains in the wallet.
+5. Approve when prompted, then confirm one atomic sale per token. **Refresh routes** reloads balances and quotes. Pending receipts remain protected from resubmission in the current page session and are checked again on Refresh.
 
-Use Node 22.12+ and npm. The frontend manifest and lockfile are in `web/`.
+## Install, develop, preview and rebuild
+
+Use Node 22.12+ and npm. Dependencies and the existing lockfile are in `web/`.
 
 ```sh
 cd web
@@ -26,81 +32,54 @@ npm run build
 npm run preview
 ```
 
-`npm run build` includes the TypeScript check and writes `../dist/`. Vite uses `base: './'`; all runtime assets and the historical launch snapshot are local, relative URLs. There is one page, no backend, no private API key, and no server rewrite requirement. Wallets use EIP-6963, wallet-app browser links and Coinbase Smart Wallet.
+The build includes TypeScript checking and writes `../dist/`. Existing Vite configuration uses `base: './'`. The export has relative assets, local pool/launch history, favicon and share image; it works beneath a static gateway subpath without a backend or server rewrites. Do not publish from the worker: the network handles publication after submission.
 
-To validate the production interactions with an available Playwright installation:
+## Route discovery and execution
 
-```sh
-cd web
-node --experimental-strip-types scripts/interact.mjs
-node --experimental-strip-types scripts/check-abi.mjs
-node --experimental-strip-types scripts/verify-live.mjs https://eth.drpc.org
-node scripts/browser-live.mjs
-```
+`web/public/pools.json` contains 889 pool initialization records verified from Ethereum through block 26,203,159. It is an event index, not a token registration list or a saved quote. Its anchor hash and pool-key hashes are checked. Runtime discovery adds subsequent matching initialization events, checks launch receipts for new tokens, and reads current active liquidity to order alternatives. Historical holdings still come from `launches.json` and incremental official registry events.
 
-`interact.mjs` uses explicitly simulated wallets and RPC responses. `verify-live.mjs` and `browser-live.mjs` use real Ethereum data and the supplied public holder address, and never request signatures. Playwright scripts accept `IMD_PLAYWRIGHT` pointing to its `index.mjs` and `PLAYWRIGHT_BROWSERS_PATH` where needed. They write disposable screenshots under `test/scratch/`.
+Every positive holding is searched for simple v4 paths to IMD, including ETH intermediaries. The search prefers fewer hops, then active liquidity, and tests at most 24 candidate paths of up to three pools. It returns the first positive live quote, not a claim of the globally best price. For the deployed Quoter's explicit `NotEnoughLiquidity(bytes32)` failure, it tries up to 12 successively halved amounts. These amounts are labelled partial; they are not advertised as the maximum sellable amount. Search exhaustion and RPC failures are disclosed rather than treated as proof that no pool exists.
 
-The live script's historical replay needs archive reads. PublicNode refused that part of the revision check with “Archive requests require a personal token”; the same check passed through the already configured dRPC endpoint. Normal current-block discovery and the browser's public RPC checks passed. The script records the RPC URL actually supplied in its report.
+Review refreshes the chosen route and verifies the balance. Each sale then obtains another quote, retains the **reviewed** 3% slippage floor, simulates complete execution, estimates gas and verifies the active account and chain before signing. Newly requested ERC-20 approval is for the needed amount to Permit2; the Permit2 authorization names Universal Router, the needed amount and a ten-minute expiration. Existing sufficient approvals can be reused.
 
-## How discovery works
+The encoded v4 actions are `SWAP_EXACT_IN`, `SETTLE_ALL`, `TAKE_PORTION` and `TAKE_ALL`. Each token sale is atomic. The fee is 200 basis points of that swap's IMD credit, sent to the existing treasury `0xFC3ad9C531e1736690b2d5f24FebD35ebf051cFB`, rounded down per transaction. Net IMD goes to the connected sender. There are no allow-revert commands, arbitrary external calldata or native ETH sale payments. A reverted sale leaves input tokens in the wallet and charges no sale fee; network gas still costs ETH. Multiple selected tokens require separate transactions and accumulate IMD in the wallet.
 
-1. `web/public/launches.json` contains a generated snapshot of **all pages** of the official [launch index](https://api.imd.fun/launches?limit=500), filtered to Ethereum token artifacts. The refresh script checks successful deployment receipts and deployed code, and reconciles every record in both current on-chain registries. It is not a manually curated token list.
-2. The snapshot pins Ethereum block **26,202,460**, its hash, and registry counts. At runtime the client checks chain ID 1 and that block hash, reads current registry counts, scans subsequent `LaunchRecorded` events in bounded ranges, and reads each event's `artifactsOf(launchNumber)`. Only the explicit `token` role qualifies; names and symbols do not establish eligibility. Missing events are detected by comparing counts.
-3. At one current Ethereum block, batched ERC-20 `balanceOf` and `decimals` calls match discovered addresses against the wallet. Failed entries are retried individually at that same block, including when viem resolves aggregate RPC rejection as per-call failures. Successful entries are retained. Amounts remain `bigint` and are formatted exactly, including 0–255 decimals. Missing decimals are shown as raw units and cannot be sold.
-4. The app separately reads SwarmExit's per-token preview, route and held refunds. A positive holding survives missing registration, route, liquidity, pricing or preview errors. Unknown prices say unavailable. A failed balance or registry read produces a partial or failure state, never a completed empty-wallet result.
-5. Account and network changes invalidate in-flight UI results and sale confirmations. Both the wallet chain and the public RPC chain must be Ethereum before signing.
+Receipts must succeed and contain reconcilable IMD transfers from PoolManager to the account and treasury before showing Sold. Unknown receipts remain pending. A later rejection or failure preserves earlier confirmed results. Legacy SwarmExit held refunds keep their claim control.
 
-The runtime RPCs are `https://ethereum-rpc.publicnode.com` and `https://eth.drpc.org`, with bounded timeouts and fallback. The official index does not grant cross-origin access to the static app; a browser CORS check failed. Consequently the browser reads bundled history and on-chain registry updates rather than depending on that API.
+## Validation commands and results
 
-Regenerate history before releasing, or when IMD changes its factory deployments:
+From the repository root, with Playwright available:
 
 ```sh
-cd web
-node scripts/update-launches.mjs
-npm run typecheck
-npm run build
+IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node --experimental-strip-types web/scripts/interact-routes.mjs
+IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste
+node --experimental-strip-types web/scripts/verify-routes.mjs https://ethereum-rpc.publicnode.com test/scratch/live-routes.json
+node --experimental-strip-types web/scripts/verify-route-fork.mjs https://ethereum-rpc.publicnode.com test/scratch/fork-routes.json
 ```
 
-The refresh script fails on incomplete pages, registry count mismatch, invalid provenance, unsuccessful deployment, absent code or a changed anchor block. It writes the snapshot only after verification. Both the snapshot and rebuilt `dist/` must be delivered.
+The fork check requires Anvil and the preceding live evidence file. It starts and closes its own disposable fork; all simulated transactions remain local. An archive-capable RPC may be needed. `web/scripts/browser-live.mjs` performs the production browser's read-only known-wallet check; it accepts an optional RPC transport argument. No script needs a private key.
 
-## Selling, fees and remaining live configuration
+Completed checks: production build and typecheck; **58 unit/regression tests**; **101 Chromium interaction assertions** at 320, 390, 768 and 1440 pixels; **16/16 taste@1 checks**; real-chain wallet discovery and quotes; local-fork hook and ETH-bridge sales with exact input/fee reconciliation; local-fork reverted sale retaining tokens with no sale fee. The build reports a nonfatal JavaScript chunk-size warning (approximately 649 kB uncompressed). Browser tests use simulated wallets and explicitly mocked transactions; the separate mainnet browser check uses real chain responses and forbids signing.
 
-SwarmExit remains at [`0x5c3c2a6d7d340db9f8b3e0cbbc8dbbb7ec73bc61`](https://etherscan.io/address/0x5c3c2a6d7d340db9f8b3e0cbbc8dbbb7ec73bc61). Its `SELL_TAX_BPS` was read as **200**, and its `TREASURY` as **`0xFC3ad9C531e1736690b2d5f24FebD35ebf051cFB`**. These values and the ABI remain those of the merged implementation.
+## Updating the event indexes
 
-Sell all / sell selected retain confirmation, exact token approvals, per-token minimum proceeds, gas estimates and batches bounded by the contract's limit. Before approval, the confirmation clearly labels its figures as quotes. After approval, a fresh simulation and gas estimate must pass before a sale is sent. Failed simulations never fall back to invented successful outcomes. The client checks receipt status and only accepts outcome logs from SwarmExit for the connected account and submitted tokens. Unknown confirmations remain pending; a later batch failure retains earlier confirmed results.
+```sh
+node --experimental-strip-types web/scripts/update-launches.mjs
+node --experimental-strip-types web/scripts/update-pools.mjs https://ethereum-rpc.publicnode.com
+npm --prefix web run build
+```
 
-The deployed contract charges the fee on successful IMD proceeds, rounded down per transaction. A reverted sale charges no sale fee, although network gas is spent. A token that refuses its refund leaves a claimable held refund; transfer-tax tokens can return less than the initial amount. The interface states those distinctions.
+Deliver both source indexes and the rebuilt copies in `dist/`. `update-pools.mjs` filters initialization events by launch currencies and IMD, recursively reduces refused ranges, and validates the resulting pool keys before writing. Never edit quotes into these indexes.
 
-Receipt outcomes are reduced per token across all verified events. `RefundHeld` takes precedence over `TokenRefunded`, including the contract's actual order where the latter is emitted last. A held refund stays marked unsold with the instruction to claim it; it is never described as delivered to the wallet.
+## Scope and limits
 
-**The live contract currently has zero registered sale tokens.** The 163 detected holdings are therefore visible and disabled for selling. No mainnet sale was sent or claimed to succeed. The owner must use the existing `setSwarmToken`, `setTokenRoute`, `setImdRoute` and `setEthUsdFeed` functions with the actual launch pools and price feed; discovery no longer depends on completing this configuration. See the [upstream contract's configuration documentation](https://github.com/identity-md-launches/launch-1682-build-protocol-enables-user/blob/e6a695d9a368642617f5c801a7759494caf0b81d/README.md#after-launch-owner-responsibilities).
+- Ethereum and Uniswap v4 only. This searches all identified holdings, not all DEXs or every possible route. V2/V3, RFQs, token-specific hook inputs and split-routing are not implemented. Future factory changes need discovery configuration updates.
+- Quotes depend on live liquidity, RPC availability and hook behavior. Custom or taxed token transfers may still fail the final simulation. Some holdings have no usable quote even at reduced amounts.
+- Large wallets can take several minutes over browser RPC transport. Progress and discovered holdings remain visible. Estimates are refreshed before review and execution.
+- No real-wallet mainnet transaction, physical phone, WebKit, screen reader, native zoom or RTL session was tested. The worker's supplied Ethereum transport was used for real-chain checks; this run does not claim fresh public-browser CORS verification.
+- Pending-transaction protection lasts within the current page session, including account/chain switches. After reloading the page, inspect any outstanding wallet transaction before starting another sale.
+- The site was built locally; remote publication is handled after this task and was not claimed or performed.
 
-## Supported scope and limitations
+## Implementation references
 
-- Ethereum mainnet only. Other wallet chains require switching; this frontend does not silently query another chain.
-- Historical official records plus subsequent launches in the two factory registries published in [IMD's deployment table](https://imd.fun/docs/#contracts). Future factory migrations require refreshing that configuration and rebuilding. Historical API omissions outside those registries cannot be independently discovered by this version.
-- Discovery depends on available public Ethereum RPCs. A partial result identifies its gaps and offers Refresh. No private indexer or wallet token-name heuristics are used.
-- USD figures depend on the configured IMD route and price feed; there are currently no real USD quotes from SwarmExit. Unknown prices are not zero prices.
-- Mainnet token sales, real wallet signing, physical phones, WebKit and screen-reader sessions were not tested. Sale-path tests use mocks, supplemented by 128 passing tests from the unchanged upstream contract tree.
-
-## Delivery and publication
-
-`dist/index.html`, all hashed assets, favicon, share image and `launches.json` are the static delivery. The network's existing process publishes the supplied export after submission. This run has **not published or verified an updated remote deployment**; no updated URL was issued. The pinned hosting handoff names the legacy Walletscope alias, so it does not establish that the separate SwarmSweep site has been updated. No publication credentials were read and no replacement hosting service was introduced.
-
-Once the publisher issues the actual HTTPS URL, run `node web/scripts/verify-deployed.mjs` with that URL as its argument. It compares every deployed file byte-for-byte with this `dist/`. Run `web/scripts/browser-live.mjs` against that URL for the read-only mainnet wallet check. Do not equate the local build or the previously merged site with a verified new deployment.
-
-## Main files
-
-| File | Purpose |
-| --- | --- |
-| `web/src/lib/discovery.ts` | Verified history, registry events, completeness checks |
-| `web/scripts/update-launches.mjs` | Reproducible full-history snapshot generation |
-| `web/src/lib/sweep.ts` | Independent balances, route eligibility, simulation and receipts |
-| `web/src/lib/format.ts` | Exact integer-based balance display |
-| `web/src/App.tsx` | Chain/account invalidation and explicit discovery states |
-| `web/src/components/TokenList.tsx` | Visible unsupported holdings, raw balances and provenance |
-| `web/src/components/ConfirmDialog.tsx` | Quote/approval distinction and gas information |
-| `web/src/wallet/ConnectSheet.tsx` | Actual wallet chain and switch handling |
-| `web/src/config.ts`, `web/src/deployment.ts` | RPC fallback and unchanged deployed constants |
-| `web/test/`, `web/scripts/interact.mjs` | Regression and production interaction tests |
-| `DESIGN.md`, `VALIDATION.md` | Final design system and actual validation evidence |
+Addresses are verified against [Uniswap's Ethereum deployment table](https://developers.uniswap.org/docs/protocols/v4/deployments). The original router parameter layout comes from [IV4Router at the pinned periphery commit](https://github.com/Uniswap/v4-periphery/blob/3796e9c460b4ad5befd40163f5c14595e7aeb107/src/interfaces/IV4Router.sol), with actions from [Actions.sol at that same commit](https://github.com/Uniswap/v4-periphery/blob/3796e9c460b4ad5befd40163f5c14595e7aeb107/src/libraries/Actions.sol). The calldata was also executed against the deployed bytecode on the local fork. See [DESIGN.md](DESIGN.md) for the final interface system.

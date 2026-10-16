@@ -128,6 +128,39 @@ a {
   outline-offset: 2px;
 }
 
+.selection-tools {
+  margin-block: var(--space-3) var(--space-4);
+}
+.selection-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.pick-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 44px;
+  cursor: pointer;
+}
+.pick-label span {
+  font-size: var(--text-sm);
+}
+.route-details {
+  margin-top: var(--space-2);
+}
+.route-details summary {
+  cursor: pointer;
+  min-height: 24px;
+  font-size: var(--text-sm);
+}
+.route-details .mono {
+  overflow-wrap: anywhere;
+}
+
 /* ---- page frame ---- */
 #page {
   max-width: var(--content-width);
@@ -366,8 +399,8 @@ main {
 }
 
 .tokens .col-pick {
-  width: 44px;
-  padding-inline-end: 0;
+  width: 72px;
+  padding-inline: 8px;
 }
 
 .tokens input[type="checkbox"] {
@@ -719,14 +752,14 @@ main {
   .tokens td[data-label="Balance"] {
     grid-area: balance;
   }
-  .tokens td[data-label="Value"] {
+  .tokens td[data-label="IMD quote"] {
     grid-area: value;
   }
-  .tokens td[data-label="Status"] {
+  .tokens td[data-label="Live sell route"] {
     grid-area: status;
   }
   .tokens td[data-label="Balance"]::before,
-  .tokens td[data-label="Value"]::before {
+  .tokens td[data-label="IMD quote"]::before {
     content: attr(data-label);
     display: block;
     font-size: var(--text-xs);
@@ -805,4 +838,11 @@ main {
 }
 .token-name {
   overflow-wrap: anywhere;
+}
+
+@media (max-width: 639px) {
+  .pick-label {
+    flex-direction: column;
+    gap: 0;
+  }
 }

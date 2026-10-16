@@ -5,14 +5,14 @@ import { EXPLORER_URL, IMD_SYMBOL, SWARM_EXIT_ADDRESS } from "./config";
 import { ConnectSheet } from "./wallet/ConnectSheet";
 import { TokenList } from "./components/TokenList";
 import { ConfirmDialog } from "./components/ConfirmDialog";
-import { errorText, fmtAmount, fmtUsd, short } from "./lib/format";
+import { resolvePending } from "./lib/directSale";
+import { errorText, fmtAmount, short } from "./lib/format";
 import {
   claimRefund,
   executeSale,
   feeSplit,
   loadWallet,
   planSale,
-  usdValue,
   type Plan,
   type Progress,
   type SwarmToken,
@@ -31,7 +31,10 @@ export function App() {
   const identityRef = useRef(identity);
   identityRef.current = identity;
   const requestRef = useRef(0);
+  const saleTrigger = useRef<HTMLElement | null>(null);
+  const pendingRef = useRef(new Map<string, SwarmToken["result"]>());
   const [readProgress, setReadProgress] = useState("");
+  const [pendingTokens, setPendingTokens] = useState<SwarmToken[]>([]);
   const [state, setState] = useState<WalletState | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -49,23 +52,35 @@ export function App() {
     setLoading(true);
     setLoadError(null);
     setState(null);
+    setPendingTokens([]);
     setSelected(new Set());
     setReadProgress("Loading verified launch history…");
     try {
+      for (const [key, pending] of pendingRef.current) {
+        if (!pending || !key.startsWith(`${address.toLowerCase()}:`)) continue;
+        const resolved = await resolvePending(client, address, pending);
+        if (!current()) return;
+        if (!resolved) pendingRef.current.delete(key);
+        else pendingRef.current.set(key, resolved);
+      }
       const next = await loadWallet(client, address, {
+        onHoldings: (tokens) => {
+          if (current()) setPendingTokens(tokens);
+        },
         progress: (text) => {
           if (current()) setReadProgress(text);
         },
       });
       if (!current()) return;
-      setState(next);
-      setSelected(
-        new Set(
-          next.tokens
-            .filter((t) => t.sellable)
-            .map((t) => t.address.toLowerCase()),
-        ),
-      );
+      setState({
+        ...next,
+        tokens: next.tokens.map((t) => ({
+          ...t,
+          result: pendingRef.current.get(`${address.toLowerCase()}:${t.address.toLowerCase()}`),
+        })),
+      });
+      setPendingTokens([]);
+      setSelected(new Set());
     } catch (e) {
       if (current())
         setLoadError(`Discovery failed: ${errorText(e)} Retry with Refresh.`);
@@ -79,6 +94,7 @@ export function App() {
 
   useEffect(() => {
     setState(null);
+    setPendingTokens([]);
     setSelected(new Set());
     setSale(null);
     setPlanning(false);
@@ -92,7 +108,7 @@ export function App() {
     };
   }, [onChain, address, identity, refresh]);
 
-  const tokens = state?.tokens ?? [];
+  const tokens = state?.tokens ?? pendingTokens;
   const sellable = useMemo(
     () => tokens.filter((t) => t.sellable && t.result === undefined),
     [tokens],
@@ -101,12 +117,11 @@ export function App() {
     () => sellable.filter((t) => selected.has(t.address.toLowerCase())),
     [sellable, selected],
   );
-  const grossAll = sellable.reduce((s, t) => s + t.expectedImd, 0n);
-  const { net: netAll } = feeSplit(grossAll);
-  const totalUsd = state?.pricing ? usdValue(grossAll, state.pricing) : null;
+  const netAll = chosen.reduce((s, t) => s + feeSplit(t.expectedImd).net, 0n);
   const busy =
     planning ||
-    (sale !== null && sale.progress !== null && sale.error === null);
+    (sale !== null && sale.progress !== null && sale.error === null) ||
+    claiming !== null;
 
   const toggle = (addr: string) => {
     const k = addr.toLowerCase();
@@ -120,6 +135,7 @@ export function App() {
 
   const startSale = async (list: SwarmToken[]) => {
     if (!client || !address || !state) return;
+    saleTrigger.current = document.activeElement as HTMLElement;
     setPlanning(true);
     setNotice("");
     try {
@@ -160,9 +176,13 @@ export function App() {
         address,
         sale.plan,
         state.maxPerSale,
-        (progress) => setSale((s) => (s ? { ...s, progress } : s)),
+        (progress) => {
+          if (identityRef.current === identity)
+            setSale((s) => (s ? { ...s, progress } : s));
+        },
       );
     } catch (e) {
+      if (identityRef.current !== identity) return;
       setSale((s) =>
         s
           ? {
@@ -175,6 +195,8 @@ export function App() {
       return;
     }
     if (identityRef.current !== identity) return;
+    for (const [key, result] of results)
+      if (result.kind === "pending") pendingRef.current.set(`${address.toLowerCase()}:${key}`, result);
     const sold = [...results.values()].filter((r) => r.kind === "sold").length;
     setState((s) =>
       s
@@ -258,8 +280,8 @@ export function App() {
           <section className="hero">
             <h1>Sweep swarm tokens into IMD</h1>
             <p>
-              Find your Ethereum swarm tokens. Sell supported holdings for $
-              {IMD_SYMBOL}, with a 2% fee on successful proceeds.
+              Choose tokens, check live routes, and sell for {IMD_SYMBOL}. No
+              registration. A 2% fee applies to proceeds.
             </p>
           </section>
 
@@ -277,13 +299,11 @@ export function App() {
                 </dd>
               </div>
               <div>
-                <dt>Sellable value</dt>
-                <dd>
-                  {state ? (state.pricing ? fmtUsd(totalUsd) : "USD n/a") : "–"}
-                </dd>
+                <dt>Selected tokens</dt>
+                <dd>{state ? chosen.length : "–"}</dd>
               </div>
               <div>
-                <dt>You receive, after the 2% fee</dt>
+                <dt>Selected estimate, after 2% fee</dt>
                 <dd>{state ? `${fmtAmount(netAll)} ${IMD_SYMBOL}` : "–"}</dd>
               </div>
             </dl>
@@ -291,24 +311,26 @@ export function App() {
             <div className="actions">
               <button
                 className="btn btn-primary"
-                onClick={() => startSale(sellable)}
-                disabled={sellDisabled || sellable.length === 0}
-              >
-                {planning ? "Checking…" : "Sell all"}
-              </button>
-              <button
-                className="btn btn-secondary"
                 onClick={() => startSale(chosen)}
                 disabled={sellDisabled || chosen.length === 0}
               >
-                Sell selected{chosen.length > 0 ? ` (${chosen.length})` : ""}
+                {planning
+                  ? "Checking…"
+                  : `Review selected${chosen.length ? ` (${chosen.length})` : ""}`}
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => startSale(sellable)}
+                disabled={sellDisabled || sellable.length === 0}
+              >
+                Review all routes
               </button>
               <button
                 className="btn btn-secondary"
                 onClick={() => void refresh()}
                 disabled={!onChain || loading || busy}
               >
-                {loading ? "Reading…" : "Refresh"}
+                {loading ? "Checking…" : "Refresh routes"}
               </button>
               {!isConnected && (
                 <span className="hint">Connect a wallet to start.</span>
@@ -316,11 +338,6 @@ export function App() {
               {isConnected && !onChain && (
                 <span className="hint">
                   Switch your wallet to {chain.name} to continue.
-                </span>
-              )}
-              {state?.paused && (
-                <span className="hint">
-                  Selling is paused by the contract owner.
                 </span>
               )}
             </div>
@@ -351,13 +368,12 @@ export function App() {
               {state.pricingError && (
                 <p>USD prices unavailable: {state.pricingError}</p>
               )}
-              {state.registered === 0 && state.tokens.length > 0 && (
-                <p>
-                  These tokens have verified launch records. SwarmExit has not
-                  registered them for selling; its owner must configure tokens
-                  and routes.
-                </p>
-              )}
+              <p>
+                Routes use on-chain Uniswap v4 pools, including paths through
+                ETH. Quotes reflect this block and are checked again before
+                selling. Other exchanges and custom hook inputs are not
+                searched.
+              </p>
               <ul>
                 {state.warnings.map((w, i) => (
                   <li key={i}>{w}</li>
@@ -371,9 +387,13 @@ export function App() {
             pricing={state?.pricing ?? null}
             selected={selected}
             onToggle={toggle}
+            onSelectAll={() =>
+              setSelected(new Set(sellable.map((t) => t.address.toLowerCase())))
+            }
+            onClear={() => setSelected(new Set())}
             onClaim={onClaim}
             claiming={claiming}
-            busy={busy}
+            busy={busy || loading}
             connected={onChain}
             loading={loading}
             error={loadError}
@@ -383,7 +403,9 @@ export function App() {
 
         <footer className="foot">
           <p>
-            Contract SwarmExit{" "}
+            Live sales use Uniswap v4, one transaction per token. A reverted
+            sale leaves tokens in your wallet; network gas is still paid. Legacy
+            refunds remain available from SwarmExit{" "}
             <a
               className="mono"
               href={`${EXPLORER_URL}/address/${SWARM_EXIT_ADDRESS}`}
@@ -392,9 +414,7 @@ export function App() {
             >
               {short(SWARM_EXIT_ADDRESS)}
             </a>{" "}
-            on {chain.name}. Failed sales incur no sale fee. A refused refund
-            stays claimable; transfer-tax tokens may return less. Network gas is
-            still paid.
+            on {chain.name}.
           </p>
         </footer>
       </div>
@@ -405,6 +425,7 @@ export function App() {
           pricing={state?.pricing ?? null}
           progress={sale.progress}
           error={sale.error}
+          returnFocus={saleTrigger.current}
           onConfirm={() => void confirmSale()}
           onClose={() => setSale(null)}
         />
