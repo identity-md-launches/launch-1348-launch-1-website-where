@@ -1,0 +1,10 @@
+{
+  "transport": "public browser RPC",
+  "account": "0x0ace1dbe8aab293cd58d5e3ea38814f0ccb74782",
+  "status": "USD values unavailable: the IMD route or price feed is not configured yet.",
+  "rows": 0,
+  "firstRaw": null,
+  "firstFormatted": null,
+  "pageErrors": [],
+  "networkFailures": []
+}
