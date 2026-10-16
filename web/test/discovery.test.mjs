@@ -1,13 +1,18 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { stringToHex } from "viem";
+import { createPublicClient, custom, decodeFunctionData, encodeFunctionResult, parseAbi, stringToHex } from "viem";
+import { mainnet } from "viem/chains";
 import {
   discoverLaunches,
   REGISTRIES,
+  registryAbi,
   validateSnapshot,
 } from "../src/lib/discovery.ts";
 import { loadWallet } from "../src/lib/sweep.ts";
 import { fmtAmount } from "../src/lib/format.ts";
+import { erc20Abi } from "../src/abi/erc20.ts";
+import { swarmExitAbi } from "../src/abi/swarmExit.ts";
+import { SWARM_EXIT_ADDRESS } from "../src/deployment.ts";
 const A = "0x1111111111111111111111111111111111111111",
   B = "0x2222222222222222222222222222222222222222",
   USER = "0x3333333333333333333333333333333333333333";
@@ -53,7 +58,8 @@ function fixture({
         if (failure.includes(address)) throw Error("balance failed");
         return balances[address];
       }
-      if (functionName === "tokenRoute") return { venue: 0, tokenOut: A };
+      if (functionName === "tokenRoute")
+        return { venue: 0, router: A, quoter: A, tokenIn: A, tokenOut: A, data: "0x" };
       if (functionName === "ethUsdPrice") throw Error("not configured");
       throw Error("Unexpected read " + functionName + " " + args);
     },
@@ -260,4 +266,89 @@ test("unreadable sale settings are unknown, not an invented paused state", async
   assert.equal(s.tokens[0].sellable, false);
   assert.equal(s.complete, false);
   assert.match(s.tokens[0].readError, /Sale settings/);
+});
+
+// Exercise viem's real allowFailure behavior; a rejected aggregate resolves to failure entries.
+function rpcFixture({ aggregate = "reject", ...options } = {}) {
+  const source = fixture(options), isolated = [];
+  const multiAbi = parseAbi(["function aggregate3((address target,bool allowFailure,bytes callData)[] calls) payable returns((bool success,bytes returnData)[] returnData)"]);
+  let aggregates = 0;
+  const client = createPublicClient({
+    chain: mainnet,
+    transport: custom({
+      async request({ method, params }) {
+        if (method === "eth_chainId") return "0x1";
+        if (method === "eth_blockNumber") return "0x78";
+        if (method === "eth_getBlockByNumber") return { hash: HASH, number: "0x64", transactions: [] };
+        if (method !== "eth_call") throw Error(`Unexpected RPC ${method}`);
+        const [{ to, data }, block] = params;
+        if (to.toLowerCase() === mainnet.contracts.multicall3.address.toLowerCase()) {
+          aggregates++;
+          if (aggregate === "reject") throw Object.assign(Error("aggregate exceeds RPC gas cap"), { code: -32000 });
+          const { args } = decodeFunctionData({ abi: multiAbi, data });
+          return encodeFunctionResult({ abi: multiAbi, functionName: "aggregate3", result: await Promise.all(args[0].map(async ({ target, callData }, i) => {
+            // Preserve A's successful balance/decimals and retry only B's two failed entries.
+            if (i >= 2) return { success: false, returnData: "0x" };
+            const { functionName, args } = decodeFunctionData({ abi: erc20Abi, data: callData });
+            return { success: true, returnData: encodeFunctionResult({ abi: erc20Abi, functionName, result: await source.readContract({ address: target, functionName, args }) }) };
+          })) });
+        }
+        const abi = to.toLowerCase() === SWARM_EXIT_ADDRESS.toLowerCase() ? swarmExitAbi
+          : REGISTRIES.some((r) => r.address === to.toLowerCase()) ? registryAbi : erc20Abi;
+        const { functionName, args } = decodeFunctionData({ abi, data });
+        if (abi === erc20Abi && ["balanceOf", "decimals"].includes(functionName)) isolated.push({ address: to.toLowerCase(), functionName, block });
+        const call = { address: to.toLowerCase(), functionName, args };
+        const result = ["preview", "quoteImdInBridge"].includes(functionName)
+          ? (await source.simulateContract(call)).result : await source.readContract(call);
+        return encodeFunctionResult({ abi, functionName, result });
+      },
+    }, { retryCount: 0 }),
+  });
+  return { client, isolated, aggregateCount: () => aggregates };
+}
+
+test("real viem rejected aggregate recovers exact balances and decimals through isolated RPC", async () => {
+  const { client, isolated, aggregateCount } = rpcFixture();
+  const s = await loadWallet(client, USER, { snapshot: snapshot() });
+  assert.equal(aggregateCount(), 1);
+  assert.equal(s.complete, true);
+  assert.equal(s.balancesRead, 2);
+  assert.equal(s.tokens.length, 1);
+  assert.equal(s.tokens[0].balance, 1234567n);
+  assert.equal(s.tokens[0].decimals, 6);
+  assert.equal(fmtAmount(s.tokens[0].balance, s.tokens[0].decimals), "1.234567");
+  assert.equal(s.tokens[0].sellable, false);
+  assert.equal(isolated.length, 4);
+  assert.ok(isolated.every((read) => read.block === "0x78"));
+});
+
+test("real viem retries only failed aggregate entries, preserving successful reads", async () => {
+  const { client, isolated } = rpcFixture({ aggregate: "entries", balances: { [A]: 1234567n, [B]: 1n }, decimals: { [A]: 6, [B]: 24 } });
+  const s = await loadWallet(client, USER, { snapshot: snapshot() });
+  assert.equal(s.complete, true, s.warnings.join(" "));
+  assert.equal(s.tokens.length, 2);
+  const b = s.tokens.find((t) => t.address === B);
+  assert.equal(fmtAmount(b.balance, b.decimals), "0.000000000000000000000001");
+  assert.deepEqual(isolated, [
+    { address: B, functionName: "balanceOf", block: "0x78" },
+    { address: B, functionName: "decimals", block: "0x78" },
+  ]);
+});
+
+test("real viem isolated failures still report partial holdings or unknown wallet", async () => {
+  const { client } = rpcFixture({ failure: [B] });
+  const s = await loadWallet(client, USER, { snapshot: snapshot() });
+  assert.equal(s.complete, false);
+  assert.equal(s.tokens.length, 1);
+  assert.equal(s.balancesRead, 1);
+  assert.match(s.warnings.join(" "), /1 token balance reads failed/);
+  await assert.rejects(loadWallet(rpcFixture({ failure: [A, B] }).client, USER, { snapshot: snapshot() }), /no token balances/);
+});
+
+test("real viem unrecoverable decimals retain raw units and disable selling", async () => {
+  const s = await loadWallet(rpcFixture({ decimals: { [A]: null, [B]: 18 } }).client, USER, { snapshot: snapshot() });
+  assert.equal(s.complete, false);
+  assert.equal(s.tokens[0].decimals, null);
+  assert.equal(fmtAmount(s.tokens[0].balance, s.tokens[0].decimals), "1234567 raw units");
+  assert.equal(s.tokens[0].sellable, false);
 });

@@ -260,3 +260,54 @@ test("changed balance cannot sell an amount absent from the preview", async () =
   assert.equal(writes.length, 0);
   assert.match(r.get(A).reason, /balance changed/);
 });
+
+function refundLog(eventName, { user = USER, token = A, address = SWARM_EXIT_ADDRESS } = {}) {
+  return {
+    address,
+    topics: encodeEventTopics({ abi: swarmExitAbi, eventName, args: { user, token } }),
+    data: eventName === "TokenRefunded"
+      ? encodeAbiParameters([{ type: "uint256" }, { type: "bytes" }], [1234567n, "0x"])
+      : encodeAbiParameters([{ type: "uint256" }], [1234567n]),
+  };
+}
+
+for (const order of [["RefundHeld", "TokenRefunded"], ["TokenRefunded", "RefundHeld"]]) {
+  test(`held refund takes precedence with events in order: ${order.join(", ")}`, async () => {
+    const { client, wallet } = harness();
+    client.waitForTransactionReceipt = async () => ({
+      status: "success",
+      logs: [
+        ...order.map((eventName) => refundLog(eventName)),
+        {
+          address: SWARM_EXIT_ADDRESS,
+          topics: encodeEventTopics({ abi: swarmExitAbi, eventName: "TokenSold", args: { user: USER, token: B } }),
+          data: encodeAbiParameters([{ type: "uint256" }, { type: "uint256" }], [1234567n, 100000n]),
+        },
+      ],
+    });
+    const r = await executeSale(wallet, client, USER, plan([token(), token(B)]), 50, () => {});
+    assert.equal(r.get(A).kind, "unsold");
+    assert.equal(r.get(A).held, true);
+    assert.equal(r.get(A).reason, "Token refused the refund. Claim it below.");
+    assert.equal(r.get(A).txHash, HASH);
+    assert.deepEqual(r.get(B), { kind: "sold", imdOut: 100000n, txHash: HASH });
+  });
+}
+
+test("successful refund is not marked held by unrelated RefundHeld logs", async () => {
+  const { client, wallet } = harness();
+  client.waitForTransactionReceipt = async () => ({
+    status: "success",
+    logs: [
+      refundLog("TokenRefunded"),
+      refundLog("RefundHeld", { address: B }),
+      refundLog("RefundHeld", { user: B }),
+      refundLog("RefundHeld", { token: B }),
+    ],
+  });
+  const r = await executeSale(wallet, client, USER, plan(), 50, () => {});
+  assert.equal(r.get(A).kind, "unsold");
+  assert.notEqual(r.get(A).held, true);
+  assert.match(r.get(A).reason, /tokens refunded/);
+  assert.equal(r.size, 1);
+});

@@ -52,6 +52,7 @@ const sent = [];
 function ethCall({ to, data }) {
   const target = to.toLowerCase();
   if(target==='0xca11bde05977b3631167028862be2a173976ca11') {
+    if(readMode==='aggregate-failure')throw Error('aggregate exceeds RPC gas cap');
     const {args}=decodeFunctionData({abi:multiAbi,data});
     return encodeFunctionResult({abi:multiAbi,functionName:'aggregate3',result:args[0].map(c=>{try{return {success:true,returnData:ethCall({to:c.target,data:c.callData})}}catch{return {success:false,returnData:'0x'}}})});
   }
@@ -66,7 +67,7 @@ function ethCall({ to, data }) {
       case "minImdOut": return enc(parseUnits("0.001", 18));
       case "preview": return enc(args[1].map((t) => ({ token:getAddress(t),balance:meta[t.toLowerCase()].balance,expectedImd:meta[t.toLowerCase()].expected,sellable:meta[t.toLowerCase()].sellable,status:meta[t.toLowerCase()].status })));
       case "previewAll": return enc(tokens.map((t) => ({ token: getAddress(t), balance: meta[t].balance, expectedImd: meta[t].expected, sellable: meta[t].sellable, status: meta[t].status })));
-      case "heldRefunds": return enc(0n);
+      case "heldRefunds": return enc(readMode === 'held-refund' && saleTxHash && args[1].toLowerCase() === T.beta ? meta[T.beta].balance : 0n);
       case "tokenRoute": { const r = meta[args[0].toLowerCase()].route; return enc({ venue: r[0], router: getAddress(r[1]), quoter: getAddress(r[2]), tokenIn: getAddress(r[3]), tokenOut: getAddress(r[4]), data: "0x" }); }
       case "quoteImdInBridge": return enc(parseUnits("0.0001", 18)); // 1 IMD = 0.0001 ETH
       case "ethUsdPrice": return enc([300000000000n, 8]); // $3000
@@ -89,6 +90,7 @@ function ethCall({ to, data }) {
     if (functionName === "allowance") return enc(allowances.get(target) ?? 0n);
     if (functionName === "balanceOf") {
       if(readMode==='failure'||(readMode==='partial'&&target===T.beta))throw Error('Balance RPC failure');
+      if(readMode==='held-refund' && saleTxHash && target===T.beta)return enc(0n);
       return enc(readMode==='empty'||args[0].toLowerCase()!==USER?0n:meta[target].balance);
     }
   }
@@ -101,6 +103,7 @@ function receiptFor(hash) {
   if (tx && tx.to.toLowerCase() === EXIT) {
     const log = (eventName, args, data) => logs.push({ address: EXIT, topics: encodeEventTopics({ abi: swarmExitAbi, eventName, args }), data, blockNumber: "0x10", transactionHash: hash, transactionIndex: "0x0", blockHash: "0x" + "ab".repeat(32), logIndex: toHex(logs.length), removed: false });
     log("TokenSold", { user: USER, token: T.alpha }, encodeAbiParameters([{ type: "uint256" }, { type: "uint256" }], [meta[T.alpha].balance, meta[T.alpha].expected]));
+    if (readMode === 'held-refund') log("RefundHeld", { user: USER, token: T.beta }, encodeAbiParameters([{ type: "uint256" }], [meta[T.beta].balance]));
     log("TokenRefunded", { user: USER, token: T.beta }, encodeAbiParameters([{ type: "uint256" }, { type: "bytes" }], [meta[T.beta].balance, "0x"]));
     log("SoldAll", { user: USER }, encodeAbiParameters([{ type: "uint256" }, { type: "uint256" }, { type: "uint256" }], [meta[T.alpha].expected, meta[T.alpha].expected / 50n, meta[T.alpha].expected - meta[T.alpha].expected / 50n]));
   }
@@ -145,10 +148,12 @@ const base = `http://127.0.0.1:${server.address().port}/preview/`;
 
 const browser = await chromium.launch();
 const failures = [];
-const check = (cond, msg) => { console.log(`${cond ? "ok  " : "FAIL"} ${msg}`); if (!cond) failures.push(msg); };
+const checks = [];
+const measurements = {};
+const check = (cond, msg) => { checks.push({ passed: !!cond, message: msg }); console.log(`${cond ? "ok  " : "FAIL"} ${msg}`); if (!cond) failures.push(msg); };
 
-async function openPage(width, height, { wallet = true } = {}) {
-  const ctx = await browser.newContext({ viewport: { width, height }, hasTouch: width < 700 });
+async function openPage(width, height, { wallet = true, userAgent } = {}) {
+  const ctx = await browser.newContext({ viewport: { width, height }, hasTouch: width < 700, userAgent });
   const page = await ctx.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
@@ -268,6 +273,13 @@ for (const width of [390, 1440]) {
   check((await rows.count()) === 4, `${width}: four held tokens listed, zero balance token hidden (${await rows.count()})`);
   check(await page.getByText("Uniswap v4 to IMD").isVisible(), `${width}: ALPHA sell route identified`);
   check(await page.getByText("Uniswap V2 to ETH, then IMD").isVisible(), `${width}: BETA sell route identified`);
+  const routeBounds = await page.getByText("Uniswap V2 to ETH, then IMD", { exact: true }).evaluate((el) => {
+    const pill = el.getBoundingClientRect(), cell = el.closest('td').getBoundingClientRect();
+    const padding = parseFloat(getComputedStyle(el.closest('td')).paddingRight);
+    return { pillWidth: pill.width, pillRight: pill.right, cellRight: cell.right, contentRight: cell.right - padding };
+  });
+  measurements[`route-${width}`] = routeBounds;
+  check(routeBounds.pillRight <= routeBounds.contentRight + 0.5, `${width}: complete two-leg route fits its status cell (${JSON.stringify(routeBounds)})`);
   check((await page.getByText("No sell route found").count()) === 2, `${width}: GAMMA and DELTA marked 'No sell route found'`);
   const dim = await page.locator("tr.dim").count();
   check(dim === 2, `${width}: two rows greyed out (${dim})`);
@@ -387,7 +399,107 @@ readMode='normal';
  await ctx.close();
 }
 
+// Precise amounts must remain exact and readable in both quote and receipt states at 320px.
+{
+  const original = meta[T.alpha].expected;
+  meta[T.alpha].expected = parseUnits('100.123456789012345678', 18);
+  calls.length = 0; sent.length = 0; allowances.clear(); saleTxHash = null; txCount = 0;
+  const { ctx, page, errors } = await openPage(320, 844);
+  await page.getByRole('button', { name: 'Connect wallet' }).click();
+  await page.getByRole('button', { name: 'Mock Wallet' }).click();
+  await page.getByText(/Discovery complete:/).waitFor();
+  const alpha = page.locator('table.tokens tbody tr', { has: page.getByText('ALPHA', { exact: true }) });
+  check(await alpha.locator('[data-label=Value] .note').textContent() === '100.123456789012345678 IMD', '320: precise quote retains all 18 decimal places');
+  measurements.preciseQuoteWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  check(measurements.preciseQuoteWidth === 320, `320: precise quote has no horizontal overflow (${measurements.preciseQuoteWidth})`);
+  await page.screenshot({ path: path.join(OUT, '320-precise-quote.png'), fullPage: true });
+  await page.getByRole('button', { name: 'Sell all', exact: true }).click();
+  await page.getByRole('dialog').waitFor();
+  check(await page.getByText('150.123456789012345678 IMD', { exact: true }).isVisible(), '320: transaction preview preserves precise gross proceeds');
+  await page.getByRole('button', { name: 'Sell 2 tokens', exact: true }).click();
+  await page.getByText(/1 of 2 sold/).waitFor();
+  check(await alpha.locator('.status .note').first().textContent() === '100.123456789012345678 IMD gross', '320: sold outcome retains all 18 decimal places');
+  measurements.preciseOutcomeWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  check(measurements.preciseOutcomeWidth === 320, `320: precise sale outcome has no horizontal overflow (${measurements.preciseOutcomeWidth})`);
+  await page.screenshot({ path: path.join(OUT, '320-precise-outcome.png'), fullPage: true });
+  check(errors.length === 0, `320: precise quote/sale has no console/page errors (${errors.join('; ')})`);
+  await ctx.close();
+  meta[T.alpha].expected = original;
+}
+
+// A phone can announce a real EIP-6963 provider without setting window.ethereum.
+{
+  const userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
+  const { ctx, page, errors } = await openPage(390, 844, { userAgent });
+  check(await page.evaluate(() => !window.ethereum), 'phone EIP-6963 fixture has no legacy window.ethereum');
+  await page.getByRole('button', { name: 'Connect wallet' }).click();
+  const mock = page.getByRole('button', { name: 'Mock Wallet', exact: true });
+  measurements.mobileNamedWalletCount = await mock.count();
+  check(measurements.mobileNamedWalletCount === 1, 'phone: EIP-6963-only Mock Wallet is selectable');
+  check(await page.getByRole('link', { name: /Open in/ }).count() === 0, 'phone: available provider takes precedence over external wallet links');
+  check(await page.getByRole('button', { name: 'Browser wallet' }).count() === 0, 'phone: named provider hides generic injected connector');
+  check(await page.getByRole('button', { name: 'Coinbase Smart Wallet' }).isVisible(), 'phone: Coinbase Smart Wallet remains available with EIP-6963');
+  await page.screenshot({ path: path.join(OUT, '390-phone-eip6963-sheet.png') });
+  if (measurements.mobileNamedWalletCount === 1) {
+    await mock.click();
+    await page.getByText(/Discovery complete:/).waitFor();
+    check(await page.locator('table.tokens tbody tr:not(.empty)').count() === 4, 'phone: EIP-6963 connection discovers four positive holdings');
+    check(await page.getByRole('button', { name: /Disconnect/ }).isVisible(), 'phone: EIP-6963 wallet connects and closes the sheet');
+  }
+  check(errors.length === 0, `phone EIP-6963: no console/page errors (${errors.join('; ')})`);
+  await ctx.close();
+}
+
+// Actual viem client with both aggregate RPC endpoints rejected must issue isolated reads.
+{
+  readMode = 'aggregate-failure';
+  calls.length = 0;
+  const { ctx, page, errors } = await openPage(390, 844);
+  await page.getByRole('button', { name: 'Connect wallet' }).click();
+  await page.getByRole('button', { name: 'Mock Wallet' }).click();
+  await page.getByText(/Discovery complete:|Discovery failed:|Partial discovery:/).first().waitFor();
+  const status = await page.locator('.status-line').first().innerText();
+  measurements.aggregateFallback = { status, balanceCalls: calls.filter((c) => c === 'erc20.balanceOf').length, rows: await page.locator('table.tokens tbody tr:not(.empty)').count() };
+  check(status.includes('Discovery complete:'), 'aggregate RPC rejection recovers complete discovery');
+  check(measurements.aggregateFallback.rows === 4, `aggregate RPC rejection retains four positive holdings (${measurements.aggregateFallback.rows})`);
+  check(measurements.aggregateFallback.balanceCalls === 5, `aggregate RPC rejection issues five isolated balance calls (${measurements.aggregateFallback.balanceCalls})`);
+  if (measurements.aggregateFallback.rows === 4) {
+    const alpha = page.locator('table.tokens tbody tr', { has: page.getByText('ALPHA', { exact: true }) });
+    check(await alpha.locator('.exact-balance').innerText() === '12,500', 'aggregate fallback preserves formatted ALPHA balance');
+    check(await alpha.locator('.raw-balance .mono').textContent() === '12500000000000000000000', 'aggregate fallback preserves raw ALPHA balance');
+  }
+  check(errors.length === 0, `aggregate fallback: no console/page errors (${errors.join('; ')})`);
+  await page.screenshot({ path: path.join(OUT, '390-aggregate-fallback.png'), fullPage: true });
+  await ctx.close();
+  readMode = 'normal';
+}
+
+// On-chain event order: RefundHeld precedes TokenRefunded when the token refuses the transfer.
+{
+  readMode = 'held-refund';
+  sent.length = 0; allowances.clear(); saleTxHash = null; txCount = 0;
+  const { ctx, page, errors } = await openPage(390, 844);
+  await page.getByRole('button', { name: 'Connect wallet' }).click();
+  await page.getByRole('button', { name: 'Mock Wallet' }).click();
+  await page.getByText(/Discovery complete:/).waitFor();
+  await page.getByRole('button', { name: 'Sell all', exact: true }).click();
+  await page.getByRole('button', { name: 'Sell 2 tokens', exact: true }).click();
+  await page.getByText(/1 of 2 sold/).waitFor();
+  const beta = page.locator('table.tokens tbody tr', { has: page.getByText('BETA', { exact: true }) });
+  await beta.getByRole('button', { name: 'Claim refund' }).waitFor();
+  check(await beta.getByText('Token refused the refund. Claim it below.', { exact: true }).isVisible(), 'held refund: receipt says tokens are held and must be claimed');
+  check(await beta.getByText(/tokens refunded/).count() === 0, 'held refund: receipt never claims the transfer succeeded');
+  check(await beta.locator('.exact-balance').textContent() === '0', 'held refund: zero wallet balance remains visible with the claim');
+  check(await beta.getByRole('button', { name: 'Claim refund' }).isEnabled(), 'held refund: confirmed held balance exposes an enabled claim control');
+  check(await beta.getByText(/3.25 held as refund/).isVisible(), 'held refund: exact held balance is displayed');
+  check(errors.length === 0, `held refund: no console/page errors (${errors.join('; ')})`);
+  await page.screenshot({ path: path.join(OUT, '390-held-refund.png'), fullPage: true });
+  await ctx.close();
+  readMode = 'normal';
+}
+
 await browser.close();
 server.close();
+fs.writeFileSync(path.join(OUT, 'result.json'), JSON.stringify({ checks, measurements, failures }, null, 2) + '\n');
 console.log(failures.length === 0 ? "\nALL CHECKS PASSED" : `\n${failures.length} CHECK(S) FAILED`);
 process.exit(failures.length === 0 ? 0 : 1);

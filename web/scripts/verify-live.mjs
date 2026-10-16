@@ -9,9 +9,10 @@ import { erc20Abi } from "../src/abi/erc20.ts";
 import { swarmExitAbi } from "../src/abi/swarmExit.ts";
 import { SWARM_EXIT_ADDRESS } from "../src/deployment.ts";
 const account = "0x0ace1dbe8aab293cd58d5e3ea38814f0ccb74782";
+const rpcSource = process.argv[2] || "https://ethereum-rpc.publicnode.com";
 const client = createPublicClient({
   chain: mainnet,
-  transport: http(process.argv[2] || "https://ethereum-rpc.publicnode.com", {
+  transport: http(rpcSource, {
     timeout: 20000,
   }),
 });
@@ -121,7 +122,7 @@ const report = {
   chainId: 1,
   account,
   blockNumber: state.blockNumber.toString(),
-  rpcSource: "https://ethereum-rpc.publicnode.com",
+  rpcSource,
   officialSource: snapshot.source,
   snapshotBlock: snapshot.blockNumber,
   launchContracts: state.discovered,

@@ -77,6 +77,8 @@ export function ConnectSheet({
   const named = connectors.some(
     (c) => c.type === "injected" && c.id !== "injected",
   );
+  // An EIP-6963 wallet can be available on a phone without window.ethereum.
+  const needsOpenIn = mobile && !named;
   const listed = [
     ...connectors.filter((c) => c.type === "injected"),
     ...connectors.filter((c) => c.type !== "injected"),
@@ -176,7 +178,7 @@ export function ConnectSheet({
                   ×
                 </button>
               </div>
-              {mobile &&
+              {needsOpenIn &&
                 OPEN_IN.map((w) => (
                   <a
                     key={w.id}
@@ -199,7 +201,7 @@ export function ConnectSheet({
                   </a>
                 ))}
               {listed
-                .filter((c) => !mobile || c.type !== "injected")
+                .filter((c) => !needsOpenIn || c.id !== "injected")
                 .map((c) => (
                   <button
                     key={c.uid}

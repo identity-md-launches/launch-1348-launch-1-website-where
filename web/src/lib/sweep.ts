@@ -222,20 +222,25 @@ export async function loadWallet(
         multicallAddress: mainnet.contracts.multicall3.address,
         batchSize: 0,
       });
-    } catch {
-      reads = await Promise.all(
-        contracts.map(async (c) => {
-          try {
-            return {
-              status: "success" as const,
-              result: await client.readContract({ ...c, blockNumber }),
-            };
-          } catch (error) {
-            return { status: "failure" as const, error };
-          }
-        }),
-      );
+    } catch (error) {
+      reads = contracts.map(() => ({ status: "failure" as const, error }));
     }
+    // With allowFailure, viem also resolves aggregate RPC rejection as failed entries.
+    // Retry only those entries, at the same block, before deciding coverage is incomplete.
+    reads = await Promise.all(
+      contracts.map(async (c, i) => {
+        const read = reads[i];
+        if (read?.status === "success") return read;
+        try {
+          return {
+            status: "success" as const,
+            result: await client.readContract({ ...c, blockNumber }),
+          };
+        } catch (error) {
+          return { status: "failure" as const, error };
+        }
+      }),
+    );
     await Promise.all(
       chunk.map(async (launch, i) => {
         const balanceRead = reads[i * 2]!;
@@ -673,38 +678,43 @@ export async function executeSale(
       abi: swarmExitAbi,
       logs: receipt.logs.filter((l) => same(l.address, SWARM_EXIT_ADDRESS)),
     });
-    for (const log of logs) {
-      if (
-        !("user" in log.args) ||
-        !same(log.args.user, account) ||
-        !("token" in log.args)
-      )
-        continue;
-      const tokenAddress = log.args.token;
-      if (!batch.some((i) => same(i.token.address, tokenAddress))) continue;
-      const k = tokenAddress.toLowerCase();
-      if (log.eventName === "TokenSold")
-        results.set(k, { kind: "sold", imdOut: log.args.imdOut, txHash: hash });
-      else if (log.eventName === "TokenSkipped")
+    for (const { token } of batch) {
+      const tokenLogs = logs.filter(
+        (log) =>
+          "user" in log.args &&
+          same(log.args.user, account) &&
+          "token" in log.args &&
+          same(log.args.token, token.address),
+      );
+      const k = token.address.toLowerCase();
+      const held = tokenLogs.find((log) => log.eventName === "RefundHeld");
+      const sold = tokenLogs.find((log) => log.eventName === "TokenSold");
+      const refunded = tokenLogs.find((log) => log.eventName === "TokenRefunded");
+      const skipped = tokenLogs.find((log) => log.eventName === "TokenSkipped");
+      // _refund emits RefundHeld before TokenRefunded when the transfer fails.
+      // Interpret the whole token outcome so event order cannot imply delivery.
+      if (held)
         results.set(k, {
           kind: "unsold",
-          reason:
-            STATUS_TEXT[Number(log.args.status)] ?? "Skipped by the contract.",
+          reason: "Token refused the refund. Claim it below.",
           txHash: hash,
+          held: true,
         });
-      else if (log.eventName === "TokenRefunded")
+      else if (sold)
+        results.set(k, { kind: "sold", imdOut: sold.args.imdOut, txHash: hash });
+      else if (refunded)
         results.set(k, {
           kind: "unsold",
           reason:
             "Sale failed; tokens refunded. Transfer-tax tokens may refund less.",
           txHash: hash,
         });
-      else if (log.eventName === "RefundHeld")
+      else if (skipped)
         results.set(k, {
           kind: "unsold",
-          reason: "Token refused the refund. Claim it below.",
+          reason:
+            STATUS_TEXT[Number(skipped.args.status)] ?? "Skipped by the contract.",
           txHash: hash,
-          held: true,
         });
     }
   }

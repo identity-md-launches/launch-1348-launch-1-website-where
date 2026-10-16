@@ -426,6 +426,11 @@ main {
   color: var(--color-accent);
 }
 
+.tokens .pill {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .pill-muted {
   background: var(--color-bg-muted);
   color: var(--color-text-secondary);
@@ -683,7 +688,7 @@ main {
   }
   .tokens tr {
     display: grid;
-    grid-template-columns: 44px 1fr 1fr;
+    grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas:
       "pick token balance"
       "pick status value";
@@ -747,6 +752,7 @@ main {
 
 /* Full addresses and exact balances stay readable at every viewport. */
 .exact-balance,
+.tokens .note,
 .tokens .addr,
 .raw-balance,
 .status-line,

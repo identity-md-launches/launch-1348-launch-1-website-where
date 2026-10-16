@@ -4,6 +4,8 @@ SwarmSweep finds verified Swarm-launched tokens in a connected **Ethereum mainne
 
 **Verified result, 2026-10-16:** the supplied wallet `0x0acE1DBE8AAb293cd58D5e3Ea38814f0ccb74782` holds **163** of the **220** discovered Ethereum token contracts. All 220 balances were read successfully; independent ERC-20 calls matched every positive balance and decimals value. The production browser also displayed 163 holdings using public RPCs, with no failed requests or page errors. See [VALIDATION.md](VALIDATION.md) and the [complete balance record](docs/validation/live-discovery.json).
 
+**Review revision:** all five reported defects were reproduced and fixed: held-refund event precedence, precise-amount mobile overflow, isolated RPC recovery, desktop route clipping, and mobile EIP-6963 wallet selection. The rebuilt export passed **42 regression tests**, **129 Chromium interaction checks**, typecheck, production build and **16/16 design-probe checks**. Fresh mainnet verification again detected 163 holdings. Results and remaining deployment limits are in [the revision validation](VALIDATION.md#review-revision), with a response for each finding in [.imd-responses.json](.imd-responses.json).
+
 ## Root cause and source provenance
 
 The linked [merged SwarmSweep implementation](https://github.com/identity-md-launches/launch-1682-build-protocol-enables-user/pull/2), commit `e6a695d9a368642617f5c801a7759494caf0b81d`, called SwarmExit's `previewAll(wallet)` to discover tokens. That function only iterates the contract owner's sale registry. On Ethereum, `swarmTokenCount()` is **0**, so the original page reported no tokens even though the wallet holds 163 verified launch tokens. This was reproduced in Chromium using the merged export and real Ethereum reads.
@@ -32,17 +34,19 @@ To validate the production interactions with an available Playwright installatio
 cd web
 node --experimental-strip-types scripts/interact.mjs
 node --experimental-strip-types scripts/check-abi.mjs
-node --experimental-strip-types scripts/verify-live.mjs
+node --experimental-strip-types scripts/verify-live.mjs https://eth.drpc.org
 node scripts/browser-live.mjs
 ```
 
 `interact.mjs` uses explicitly simulated wallets and RPC responses. `verify-live.mjs` and `browser-live.mjs` use real Ethereum data and the supplied public holder address, and never request signatures. Playwright scripts accept `IMD_PLAYWRIGHT` pointing to its `index.mjs` and `PLAYWRIGHT_BROWSERS_PATH` where needed. They write disposable screenshots under `test/scratch/`.
 
+The live script's historical replay needs archive reads. PublicNode refused that part of the revision check with “Archive requests require a personal token”; the same check passed through the already configured dRPC endpoint. Normal current-block discovery and the browser's public RPC checks passed. The script records the RPC URL actually supplied in its report.
+
 ## How discovery works
 
 1. `web/public/launches.json` contains a generated snapshot of **all pages** of the official [launch index](https://api.imd.fun/launches?limit=500), filtered to Ethereum token artifacts. The refresh script checks successful deployment receipts and deployed code, and reconciles every record in both current on-chain registries. It is not a manually curated token list.
 2. The snapshot pins Ethereum block **26,202,460**, its hash, and registry counts. At runtime the client checks chain ID 1 and that block hash, reads current registry counts, scans subsequent `LaunchRecorded` events in bounded ranges, and reads each event's `artifactsOf(launchNumber)`. Only the explicit `token` role qualifies; names and symbols do not establish eligibility. Missing events are detected by comparing counts.
-3. At one current Ethereum block, batched ERC-20 `balanceOf` and `decimals` calls match discovered addresses against the wallet. Multicall failure falls back to individual reads. Amounts remain `bigint` and are formatted exactly, including 0–255 decimals. Missing decimals are shown as raw units and cannot be sold.
+3. At one current Ethereum block, batched ERC-20 `balanceOf` and `decimals` calls match discovered addresses against the wallet. Failed entries are retried individually at that same block, including when viem resolves aggregate RPC rejection as per-call failures. Successful entries are retained. Amounts remain `bigint` and are formatted exactly, including 0–255 decimals. Missing decimals are shown as raw units and cannot be sold.
 4. The app separately reads SwarmExit's per-token preview, route and held refunds. A positive holding survives missing registration, route, liquidity, pricing or preview errors. Unknown prices say unavailable. A failed balance or registry read produces a partial or failure state, never a completed empty-wallet result.
 5. Account and network changes invalidate in-flight UI results and sale confirmations. Both the wallet chain and the public RPC chain must be Ethereum before signing.
 
@@ -66,6 +70,8 @@ SwarmExit remains at [`0x5c3c2a6d7d340db9f8b3e0cbbc8dbbb7ec73bc61`](https://ethe
 Sell all / sell selected retain confirmation, exact token approvals, per-token minimum proceeds, gas estimates and batches bounded by the contract's limit. Before approval, the confirmation clearly labels its figures as quotes. After approval, a fresh simulation and gas estimate must pass before a sale is sent. Failed simulations never fall back to invented successful outcomes. The client checks receipt status and only accepts outcome logs from SwarmExit for the connected account and submitted tokens. Unknown confirmations remain pending; a later batch failure retains earlier confirmed results.
 
 The deployed contract charges the fee on successful IMD proceeds, rounded down per transaction. A reverted sale charges no sale fee, although network gas is spent. A token that refuses its refund leaves a claimable held refund; transfer-tax tokens can return less than the initial amount. The interface states those distinctions.
+
+Receipt outcomes are reduced per token across all verified events. `RefundHeld` takes precedence over `TokenRefunded`, including the contract's actual order where the latter is emitted last. A held refund stays marked unsold with the instruction to claim it; it is never described as delivered to the wallet.
 
 **The live contract currently has zero registered sale tokens.** The 163 detected holdings are therefore visible and disabled for selling. No mainnet sale was sent or claimed to succeed. The owner must use the existing `setSwarmToken`, `setTokenRoute`, `setImdRoute` and `setEthUsdFeed` functions with the actual launch pools and price feed; discovery no longer depends on completing this configuration. See the [upstream contract's configuration documentation](https://github.com/identity-md-launches/launch-1682-build-protocol-enables-user/blob/e6a695d9a368642617f5c801a7759494caf0b81d/README.md#after-launch-owner-responsibilities).
 

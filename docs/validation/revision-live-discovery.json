@@ -1,0 +1,1654 @@
+{
+  "incrementalCheck": {
+    "fromBlock": 26200960,
+    "historicalTokens": 218,
+    "recoveredTokens": 2,
+    "totalTokens": 220,
+    "warnings": []
+  },
+  "treasury": "0xFC3ad9C531e1736690b2d5f24FebD35ebf051cFB",
+  "feeBps": "200",
+  "chainId": 1,
+  "account": "0x0ace1dbe8aab293cd58d5e3ea38814f0ccb74782",
+  "blockNumber": "26202661",
+  "rpcSource": "https://eth.drpc.org",
+  "officialSource": "https://api.imd.fun/launches",
+  "snapshotBlock": 26202460,
+  "launchContracts": 220,
+  "balancesRead": 220,
+  "swarmExitRegistered": "0",
+  "complete": true,
+  "warnings": [],
+  "holdings": [
+    {
+      "address": "0x01b3b98599608a41d46a3c5c34ed736329b7c6b2",
+      "symbol": "GENESIS",
+      "launchNumber": 1156,
+      "raw": "90497737556561085972851",
+      "decimals": 18,
+      "formatted": "90497.737556561085972851",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x047ceafe0e715b7af38b65dd7185c60d9420594c",
+      "symbol": "1MD",
+      "launchNumber": 945,
+      "raw": "103896103896103896103897",
+      "decimals": 18,
+      "formatted": "103896.103896103896103897",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x05931b5d7c0f5fbb2315a87ed48e3167483b1b67",
+      "symbol": "PACHU",
+      "launchNumber": 823,
+      "raw": "111888111888111888111889",
+      "decimals": 18,
+      "formatted": "111888.111888111888111889",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x0692a2313f31852b041dd733d89126a714a6fcd1",
+      "symbol": "LOOT",
+      "launchNumber": 1445,
+      "raw": "79286422200198216055501",
+      "decimals": 18,
+      "formatted": "79286.422200198216055501",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x083e1581e8e8f646926259956e10dc6dd8836468",
+      "symbol": "SORN",
+      "launchNumber": 1504,
+      "raw": "78817733990147783251232",
+      "decimals": 18,
+      "formatted": "78817.733990147783251232",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x0baf064693b5d0ec4fd12374f74f452b44250d2f",
+      "symbol": "PMD",
+      "launchNumber": 1607,
+      "raw": "78662733529990167158309",
+      "decimals": 18,
+      "formatted": "78662.733529990167158309",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x0eee1f96f745845c24f62afd200875cfa4a411b8",
+      "symbol": "SIMDTEST",
+      "launchNumber": 998,
+      "raw": "99255583126550868486353",
+      "decimals": 18,
+      "formatted": "99255.583126550868486353",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x0fd888a99f30b2d60d5cf7ad73540c02ada15d28",
+      "symbol": "RISK",
+      "launchNumber": 1113,
+      "raw": "92592592592592592592593",
+      "decimals": 18,
+      "formatted": "92592.592592592592592593",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x10104fdc10e6d562d9bb63379e085e1d61bde229",
+      "symbol": "SPEPE",
+      "launchNumber": 1039,
+      "raw": "98643649815043156596795",
+      "decimals": 18,
+      "formatted": "98643.649815043156596795",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x10c930d707e6d83708e69516c8d594be7cfb5654",
+      "symbol": "PEPES",
+      "launchNumber": 767,
+      "raw": "125588697017268445839875",
+      "decimals": 18,
+      "formatted": "125588.697017268445839875",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x13118c8e8ff0e5a1d96b96239954718acb16e946",
+      "symbol": "WORKER",
+      "launchNumber": 992,
+      "raw": "101522842639593908629442",
+      "decimals": 18,
+      "formatted": "101522.842639593908629442",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x1553a3d4ae3efa98fb9a0e261602bc4d4d580452",
+      "symbol": "HARVEST",
+      "launchNumber": 1029,
+      "raw": "98643649815043156596795",
+      "decimals": 18,
+      "formatted": "98643.649815043156596795",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x15881793f74ed4c7e41ce79b5ded4bb5a3f178c3",
+      "symbol": "IFO",
+      "launchNumber": 1452,
+      "raw": "79207920792079207920793",
+      "decimals": 18,
+      "formatted": "79207.920792079207920793",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x170c31f33c840a043f607563c25e8c1953b9107a",
+      "symbol": "TEYO",
+      "launchNumber": 1514,
+      "raw": "80889787664307381193125",
+      "decimals": 18,
+      "formatted": "80889.787664307381193125",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x1782f228c9e36f86252f2c2ea61c01f99dbfa2b5",
+      "symbol": "KITE",
+      "launchNumber": 1392,
+      "raw": "80563947633434038267876",
+      "decimals": 18,
+      "formatted": "80563.947633434038267876",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x180074fbbefae999cdaa29332144eb71098fdc64",
+      "symbol": "NUKE",
+      "launchNumber": 1149,
+      "raw": "89686098654708520179373",
+      "decimals": 18,
+      "formatted": "89686.098654708520179373",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x18150e743cf534346bc20df5e6f6ed06ea35a71c",
+      "symbol": "DOLAR",
+      "launchNumber": 946,
+      "raw": "100882723833543505674654",
+      "decimals": 18,
+      "formatted": "100882.723833543505674654",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x19daa15bddcce57e75921d6ab72832cedd2054bc",
+      "symbol": "SIMDTEST",
+      "launchNumber": 1009,
+      "raw": "98522167487684729064040",
+      "decimals": 18,
+      "formatted": "98522.16748768472906404",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x1a8fbf1b3577d0b573f8540a3ae0450bf251a14c",
+      "symbol": "BITES",
+      "launchNumber": 1474,
+      "raw": "790513833992094861661",
+      "decimals": 18,
+      "formatted": "790.513833992094861661",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x1b9c1f26f591ccccef7762edfefad39bf107da4c",
+      "symbol": "INFER",
+      "launchNumber": 1257,
+      "raw": "89285714285714285714286",
+      "decimals": 18,
+      "formatted": "89285.714285714285714286",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x1c76f5aa4cab77f39d90789e91e88eaac509cc03",
+      "symbol": "CADENCEIMD",
+      "launchNumber": 1324,
+      "raw": "88202866593164277839030",
+      "decimals": 18,
+      "formatted": "88202.86659316427783903",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x1ca173188918409e15034c8696ce052b15cc7005",
+      "symbol": "COINSTARK",
+      "launchNumber": 1471,
+      "raw": "79286422200198216055501",
+      "decimals": 18,
+      "formatted": "79286.422200198216055501",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x1fbd6a2acfc22b995dba27c0fd216ce4f7e6a60b",
+      "symbol": "LOOM",
+      "launchNumber": 1549,
+      "raw": "78048780487804878048781",
+      "decimals": 18,
+      "formatted": "78048.780487804878048781",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x2609adebbf7a4e49fcd3b8ca8de633e12c50bf9a",
+      "symbol": "VERDICT",
+      "launchNumber": 1332,
+      "raw": "87815587266739846322723",
+      "decimals": 18,
+      "formatted": "87815.587266739846322723",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x260b97dd95e22e738ac2f1aa52700183ca3923ff",
+      "symbol": "SWARMLER",
+      "launchNumber": 1565,
+      "raw": "77220077220077220077221",
+      "decimals": 18,
+      "formatted": "77220.077220077220077221",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x285778eb64709afb6bde3e6a46bec1286ee59b52",
+      "symbol": "POLYNEUM",
+      "launchNumber": 1596,
+      "raw": "76997112608277189605390",
+      "decimals": 18,
+      "formatted": "76997.11260827718960539",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x2d3f5de0282d0127facdb64ae1bf778981f4aa75",
+      "symbol": "SWARMPEPES",
+      "launchNumber": 836,
+      "raw": "111888111888111888111889",
+      "decimals": 18,
+      "formatted": "111888.111888111888111889",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x2e06a88d87e67503105051c940163a625d5e1e19",
+      "symbol": "ZEUS",
+      "launchNumber": 1145,
+      "raw": "89786756453423120089787",
+      "decimals": 18,
+      "formatted": "89786.756453423120089787",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x2e708fd7ddb6f2c1a69372fc9c3d1f77c14f5632",
+      "symbol": "SPECTRA",
+      "launchNumber": 1171,
+      "raw": "89887640449438202247191",
+      "decimals": 18,
+      "formatted": "89887.640449438202247191",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x307225e352b98198076df3c7ca2bd8dae2aa0b23",
+      "symbol": "LOOM",
+      "launchNumber": 1527,
+      "raw": "78277886497064579256361",
+      "decimals": 18,
+      "formatted": "78277.886497064579256361",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x30ef39086948a8508f9d184926ab3cc5cde7941b",
+      "symbol": "SIMDTEST",
+      "launchNumber": 1021,
+      "raw": "98643649815043156596795",
+      "decimals": 18,
+      "formatted": "98643.649815043156596795",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x3190c988b635c28f307687f93d699333fdc3190c",
+      "symbol": "IMDUSD",
+      "launchNumber": 812,
+      "raw": "119940029985007496251874",
+      "decimals": 18,
+      "formatted": "119940.029985007496251874",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x31ca73d03093357df8ddaaa73dbe1970f4eead6c",
+      "symbol": "TDEMO",
+      "launchNumber": 1245,
+      "raw": "89786756453423120089787",
+      "decimals": 18,
+      "formatted": "89786.756453423120089787",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x32949824bcad5af19c3748590a9ab4a2b6fce69a",
+      "symbol": "SIMDTEST",
+      "launchNumber": 997,
+      "raw": "103761348897535667963684",
+      "decimals": 18,
+      "formatted": "103761.348897535667963684",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x380cfcb68f13e6be8b27f34d24690764ad84a3ac",
+      "symbol": "STARKNET",
+      "launchNumber": 1566,
+      "raw": "78201368523949169110460",
+      "decimals": 18,
+      "formatted": "78201.36852394916911046",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x384f51225544c64eed731b501a0962eff5acc5fe",
+      "symbol": "TEST",
+      "launchNumber": 1274,
+      "raw": "89086859688195991091314",
+      "decimals": 18,
+      "formatted": "89086.859688195991091314",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x3b34c6ff567ac521ce1a46cd7cc572a0d5c65f59",
+      "symbol": "PERK",
+      "launchNumber": 1663,
+      "raw": "77294685990338164251208",
+      "decimals": 18,
+      "formatted": "77294.685990338164251208",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x3b6d536d8adf4335a79d8605b3bcc17160ea56d6",
+      "symbol": "PEPE",
+      "launchNumber": 754,
+      "raw": "126782884310618066561015",
+      "decimals": 18,
+      "formatted": "126782.884310618066561015",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x3e2e5f24433a4d176b0a1ab9c7fdbedbed440bd1",
+      "symbol": "SFP",
+      "launchNumber": 1298,
+      "raw": "89186176142697881828317",
+      "decimals": 18,
+      "formatted": "89186.176142697881828317",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x40ee61fdabe76d966a29ea406233ed80eb318410",
+      "symbol": "CETS",
+      "launchNumber": 903,
+      "raw": "106666666666666666666667",
+      "decimals": 18,
+      "formatted": "106666.666666666666666667",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x41340effe45c2f919f5fb1c55cb0068ed12cd139",
+      "symbol": "VERDICT",
+      "launchNumber": 1319,
+      "raw": "88593576965669988925803",
+      "decimals": 18,
+      "formatted": "88593.576965669988925803",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x42418ad73e20cf0c8bc8a29fe1bc26b5de312a1f",
+      "symbol": "PRIO",
+      "launchNumber": 1126,
+      "raw": "92378752886836027713626",
+      "decimals": 18,
+      "formatted": "92378.752886836027713626",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x450e5910decee15c3ac056e3ed66cb5ea3dd33be",
+      "symbol": "CABAL",
+      "launchNumber": 953,
+      "raw": "101522842639593908629442",
+      "decimals": 18,
+      "formatted": "101522.842639593908629442",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x462bc29829dce787e3c8b32f5c032a49234f0e2b",
+      "symbol": "NECTAR",
+      "launchNumber": 1422,
+      "raw": "80080080080080080080081",
+      "decimals": 18,
+      "formatted": "80080.080080080080080081",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x481f878b29c276f77050723eba9ae1375ad85bb6",
+      "symbol": "VERDICT",
+      "launchNumber": 1352,
+      "raw": "84925690021231422505308",
+      "decimals": 18,
+      "formatted": "84925.690021231422505308",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x4a09888667f7bcf5ff990b213e6e09ac442e24f7",
+      "symbol": "DAEMON",
+      "launchNumber": 745,
+      "raw": "128000000000000000000000",
+      "decimals": 18,
+      "formatted": "128000",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x4a207d33f42dc819eccfa74091ad33ced0fa4b2f",
+      "symbol": "SHITPAPER",
+      "launchNumber": 1155,
+      "raw": "89887640449438202247191",
+      "decimals": 18,
+      "formatted": "89887.640449438202247191",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x4a3c2cf66b44ba4c7e2b1eb4ca5738d63cc47845",
+      "symbol": "PONZI",
+      "launchNumber": 1519,
+      "raw": "80808080808080808080809",
+      "decimals": 18,
+      "formatted": "80808.080808080808080809",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x4b3d4fa5e6c043cc56651da83bd857a2cc355b01",
+      "symbol": "HI",
+      "launchNumber": 780,
+      "raw": "124416796267496111975117",
+      "decimals": 18,
+      "formatted": "124416.796267496111975117",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x4c574e03ff68efff585a411f3e4faa7fa21f889a",
+      "symbol": "SPAD",
+      "launchNumber": 1104,
+      "raw": "93567251461988304093568",
+      "decimals": 18,
+      "formatted": "93567.251461988304093568",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x4d7d8f402581bf084df65737a656b5f917763615",
+      "symbol": "CRAWLHIVE",
+      "launchNumber": 1621,
+      "raw": "76408787010506208213945",
+      "decimals": 18,
+      "formatted": "76408.787010506208213945",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x4dc25f4a5beecfdd7ef3dde1c250cbcc29497753",
+      "symbol": "AINSEM",
+      "launchNumber": 824,
+      "raw": "111888111888111888111889",
+      "decimals": 18,
+      "formatted": "111888.111888111888111889",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x4f2bacee5f2e7ce3f48dfbd635d96e9a8fcbe478",
+      "symbol": "PAWN",
+      "launchNumber": 994,
+      "raw": "98522167487684729064040",
+      "decimals": 18,
+      "formatted": "98522.16748768472906404",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x501381d5156693e71aa5e69bf05dfb418401975f",
+      "symbol": "GOONCAT",
+      "launchNumber": 1333,
+      "raw": "85653104925053533190579",
+      "decimals": 18,
+      "formatted": "85653.104925053533190579",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x52b4f1a53d5919d08c6c60b31bd97dd901c88879",
+      "symbol": "IMDUSD",
+      "launchNumber": 882,
+      "raw": "107382550335570469798658",
+      "decimals": 18,
+      "formatted": "107382.550335570469798658",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x54554595f31773de25e92f92e41410e6888f3565",
+      "symbol": "SPALACE",
+      "launchNumber": 1210,
+      "raw": "88888888888888888888889",
+      "decimals": 18,
+      "formatted": "88888.888888888888888889",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x562f83ebb80a84c6570aeb8f088fbff2a82ca8e4",
+      "symbol": "MIRROR",
+      "launchNumber": 1006,
+      "raw": "98643649815043156596795",
+      "decimals": 18,
+      "formatted": "98643.649815043156596795",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x58980b5f31238a552e93ec6dc5a58cbc53447f09",
+      "symbol": "SIMDTEST",
+      "launchNumber": 989,
+      "raw": "102432778489116517285532",
+      "decimals": 18,
+      "formatted": "102432.778489116517285532",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x58d249d70f9c2508fbe50bf7bf749db0f248645c",
+      "symbol": "COINBITC",
+      "launchNumber": 1450,
+      "raw": "80000000000000000000000",
+      "decimals": 18,
+      "formatted": "80000",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x5a90820d0ea07e030a909491ab6b0cb5d5deeffe",
+      "symbol": "CRAWL",
+      "launchNumber": 1634,
+      "raw": "76190476190476190476191",
+      "decimals": 18,
+      "formatted": "76190.476190476190476191",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x5b9aa7a7443964e80045ea9033e5ebf4f44979e4",
+      "symbol": "STRATA",
+      "launchNumber": 805,
+      "raw": "120481927710843373493976",
+      "decimals": 18,
+      "formatted": "120481.927710843373493976",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x5e5b866b079d4063ba080b758aef127ccd570fea",
+      "symbol": "SNITCH",
+      "launchNumber": 1398,
+      "raw": "80402010050251256281407",
+      "decimals": 18,
+      "formatted": "80402.010050251256281407",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x60bc25c265de869e3d407676fed997d1f1902fe9",
+      "symbol": "ORACLE",
+      "launchNumber": 1132,
+      "raw": "90293453724604966139955",
+      "decimals": 18,
+      "formatted": "90293.453724604966139955",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x619047eceb1dab6d0a6e33ab326b3a17b1e119d8",
+      "symbol": "BRAIN",
+      "launchNumber": 1500,
+      "raw": "78817733990147783251232",
+      "decimals": 18,
+      "formatted": "78817.733990147783251232",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x61aec2f5fc07011f84f67c8ef83f28dd7d76cf56",
+      "symbol": "BLOX",
+      "launchNumber": 1581,
+      "raw": "79365079365079365079366",
+      "decimals": 18,
+      "formatted": "79365.079365079365079366",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x6604559d43eaae9510fa702d949c8be15b586db9",
+      "symbol": "SIMDTEST",
+      "launchNumber": 1008,
+      "raw": "99009900990099009900991",
+      "decimals": 18,
+      "formatted": "99009.900990099009900991",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x6abb57b52a2d12c1af47cd5819154034cf35bc3e",
+      "symbol": "PULSE",
+      "launchNumber": 1416,
+      "raw": "79522862823061630218688",
+      "decimals": 18,
+      "formatted": "79522.862823061630218688",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x6b8de03a43c697e67a5e67e214b3aba385febdd3",
+      "symbol": "TESTER",
+      "launchNumber": 1168,
+      "raw": "91954022988505747126437",
+      "decimals": 18,
+      "formatted": "91954.022988505747126437",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x6bf2954376b7ce1d5e0e77e2155fc0e9fac64ec2",
+      "symbol": "INFER",
+      "launchNumber": 1042,
+      "raw": "98643649815043156596795",
+      "decimals": 18,
+      "formatted": "98643.649815043156596795",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x7010197ad6189d1c85f66ad1bb0d876ac42a4d3b",
+      "symbol": "VERDICT",
+      "launchNumber": 1666,
+      "raw": "76335877862595419847329",
+      "decimals": 18,
+      "formatted": "76335.877862595419847329",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x7094b1ba79e7eb3fab7caa8aa9b45976cd120807",
+      "symbol": "SCOOP",
+      "launchNumber": 1376,
+      "raw": "81135902636916835699798",
+      "decimals": 18,
+      "formatted": "81135.902636916835699798",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x73ddb09750c1bbcde03722b497dac6ded00f0fa0",
+      "symbol": "CADENCE",
+      "launchNumber": 1442,
+      "raw": "79760717846460618145564",
+      "decimals": 18,
+      "formatted": "79760.717846460618145564",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x7413073711e68a182567efaf11505c80a1a5761a",
+      "symbol": "IMD6900",
+      "launchNumber": 802,
+      "raw": "118694362017804154302671",
+      "decimals": 18,
+      "formatted": "118694.362017804154302671",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x7558cfdfac2d310ff740206ec6e13529b82f2a9b",
+      "symbol": "VERDICT",
+      "launchNumber": 1435,
+      "raw": "80402010050251256281407",
+      "decimals": 18,
+      "formatted": "80402.010050251256281407",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x75652f324aa507cefbcbc321379612d0345d270b",
+      "symbol": "PEPES",
+      "launchNumber": 777,
+      "raw": "139372822299651567944251",
+      "decimals": 18,
+      "formatted": "139372.822299651567944251",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x77a583f52fb071a8efd267c0549f9efdc79fa0bd",
+      "symbol": "SDOG",
+      "launchNumber": 1114,
+      "raw": "97799511002444987775062",
+      "decimals": 18,
+      "formatted": "97799.511002444987775062",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x77c44164af8c82e949b11cdbd63ac26ade11d164",
+      "symbol": "SITR",
+      "launchNumber": 1204,
+      "raw": "88987764182424916573972",
+      "decimals": 18,
+      "formatted": "88987.764182424916573972",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x7a427b94547232356cf212fd1c668e8eb4069a46",
+      "symbol": "EMVO",
+      "launchNumber": 904,
+      "raw": "112359550561797752808989",
+      "decimals": 18,
+      "formatted": "112359.550561797752808989",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x7c52ad935e14874995ba90d62d0a4238df2b84bf",
+      "symbol": "DCA",
+      "launchNumber": 1499,
+      "raw": "78740157480314960629922",
+      "decimals": 18,
+      "formatted": "78740.157480314960629922",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x7cf6fd992e6ff892caa8651f6d4e93859e1c1c71",
+      "symbol": "HIC",
+      "launchNumber": 1503,
+      "raw": "78585461689587426326130",
+      "decimals": 18,
+      "formatted": "78585.46168958742632613",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x7d0b936d5c32daeac84da80e7706930ffd716332",
+      "symbol": "INFER",
+      "launchNumber": 1286,
+      "raw": "89285714285714285714286",
+      "decimals": 18,
+      "formatted": "89285.714285714285714286",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x7eb429ca085e861f9b010c8e42574abbcacd9d57",
+      "symbol": "MEAT",
+      "launchNumber": 1170,
+      "raw": "89086859688195991091314",
+      "decimals": 18,
+      "formatted": "89086.859688195991091314",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x81b56b0da7bf1b553123a55da538515aa6e06941",
+      "symbol": "AMBI",
+      "launchNumber": 1328,
+      "raw": "89887640449438202247191",
+      "decimals": 18,
+      "formatted": "89887.640449438202247191",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x824140446efa72526fb691221cf2a472b96c79bd",
+      "symbol": "DCA",
+      "launchNumber": 1486,
+      "raw": "78895463510848126232742",
+      "decimals": 18,
+      "formatted": "78895.463510848126232742",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x84cf85502450ea7452c9b90c947b33233eb01473",
+      "symbol": "BIC",
+      "launchNumber": 1502,
+      "raw": "78817733990147783251232",
+      "decimals": 18,
+      "formatted": "78817.733990147783251232",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x876a1beabe50fec6bc64e9e586f3efcc1da44231",
+      "symbol": "HMM",
+      "launchNumber": 1558,
+      "raw": "77294685990338164251208",
+      "decimals": 18,
+      "formatted": "77294.685990338164251208",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x891720c9638c5fbfe624a4cd9378ebea1a1e7737",
+      "symbol": "BLOX",
+      "launchNumber": 1588,
+      "raw": "80563947633434038267876",
+      "decimals": 18,
+      "formatted": "80563.947633434038267876",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x895d3bc005b32aa49905b02387203d46836fde93",
+      "symbol": "SPEPE",
+      "launchNumber": 1080,
+      "raw": "93786635404454865181712",
+      "decimals": 18,
+      "formatted": "93786.635404454865181712",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x8a4d48595c25b69c98a143ca502bdb46f8edf2a7",
+      "symbol": "COMB",
+      "launchNumber": 1403,
+      "raw": "80240722166499498495487",
+      "decimals": 18,
+      "formatted": "80240.722166499498495487",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x8d035d90cfa100bfda2347b417fcddb24fba9b8f",
+      "symbol": "SIMDTEST",
+      "launchNumber": 972,
+      "raw": "101265822784810126582279",
+      "decimals": 18,
+      "formatted": "101265.822784810126582279",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x8daedf407696693cbfb4c33b33e3a62dbae7ceaf",
+      "symbol": "COMD",
+      "launchNumber": 1508,
+      "raw": "78662733529990167158309",
+      "decimals": 18,
+      "formatted": "78662.733529990167158309",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x903b9aab922859e83f16e07cc1f8cdd53edb323e",
+      "symbol": "DROP",
+      "launchNumber": 1438,
+      "raw": "79840319361277445109781",
+      "decimals": 18,
+      "formatted": "79840.319361277445109781",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x91104bf62146bc35d2bd65de13c5b2bacde40c60",
+      "symbol": "LARP",
+      "launchNumber": 1604,
+      "raw": "77444336882865440464666",
+      "decimals": 18,
+      "formatted": "77444.336882865440464666",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x931fd96a22bca8e1008d18ed827d5c042932be17",
+      "symbol": "VIMD",
+      "launchNumber": 1645,
+      "raw": "76117982873453853472883",
+      "decimals": 18,
+      "formatted": "76117.982873453853472883",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x97a1da580b28eb284e5239f6fb658f686dad9944",
+      "symbol": "COINDESK",
+      "launchNumber": 1602,
+      "raw": "77519379844961240310078",
+      "decimals": 18,
+      "formatted": "77519.379844961240310078",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x990ad3eccc7874f18464366e7caa893d915b5cdd",
+      "symbol": "IMB",
+      "launchNumber": 756,
+      "raw": "126984126984126984126985",
+      "decimals": 18,
+      "formatted": "126984.126984126984126985",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x999a3853ba4305f432ba6d39d9204cca121bf793",
+      "symbol": "PEGZEUS",
+      "launchNumber": 810,
+      "raw": "120845921450151057401813",
+      "decimals": 18,
+      "formatted": "120845.921450151057401813",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x9c01088768451b0d84371e7e0d2bb4f941fdeeef",
+      "symbol": "SWARMLER",
+      "launchNumber": 1212,
+      "raw": "91848450057405281285879",
+      "decimals": 18,
+      "formatted": "91848.450057405281285879",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x9d0a5da56f73b6bfe1a73806dd8131c136c44812",
+      "symbol": "IMD6900",
+      "launchNumber": 861,
+      "raw": "110344827586206896551725",
+      "decimals": 18,
+      "formatted": "110344.827586206896551725",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x9e2648fed2a741ce147e21cb5733d9e125d6be13",
+      "symbol": "PIXEL",
+      "launchNumber": 1115,
+      "raw": "93786635404454865181712",
+      "decimals": 18,
+      "formatted": "93786.635404454865181712",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0x9f49f75b507ee66ff3622519872f01ddf730372f",
+      "symbol": "QUANTUM",
+      "launchNumber": 1050,
+      "raw": "97680097680097680097681",
+      "decimals": 18,
+      "formatted": "97680.097680097680097681",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xa0d0b45c36979c66f7da2b8c0eebcc83d1e6cef5",
+      "symbol": "BLOX",
+      "launchNumber": 1590,
+      "raw": "77294685990338164251208",
+      "decimals": 18,
+      "formatted": "77294.685990338164251208",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xa409e9ff658124b79fb296cb99b0e438645f10a0",
+      "symbol": "OFFSETS",
+      "launchNumber": 1407,
+      "raw": "82219938335046248715314",
+      "decimals": 18,
+      "formatted": "82219.938335046248715314",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xa80b26cd940acc90db6aa2b7deb8a34221149e92",
+      "symbol": "COINBASE",
+      "launchNumber": 1441,
+      "raw": "80889787664307381193125",
+      "decimals": 18,
+      "formatted": "80889.787664307381193125",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xa830fbb26f9d3910b6450fce431b708b103cce70",
+      "symbol": "SIMDTEST",
+      "launchNumber": 974,
+      "raw": "98522167487684729064040",
+      "decimals": 18,
+      "formatted": "98522.16748768472906404",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xa998ecb3497dcf6f3ad1d965fce5722a2a70a2a1",
+      "symbol": "IHOOKS",
+      "launchNumber": 1185,
+      "raw": "93786635404454865181712",
+      "decimals": 18,
+      "formatted": "93786.635404454865181712",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xaa67d6baa0100bbe1d2e498320477b0629d0eab2",
+      "symbol": "NUKE",
+      "launchNumber": 1097,
+      "raw": "90293453724604966139955",
+      "decimals": 18,
+      "formatted": "90293.453724604966139955",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xaaeaafc29fe7327413921f6c7234026fc555b271",
+      "symbol": "PSS",
+      "launchNumber": 1085,
+      "raw": "93896713615023474178404",
+      "decimals": 18,
+      "formatted": "93896.713615023474178404",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xaafb904cba91f9a8947c87dc0ea97fba0767eb3c",
+      "symbol": "SFP",
+      "launchNumber": 1335,
+      "raw": "89086859688195991091314",
+      "decimals": 18,
+      "formatted": "89086.859688195991091314",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xab992a93d710a90c5e52a396414ac3d144fadf9a",
+      "symbol": "SWARMCORE",
+      "launchNumber": 1361,
+      "raw": "81466395112016293279023",
+      "decimals": 18,
+      "formatted": "81466.395112016293279023",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xac972f1cd22c5b9b2afd70be735e214c4ab801fb",
+      "symbol": "VERDICT",
+      "launchNumber": 1363,
+      "raw": "81135902636916835699798",
+      "decimals": 18,
+      "formatted": "81135.902636916835699798",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xad455ee2800b314588b5178df0dcbbc5dad7e1c7",
+      "symbol": "QOBS",
+      "launchNumber": 884,
+      "raw": "107095046854082998661312",
+      "decimals": 18,
+      "formatted": "107095.046854082998661312",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xb3ca44f083d49f0864412141bf5382e4248795bd",
+      "symbol": "PLEA",
+      "launchNumber": 1609,
+      "raw": "76775431861804222648753",
+      "decimals": 18,
+      "formatted": "76775.431861804222648753",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xb5abdb30485e006019a25cc6f9a19e0a7a221d4a",
+      "symbol": "PROOF",
+      "launchNumber": 1253,
+      "raw": "89086859688195991091314",
+      "decimals": 18,
+      "formatted": "89086.859688195991091314",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xb7c08cafb38737f4e9c56ad7230dae9ff4ee590e",
+      "symbol": "SIMDTEST",
+      "launchNumber": 1010,
+      "raw": "99378881987577639751553",
+      "decimals": 18,
+      "formatted": "99378.881987577639751553",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xb9c80d4927b988b7e2bc34553075ea70444fd4d4",
+      "symbol": "BRAIN",
+      "launchNumber": 1090,
+      "raw": "94339622641509433962265",
+      "decimals": 18,
+      "formatted": "94339.622641509433962265",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xbb9315f92d088e3601ab177e70b4303f1f5f6557",
+      "symbol": "SFPT",
+      "launchNumber": 1273,
+      "raw": "89086859688195991091314",
+      "decimals": 18,
+      "formatted": "89086.859688195991091314",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xbdf0411f92a9dc1c9ba79cd6eb0223373309243a",
+      "symbol": "OFFSETS",
+      "launchNumber": 1372,
+      "raw": "80563947633434038267876",
+      "decimals": 18,
+      "formatted": "80563.947633434038267876",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xbe31a30cec279bd45b0c147f298e46e625ac3f4e",
+      "symbol": "PEBBLE",
+      "launchNumber": 1289,
+      "raw": "91116173120728929384966",
+      "decimals": 18,
+      "formatted": "91116.173120728929384966",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xbfb24d83420a948af681a60a69bd30503d15dea8",
+      "symbol": "DCA",
+      "launchNumber": 1475,
+      "raw": "79681274900398406374502",
+      "decimals": 18,
+      "formatted": "79681.274900398406374502",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xc244d8e912c095aa2bb56e911a30c44e38369e78",
+      "symbol": "Brain",
+      "launchNumber": 1089,
+      "raw": "93896713615023474178404",
+      "decimals": 18,
+      "formatted": "93896.713615023474178404",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xc280a6159698f73253274d2064c07f7aaeae122d",
+      "symbol": "PIXEL",
+      "launchNumber": 1118,
+      "raw": "92059838895281933256617",
+      "decimals": 18,
+      "formatted": "92059.838895281933256617",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xc65dd15ab56e6df80f31341a15db519aaa1b45ab",
+      "symbol": "VQI",
+      "launchNumber": 1124,
+      "raw": "93023255813953488372093",
+      "decimals": 18,
+      "formatted": "93023.255813953488372093",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xd189ddeef8827f8fcd9c5c9321191c62ed0f783d",
+      "symbol": "IMDOG",
+      "launchNumber": 757,
+      "raw": "126984126984126984126985",
+      "decimals": 18,
+      "formatted": "126984.126984126984126985",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xd1decf65337d2be11c5a86594ee6cf17ce529bbc",
+      "symbol": "CORE",
+      "launchNumber": 1202,
+      "raw": "106382978723404255319149",
+      "decimals": 18,
+      "formatted": "106382.978723404255319149",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xd1f91ee80ca01ecedd7bc8172b3441ec8c508286",
+      "symbol": "STRIKE",
+      "launchNumber": 763,
+      "raw": "131147540983606557377050",
+      "decimals": 18,
+      "formatted": "131147.54098360655737705",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xd2aef07b4a807062c1c9f01713def52172548eca",
+      "symbol": "SWARM",
+      "launchNumber": 1091,
+      "raw": "93348891481913652275380",
+      "decimals": 18,
+      "formatted": "93348.89148191365227538",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xd2e546680e04e972f6108ebed6627fb097c86217",
+      "symbol": "UI",
+      "launchNumber": 831,
+      "raw": "111888111888111888111889",
+      "decimals": 18,
+      "formatted": "111888.111888111888111889",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xd3da84d79d63467c3c0e80a06f921eeb4db6a9c4",
+      "symbol": "BSIMD",
+      "launchNumber": 1055,
+      "raw": "100628930817610062893082",
+      "decimals": 18,
+      "formatted": "100628.930817610062893082",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xd51c3c76c512b26203a3f97263671aadf51987df",
+      "symbol": "POLYNEUM",
+      "launchNumber": 1587,
+      "raw": "81549439347604485219165",
+      "decimals": 18,
+      "formatted": "81549.439347604485219165",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xd852098e83e6a8a35eb3eb6976567b0660c86494",
+      "symbol": "PRIO",
+      "launchNumber": 1232,
+      "raw": "95351609058402860548272",
+      "decimals": 18,
+      "formatted": "95351.609058402860548272",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xd960609fa3d82465d5438649ca7d271df567ed61",
+      "symbol": "SPECTRA",
+      "launchNumber": 1360,
+      "raw": "988875154511742892460",
+      "decimals": 18,
+      "formatted": "988.87515451174289246",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xda04288b2ddc365037799a3db8fa39bd6f672adf",
+      "symbol": "IMDOG",
+      "launchNumber": 1421,
+      "raw": "79286422200198216055501",
+      "decimals": 18,
+      "formatted": "79286.422200198216055501",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xdc8a5f58d8acbed38581224088c96ff24a2214fb",
+      "symbol": "TDEMO",
+      "launchNumber": 1268,
+      "raw": "88987764182424916573972",
+      "decimals": 18,
+      "formatted": "88987.764182424916573972",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xdeb797f3727ee92e12af9ed65ccd6b0cdcf91723",
+      "symbol": "SIMDTEST",
+      "launchNumber": 996,
+      "raw": "98887515451174289245983",
+      "decimals": 18,
+      "formatted": "98887.515451174289245983",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xe354d0b15b228761a7c5a7f7e3af0f381be88868",
+      "symbol": "BRIEFS",
+      "launchNumber": 1151,
+      "raw": "89485458612975391498882",
+      "decimals": 18,
+      "formatted": "89485.458612975391498882",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xe4372e859950cf56a58f972c87e74e1f079dcbdf",
+      "symbol": "SI",
+      "launchNumber": 843,
+      "raw": "112044817927170868347339",
+      "decimals": 18,
+      "formatted": "112044.817927170868347339",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xe52ab551160a74afed336c1fbf0f5d39b6fd4bba",
+      "symbol": "PANIC",
+      "launchNumber": 922,
+      "raw": "103761348897535667963684",
+      "decimals": 18,
+      "formatted": "103761.348897535667963684",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xe56b182670503c3bf73e79ca5710c175907a0560",
+      "symbol": "STRATA",
+      "launchNumber": 829,
+      "raw": "112044817927170868347339",
+      "decimals": 18,
+      "formatted": "112044.817927170868347339",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xe7b5b05cfebb11d08033020acdeb89fe672b0855",
+      "symbol": "HX",
+      "launchNumber": 881,
+      "raw": "107382550335570469798658",
+      "decimals": 18,
+      "formatted": "107382.550335570469798658",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xe9a39c7f3c5af1e71dfa1ea3f289473271a4bfd8",
+      "symbol": "IMDOG",
+      "launchNumber": 878,
+      "raw": "107671601615074024226111",
+      "decimals": 18,
+      "formatted": "107671.601615074024226111",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xed447669c94026126a0fe457c19e893cdba06ee5",
+      "symbol": "CLAUS",
+      "launchNumber": 1176,
+      "raw": "89186176142697881828317",
+      "decimals": 18,
+      "formatted": "89186.176142697881828317",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xedbafd7dbae2abc3119276814e8b738496edba0c",
+      "symbol": "ADAM",
+      "launchNumber": 839,
+      "raw": "112044817927170868347339",
+      "decimals": 18,
+      "formatted": "112044.817927170868347339",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xedebd47038e9f64f57c75eee33a50ae4a7471b47",
+      "symbol": "HVD",
+      "launchNumber": 1676,
+      "raw": "76555023923444976076555",
+      "decimals": 18,
+      "formatted": "76555.023923444976076555",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xee74e6ee48c0dc38bb46af59fdff427563ed3c2c",
+      "symbol": "UI",
+      "launchNumber": 798,
+      "raw": "119402985074626865671642",
+      "decimals": 18,
+      "formatted": "119402.985074626865671642",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf00e6cdf014239a1ee0147b3b7fa8860c1e0cd9e",
+      "symbol": "RETURN",
+      "launchNumber": 1458,
+      "raw": "79129574678536102868448",
+      "decimals": 18,
+      "formatted": "79129.574678536102868448",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf0655276faefe9cd76d91f8f9ee50172f37d45c4",
+      "symbol": "DRONE",
+      "launchNumber": 909,
+      "raw": "105960264900662251655630",
+      "decimals": 18,
+      "formatted": "105960.26490066225165563",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf08b07b740df2aaa939eea6b7bf66b44908341b9",
+      "symbol": "DIVIDENDS",
+      "launchNumber": 947,
+      "raw": "102040816326530612244898",
+      "decimals": 18,
+      "formatted": "102040.816326530612244898",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf1237ba13ac6234573c9eea6c8559eaea4b31163",
+      "symbol": "PAVE",
+      "launchNumber": 1640,
+      "raw": "76190476190476190476191",
+      "decimals": 18,
+      "formatted": "76190.476190476190476191",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf14dd0ec22aadc9f9e24d0f83f3d4d68592f4dbc",
+      "symbol": "PEPE",
+      "launchNumber": 1254,
+      "raw": "89485458612975391498882",
+      "decimals": 18,
+      "formatted": "89485.458612975391498882",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf3ca98baf1b9832162198a4e06608418f8c2faf6",
+      "symbol": "IMD",
+      "launchNumber": 751,
+      "raw": "127186009538950715421304",
+      "decimals": 18,
+      "formatted": "127186.009538950715421304",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf55b01958f805f680cc72b48e022eb80e607d58e",
+      "symbol": "WHY",
+      "launchNumber": 760,
+      "raw": "125786163522012578616353",
+      "decimals": 18,
+      "formatted": "125786.163522012578616353",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf695f8af05df5801db66422071975542e5c47285",
+      "symbol": "SEAL",
+      "launchNumber": 1623,
+      "raw": "79207920792079207920793",
+      "decimals": 18,
+      "formatted": "79207.920792079207920793",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf6b5c641811e6a290327c4dea2efa45ceade0795",
+      "symbol": "OFFSETS",
+      "launchNumber": 1370,
+      "raw": "80889787664307381193125",
+      "decimals": 18,
+      "formatted": "80889.787664307381193125",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf72be203206125dbb4cff37fa5fd1a20b9df9a73",
+      "symbol": "MIRROR",
+      "launchNumber": 1595,
+      "raw": "77519379844961240310078",
+      "decimals": 18,
+      "formatted": "77519.379844961240310078",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf78bbd3604a36147e526b1d748e27b6774a6492f",
+      "symbol": "LARP",
+      "launchNumber": 1615,
+      "raw": "76408787010506208213945",
+      "decimals": 18,
+      "formatted": "76408.787010506208213945",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf945fef6f3dd3c045a8f2f3cdc09332e72d82f7e",
+      "symbol": "SWORE",
+      "launchNumber": 1250,
+      "raw": "89186176142697881828317",
+      "decimals": 18,
+      "formatted": "89186.176142697881828317",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xf9b6283ae778754cb336e6cc16d1ba9858c9e553",
+      "symbol": "SPONGEBOT",
+      "launchNumber": 1142,
+      "raw": "88987764182424916573972",
+      "decimals": 18,
+      "formatted": "88987.764182424916573972",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xfc91be74314a8bc65820c29a985ac64860c05299",
+      "symbol": "SIMDTEST",
+      "launchNumber": 988,
+      "raw": "99378881987577639751553",
+      "decimals": 18,
+      "formatted": "99378.881987577639751553",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xfd1c234972768c23bb21d655966e0b122dd67a2c",
+      "symbol": "PRIO",
+      "launchNumber": 1153,
+      "raw": "89786756453423120089787",
+      "decimals": 18,
+      "formatted": "89786.756453423120089787",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xfda9bb7e9605910b4cf999777c0b71edc366767d",
+      "symbol": "IMDT",
+      "launchNumber": 1060,
+      "raw": "97560975609756097560976",
+      "decimals": 18,
+      "formatted": "97560.975609756097560976",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xfe76f26b64dbc50772c222819795491bab64cc89",
+      "symbol": "VERDICT",
+      "launchNumber": 1462,
+      "raw": "79129574678536102868448",
+      "decimals": 18,
+      "formatted": "79129.574678536102868448",
+      "sellable": false,
+      "status": 1
+    },
+    {
+      "address": "0xfea12e3f0530ca4cce63cfac0f6e02a67d766197",
+      "symbol": "MONKEY",
+      "launchNumber": 1191,
+      "raw": "6029110645879732739421",
+      "decimals": 18,
+      "formatted": "6029.110645879732739421",
+      "sellable": false,
+      "status": 1
+    }
+  ]
+}

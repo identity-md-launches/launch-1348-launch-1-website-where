@@ -1,5 +1,57 @@
 # SwarmSweep validation — 2026-10-16
 
+## Review revision
+
+All five review findings reproduced against the accepted source/export and are fixed. The revision changes three production source files: `web/src/lib/sweep.ts`, `web/src/styles.css` and `web/src/wallet/ConnectSheet.tsx`. Tests, evidence, documentation and `dist/` were updated. `web/scripts/verify-live.mjs` also now records its supplied RPC URL instead of always labelling its report PublicNode. Existing package manifests, lockfiles, build configuration, chain/deployment constants and ABI are unchanged.
+
+### Reproduction and correction
+
+| Finding | Before the fix | Final behavior and source |
+| --- | --- | --- |
+| Held refund overwritten | `RefundHeld(A)`, `TokenRefunded(A)`, `TokenSold(B)` left `A.held` undefined and claimed delivery. | `web/src/lib/sweep.ts:682` reduces verified logs per token, prioritizing held refunds. Both event orders pass; unrelated emitter/user/token logs cannot change the outcome. Browser shows the claim instruction, exact held amount and enabled claim control after refresh. |
+| Precise proceeds overflow | At 320px, `100.123456789012345678 IMD` expanded the page to 358px before sale and 458px after sale. | `web/src/styles.css:755` wraps token notes; `:691` gives the mobile grid shrinkable tracks. Both states now measure exactly 320px wide. Quotes, preview totals and sold amounts retain every digit. |
+| Rejected multicall bypassed fallback | Real viem `allowFailure:true` returned failure entries; the browser issued zero isolated balance calls and showed discovery failure. | `web/src/lib/sweep.ts:230` retries failed entries at the same block, retaining successful reads. The browser recovers four holdings with five isolated balance calls. Remaining RPC/metadata failures still produce partial/unknown states. |
+| Desktop route clipped | At 1440px, the 230.65625px route pill ended at x=1221.03125 beyond its cell at x=1183.5. | `web/src/styles.css:429` wraps token pills at all widths. The complete two-leg route now occupies 180.625px and ends at x=1171, inside the content edge x=1171.5. |
+| Phone hid EIP-6963 provider | The specified iPhone user agent with an announced provider but no `window.ethereum` showed zero Mock Wallet buttons. | `web/src/wallet/ConnectSheet.tsx:81` bases open-in links on provider availability and retains named injected connectors. The phone fixture connects and discovers four holdings; the no-provider phone links and Coinbase option still work. |
+
+The event order was also checked against the unchanged [upstream contract](https://github.com/identity-md-launches/launch-1682-build-protocol-enables-user/blob/e6a695d9a368642617f5c801a7759494caf0b81d/src/SwarmExit.sol#L465): `_refund` can emit `RefundHeld` before `_sellOne` emits `TokenRefunded`. No contract changes or transactions were needed.
+
+### Checks actually run for this revision
+
+The locked frontend was installed and built in the disposable `test/scratch/revision/web/` copy. Source/test changes were copied there before each relevant check, and its final export was copied to root `dist/`. Commands below are relative to that frontend copy unless noted. Browser scripts served that production export under `/preview/`, exercising relative asset URLs. Playwright and its Chromium download were kept in disposable locations; neither is part of the submission.
+
+| Command | Result |
+| --- | --- |
+| `npm ci --ignore-scripts --no-audit --no-fund` | Installed the existing lockfile without changing dependencies |
+| `npm run typecheck` | Passed |
+| `npm run build` | Passed; existing ~639kB wallet-bundle size warning remains |
+| `node --experimental-strip-types --test test/*.test.mjs` | **42 passed, 0 failed**, including real viem transport regressions, event precedence, exact decimals and transaction guards |
+| `node --experimental-strip-types scripts/interact.mjs` | **129 passed, 0 failed** in Chromium; connection, selection, fees, preview, approvals, receipts, held refunds, retry, partial/empty/RPC states, chain switching, phone EIP-6963 and precise-amount layouts |
+| `node --experimental-strip-types scripts/check-abi.mjs` | Deployment ABI digest matched |
+| `node --experimental-strip-types scripts/verify-live.mjs https://eth.drpc.org` | **220 balances read, 163 holdings** independently matched at block **26,202,661**; real historical replay recovered two tokens, no warnings |
+| `node scripts/browser-live.mjs` | **163 holdings** using direct public browser RPCs; exact first raw/formatted balance matched; zero page/request failures; no overflow at 320/390/1440 |
+| Root: `node --test test/metrics.test.mjs` | **12 passed**, preserving the legacy checkout |
+| Root: `node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste` | **16/16 passed** against final root `dist/` |
+
+The initial PublicNode live-script invocation completed the current balance checks but failed during the additional historical replay: “Archive requests require a personal token.” The full script subsequently passed through dRPC, one of the app's existing RPCs. No credential was requested or used. The failure and successful rerun are distinguished here; PublicNode archive support is not claimed.
+
+Evidence: [revision measurements](docs/validation/revision.json), [fresh live holdings](docs/validation/revision-live-discovery.json), [fresh browser-mainnet result](docs/validation/revision-browser-mainnet.json), and [.imd-responses.json](.imd-responses.json). Screenshots inspected: [390px first screen](docs/validation/revision-390-first-screen.png), [320px exact quote](docs/validation/revision-320-quote.png), [320px receipt](docs/validation/revision-320-outcome.png), [1440px routes](docs/validation/revision-1440-routes.png), [phone wallet sheet](docs/validation/revision-390-wallet.png), [held refund](docs/validation/revision-390-held-refund.png).
+
+Final integrity checks confirmed the delivered source matches the tested source and root `dist/` matches the built export byte-for-byte. The export has eight files totaling **785,129 bytes**; local HTML asset references are relative and resolve. The complete submission files total approximately **3.56 MB uncompressed**, below 8 MiB, with disposable dependencies/caches confined to scratch and no added dependency archives. Existing manifests, lockfiles and ignore rules were not changed.
+
+### Better Interface coverage and limitations
+
+All six pinned domains were reviewed on the changed surfaces, retaining the established design:
+
+- **Accessibility:** named wallet buttons remain reachable on mobile; keyboard focus entry, wrapping, Escape and restoration passed. Claim and disabled-sale states remain explicit. Screen readers were not tested.
+- **Layout:** first-screen product/connect/sale actions fit at 390px. Measured and inspected exact-value states at 320px and routes at 390/1440px; no horizontal overflow. Native zoom and RTL were not tested.
+- **Writing:** held refunds now say they must be claimed; completed, partial and failed discovery stay distinct. No delivered-refund or empty-wallet claim is made on those failure paths.
+- **Typography:** full exact amounts and route text wrap, with no rounding, clipping or new type sizes. Five-size scale, two families and two weights remain.
+- **Colors:** existing tokens retained; all probe-measured pairs passed. The probe excludes 34 text boxes with unresolved backgrounds, so this is not comprehensive contrast certification.
+- **UI:** wallet/no-provider states, confirmations, gas/fee display, mixed sale outcomes and claim availability passed. Reduced-motion and share metadata checks passed. Physical devices, real signing and WebKit were not tested; the iPhone user-agent check ran in Chromium.
+
+Complete for the five reported findings. Ethereum mainnet remains the only supported chain. The live sale registry remains empty, so those real holdings stay visible and disabled for selling; no mainnet sale, fee transfer or refund claim was executed. Historical discovery still depends on the official snapshot and documented registries, with future factory migrations requiring configuration updates. The publisher must publish this export and issue its URL before remote verification can run. This revision does **not** claim an updated remote deployment. The original implementation evidence below is retained as a historical record, not as checks rerun in this revision.
+
 ## Outcome
 
 The discovery fix is demonstrated by real Ethereum reads and the production browser export: **163 held tokens detected across 220 verified token contracts** for `0x0acE1DBE8AAb293cd58D5e3Ea38814f0ccb74782`. The original merged export displayed **zero** for that same wallet. All 163 positive raw balances and decimals were independently re-read and matched. No sale was sent on mainnet.
