@@ -1,0 +1,224 @@
+{
+  "engine": "chromium",
+  "checks": [
+    {
+      "passed": true,
+      "message": "executable fee 123 is candidate 25"
+    },
+    {
+      "passed": true,
+      "message": "candidate 25 automatically enables token selection"
+    },
+    {
+      "passed": true,
+      "message": "discovery quotes the executable candidate beyond 24"
+    },
+    {
+      "passed": true,
+      "message": "Refresh reaches candidate 25 again"
+    },
+    {
+      "passed": true,
+      "message": "late-candidate discovery has no browser errors"
+    },
+    {
+      "passed": true,
+      "message": "320: long-value review has no horizontal overflow"
+    },
+    {
+      "passed": true,
+      "message": "320: focusing confirmation retains token identity on screen"
+    },
+    {
+      "passed": true,
+      "message": "320: full long symbol retained"
+    },
+    {
+      "passed": true,
+      "message": "320: fee label retained"
+    },
+    {
+      "passed": true,
+      "message": "320: long-value review has no browser errors"
+    },
+    {
+      "passed": true,
+      "message": "390: long-value review has no horizontal overflow"
+    },
+    {
+      "passed": true,
+      "message": "390: focusing confirmation retains token identity on screen"
+    },
+    {
+      "passed": true,
+      "message": "390: full long symbol retained"
+    },
+    {
+      "passed": true,
+      "message": "390: fee label retained"
+    },
+    {
+      "passed": true,
+      "message": "390: long-value review has no browser errors"
+    },
+    {
+      "passed": true,
+      "message": "approval timeout stops further transaction requests"
+    },
+    {
+      "passed": true,
+      "message": "unresolved approval stays locked after Refresh"
+    },
+    {
+      "passed": true,
+      "message": "confirmed revert restores selection after Refresh 1"
+    },
+    {
+      "passed": true,
+      "message": "Refresh 1 retains the completed outcome"
+    },
+    {
+      "passed": true,
+      "message": "Refresh 1 allows a new review of the unsold balance"
+    },
+    {
+      "passed": true,
+      "message": "confirmed revert restores selection after Refresh 2"
+    },
+    {
+      "passed": true,
+      "message": "Refresh 2 retains the completed outcome"
+    },
+    {
+      "passed": true,
+      "message": "Refresh 2 allows a new review of the unsold balance"
+    },
+    {
+      "passed": true,
+      "message": "reconciliation and review send no extra transaction"
+    },
+    {
+      "passed": true,
+      "message": "pending receipt recovery has no browser errors"
+    },
+    {
+      "passed": true,
+      "message": "missing provider has an accurate explanation and recovery"
+    },
+    {
+      "passed": true,
+      "message": "Coinbase alternative remains available"
+    },
+    {
+      "passed": true,
+      "message": "connection error 4001 is classified correctly"
+    },
+    {
+      "passed": true,
+      "message": "Coinbase alternative remains available"
+    },
+    {
+      "passed": true,
+      "message": "connection error -32603 is classified correctly"
+    },
+    {
+      "passed": true,
+      "message": "Coinbase alternative remains available"
+    }
+  ],
+  "failures": [],
+  "measurements": {
+    "initialQuoteFees": [
+      120,
+      114,
+      108,
+      119,
+      115,
+      113,
+      117,
+      111,
+      109,
+      110,
+      112,
+      102,
+      116,
+      121,
+      122,
+      118,
+      101,
+      107,
+      124,
+      103,
+      104,
+      105,
+      100,
+      106,
+      123
+    ],
+    "refreshedQuoteFees": [
+      120,
+      114,
+      108,
+      119,
+      115,
+      113,
+      117,
+      111,
+      109,
+      110,
+      112,
+      102,
+      116,
+      121,
+      122,
+      118,
+      101,
+      107,
+      124,
+      103,
+      104,
+      105,
+      100,
+      106,
+      123,
+      120,
+      114,
+      108,
+      119,
+      115,
+      113,
+      117,
+      111,
+      109,
+      110,
+      112,
+      102,
+      116,
+      121,
+      122,
+      118,
+      101,
+      107,
+      124,
+      103,
+      104,
+      105,
+      100,
+      106,
+      123
+    ],
+    "longReview320": {
+      "clientWidth": 320,
+      "scrollWidth": 320,
+      "tableX": 16
+    },
+    "longReview390": {
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "tableX": 16
+    },
+    "connection-missing": "No browser wallet detected. Open this page in your wallet browser, or choose Coinbase Wallet.",
+    "connection-4001": "The wallet declined the connection. Choose a wallet to try again.",
+    "connection--32603": "Unable to connect to this wallet. Try again, or choose another wallet."
+  }
+}

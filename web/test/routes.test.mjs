@@ -183,6 +183,60 @@ test("no path, reverted quote and RPC outage remain distinct", async () => {
     true,
   );
 });
+test("route search continues beyond 24 candidates and reports progress without concurrent quotes", async () => {
+  const pools = Array.from({ length: 49 }, (_, i) => {
+    const p = { ...pool(A, IMD_ADDRESS), fee: 100 + i };
+    return { ...p, id: poolId(p), liquidity: 1000000n };
+  });
+  const ordered = candidatePaths(A, pools);
+  const { client } = harness();
+  const attempted = [];
+  const progress = [];
+  let active = 0;
+  client.simulateContract = async ({ args }) => {
+    assert.equal(++active, 1);
+    attempted.push(args[0].path[0].fee);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    active--;
+    if (args[0].path[0].fee !== ordered[48][0].fee) throw Error("execution reverted");
+    return { result: [10000n, 1n] };
+  };
+  const result = await findRoute(client, USER, A, 1000n, pools, 10n, (checked, total) => progress.push([checked, total]));
+  assert.equal(result.route.amountOut, 10000n);
+  assert.equal(result.incomplete, false);
+  assert.deepEqual(attempted, ordered.map(path => path[0].fee));
+  assert.deepEqual(progress, pools.map((_, i) => [i + 1, 49]));
+});
+test("a search exhausted after multiple batches is complete; late RPC failures remain incomplete", async () => {
+  const pools = Array.from({ length: 25 }, (_, i) => {
+    const p = { ...pool(A, IMD_ADDRESS), fee: 100 + i };
+    return { ...p, id: poolId(p) };
+  });
+  const { client } = harness();
+  let calls = 0;
+  client.simulateContract = async () => { calls++; throw Error("execution reverted"); };
+  let result = await findRoute(client, USER, A, 1000n, pools, 10n);
+  assert.equal(calls, 25);
+  assert.equal(result.incomplete, false);
+  assert.match(result.reason, /no live quote/);
+  calls = 0;
+  client.simulateContract = async () => { throw Error(++calls === 25 ? "HTTP timeout" : "execution reverted"); };
+  result = await findRoute(client, USER, A, 1000n, pools, 10n);
+  assert.equal(calls, 25);
+  assert.equal(result.incomplete, true);
+  assert.match(result.reason, /Live quote unavailable/);
+});
+test("successful early quote stops discovery before later paths", async () => {
+  const pools = Array.from({ length: 25 }, (_, i) => {
+    const p = { ...pool(A, IMD_ADDRESS), fee: 100 + i };
+    return { ...p, id: poolId(p) };
+  });
+  const { client } = harness();
+  let calls = 0;
+  client.simulateContract = async () => { calls++; return { result: [10000n, 1n] }; };
+  await findRoute(client, USER, A, 1000n, pools, 10n);
+  assert.equal(calls, 1);
+});
 test("insufficient full-balance liquidity yields an explicit smaller quoted amount", async () => {
   const { client } = harness();
   const error = {

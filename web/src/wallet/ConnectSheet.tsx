@@ -10,6 +10,7 @@ import {
 import { chain, WALLET_ADD_CHAIN } from "../chain";
 import { WALLET_ICONS } from "./wallet-icons";
 import { OPEN_IN, isMobileBrowser } from "./open-in";
+import { connectionErrorText } from "./connectionError";
 
 export const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
@@ -225,9 +226,7 @@ export function ConnectSheet({
                   </button>
                 ))}
               <p className="sheet-note" role="status">
-                {error
-                  ? "The wallet declined the connection. Choose a wallet to try again."
-                  : ""}
+                {connectionErrorText(error)}
               </p>
             </div>
           </div>,

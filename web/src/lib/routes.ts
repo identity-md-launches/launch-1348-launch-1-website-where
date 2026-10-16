@@ -396,6 +396,7 @@ export async function findRoute(
   amount: bigint,
   pools: Pool[],
   blockNumber: bigint,
+  progress?: (checked: number, total: number) => void,
 ): Promise<RouteResult> {
   const paths = candidatePaths(token, pools);
   if (!paths.length)
@@ -412,64 +413,69 @@ export async function findRoute(
       incomplete: false,
     };
   let unavailable = false;
+  let checked = 0;
   // Prefer a shorter executable path; this is route discovery, not a best-price aggregator.
-  // Bound work even for tokens surrounded by spam pools. A limited search is labelled as such.
-  for (const path of paths.slice(0, 24)) {
-    try {
-      const quote = await quotePath(
-        client,
-        account,
-        token,
-        amount,
-        path,
-        blockNumber,
-      );
-      return { route: quote, reason: null, incomplete: false };
-    } catch (e) {
-      if (insufficientLiquidity(e)) {
-        // A full-balance failure is not the same as no route. Find a smaller executable
-        // amount, without claiming this is the maximum or silently selling the full balance.
-        let partial = amount / 2n;
-        for (
-          let attempt = 0;
-          attempt < 12 && partial > 0n;
-          attempt++, partial /= 2n
-        ) {
-          try {
-            return {
-              route: await quotePath(
-                client,
-                account,
-                token,
-                partial,
-                path,
-                blockNumber,
-              ),
-              reason: null,
-              incomplete: false,
-            };
-          } catch (partialError) {
-            if (!insufficientLiquidity(partialError)) break;
+  // Keep requests sequential within each token and yield between bounded batches.
+  // A batch boundary must never discard the remaining candidates.
+  for (let offset = 0; offset < paths.length; offset += 24) {
+    if (offset > 0) await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    for (const path of paths.slice(offset, offset + 24)) {
+      try {
+        const quote = await quotePath(
+          client,
+          account,
+          token,
+          amount,
+          path,
+          blockNumber,
+        );
+        return { route: quote, reason: null, incomplete: false };
+      } catch (e) {
+        if (insufficientLiquidity(e)) {
+          // A full-balance failure is not the same as no route. Find a smaller executable
+          // amount, without claiming this is the maximum or silently selling the full balance.
+          let partial = amount / 2n;
+          for (
+            let attempt = 0;
+            attempt < 12 && partial > 0n;
+            attempt++, partial /= 2n
+          ) {
+            try {
+              return {
+                route: await quotePath(
+                  client,
+                  account,
+                  token,
+                  partial,
+                  path,
+                  blockNumber,
+                ),
+                reason: null,
+                incomplete: false,
+              };
+            } catch (partialError) {
+              if (!insufficientLiquidity(partialError)) break;
+            }
           }
         }
+        const error = e as { name?: string; walk?: () => { name?: string } };
+        const text = message(e);
+        if (
+          !/revert|no supported IMD|outside this router/i.test(text) &&
+          error.walk?.()?.name !== "ContractFunctionRevertedError"
+        )
+          unavailable = true;
+      } finally {
+        progress?.(++checked, paths.length);
       }
-      const error = e as { name?: string; walk?: () => { name?: string } };
-      const text = message(e);
-      if (
-        !/revert|no supported IMD|outside this router/i.test(text) &&
-        error.walk?.()?.name !== "ContractFunctionRevertedError"
-      )
-        unavailable = true;
     }
   }
   return {
     route: null,
-    incomplete: unavailable || paths.length > 24,
+    incomplete: unavailable,
     reason: unavailable
       ? "Live quote unavailable. Refresh to retry the RPC request."
-      : paths.length > 24
-        ? "No quote from the first 24 candidate paths. More pools exist; this search is incomplete."
-        : "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling.",
+      : "Pools found, but no live quote for this balance. Liquidity or pool rules may prevent selling.",
   };
 }
 

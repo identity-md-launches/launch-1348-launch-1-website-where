@@ -1,0 +1,25 @@
+{
+  "sourceFilesEqualToBuildCopy": 44,
+  "finalRebuildMatchesCheckedRootExport": true,
+  "exportFiles": {
+    "og.png": "145254cf1c7a12d38495a1e6ab27d9fbe263196f859af871af1e354171ce9eb0",
+    "launches.json": "4cb283f2575941c3cf9ad5fd8baf49d70d95f1e245ee37fc367597d4ae5e12b1",
+    "favicon.svg": "1d13c92c71c7db9102e7af0e7f957532576f6321c7e5a7e3986f431c3003c70b",
+    "index.html": "ba4ed8f3ccb1cec3ae573281fbc3cff3acb09da0427ce25eb51b662856c6702d",
+    "pools.json": "4841cd6d036741b5f8cb62b56e17c7d389c01895200ba85fe58954593e121e14",
+    "assets/connectors-D_ZJoJJG.js": "e2276078d6eb38c54f8064d654ee82f10113c838d7e640509aaabc5f13e2bd32",
+    "assets/index--jFXJChn.css": "fa27d0f840e731eb6c6ddbeec4b2b32c9312c00c4b50e0253d1155e29a848c81",
+    "assets/ccip-CNq7oJlK.js": "8c3c923a65c9045e57393a0445dc5d037062c3aa942434f55c9281c73aeaeac1",
+    "assets/index-CIrf9J10.js": "db87d71718898379242684ea3ee35c50f82fb25a4e850cde0ca939760c4210dc"
+  },
+  "relativeHtmlAssets": [
+    "./favicon.svg",
+    "./assets/index-CIrf9J10.js",
+    "./assets/index--jFXJChn.css"
+  ],
+  "metadataAndPublicAssets": true,
+  "protectedConfigurationUnchanged": true,
+  "dependencyArchivesOrSubmodules": false,
+  "submissionFileBytesBeforeThisReport": 5386468,
+  "limitBytes": 8388608
+}

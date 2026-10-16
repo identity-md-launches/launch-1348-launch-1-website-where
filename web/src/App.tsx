@@ -16,6 +16,7 @@ import {
   type Plan,
   type Progress,
   type SwarmToken,
+  type SaleResult,
   type WalletState,
 } from "./lib/sweep";
 
@@ -32,7 +33,8 @@ export function App() {
   identityRef.current = identity;
   const requestRef = useRef(0);
   const saleTrigger = useRef<HTMLElement | null>(null);
-  const pendingRef = useRef(new Map<string, SwarmToken["result"]>());
+  const pendingRef = useRef(new Map<string, Extract<SaleResult, { kind: "pending" }>>());
+  const outcomesRef = useRef(new Map<string, Exclude<SaleResult, { kind: "pending" }>>());
   const [readProgress, setReadProgress] = useState("");
   const [pendingTokens, setPendingTokens] = useState<SwarmToken[]>([]);
   const [state, setState] = useState<WalletState | null>(null);
@@ -60,8 +62,11 @@ export function App() {
         if (!pending || !key.startsWith(`${address.toLowerCase()}:`)) continue;
         const resolved = await resolvePending(client, address, pending);
         if (!current()) return;
-        if (!resolved) pendingRef.current.delete(key);
-        else pendingRef.current.set(key, resolved);
+        if (resolved?.kind === "pending") pendingRef.current.set(key, resolved);
+        else {
+          pendingRef.current.delete(key);
+          if (resolved) outcomesRef.current.set(key, resolved);
+        }
       }
       const next = await loadWallet(client, address, {
         onHoldings: (tokens) => {
@@ -77,6 +82,7 @@ export function App() {
         tokens: next.tokens.map((t) => ({
           ...t,
           result: pendingRef.current.get(`${address.toLowerCase()}:${t.address.toLowerCase()}`),
+          previousResult: outcomesRef.current.get(`${address.toLowerCase()}:${t.address.toLowerCase()}`),
         })),
       });
       setPendingTokens([]);
@@ -195,8 +201,14 @@ export function App() {
       return;
     }
     if (identityRef.current !== identity) return;
-    for (const [key, result] of results)
-      if (result.kind === "pending") pendingRef.current.set(`${address.toLowerCase()}:${key}`, result);
+    for (const [key, result] of results) {
+      const accountKey = `${address.toLowerCase()}:${key}`;
+      if (result.kind === "pending") pendingRef.current.set(accountKey, result);
+      else {
+        pendingRef.current.delete(accountKey);
+        outcomesRef.current.set(accountKey, result);
+      }
+    }
     const sold = [...results.values()].filter((r) => r.kind === "sold").length;
     setState((s) =>
       s

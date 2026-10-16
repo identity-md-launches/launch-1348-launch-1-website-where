@@ -1,9 +1,11 @@
-// Interaction validation for the SwarmSweep export (run after `npm run build`, from web/:
-// `node --experimental-strip-types scripts/interact.mjs`). Serves dist/ on a local port inside this
-// process, routes the public RPC to a JSON-RPC mock of SwarmExit and four tokens, injects an
-// EIP-6963 wallet, and walks: load, connect, sell all, confirm, approvals, sale, sold/unsold marks.
-// Playwright is not a project dependency: set IMD_PLAYWRIGHT to a Playwright index.mjs (for
-// example from an npx cache) or have `playwright` importable. Screenshots go to test/scratch/interact-routes.
+// Run after building, from web/: node --experimental-strip-types scripts/interact-routes.mjs
+// Serves dist/ under /preview/, isolates RPC and EIP-6963 wallet fixtures, and checks selection,
+// review, approvals and outcomes. No real transaction is sent. --revision-only exercises late
+// candidates, long mobile review values, pending-revert recovery and connection errors.
+// --webkit selects the second engine; --dist=<path> tests an alternate export (e.g. a baseline).
+// Set IMD_PLAYWRIGHT to an installed Playwright index.mjs. Output is in
+// test/scratch/interact-routes[-revision]-<engine>. --webkit-libs optionally supplies a local
+// runtime library directory when the test browser is packaged with separate dependencies.
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -14,12 +16,14 @@ const ROOT = path.resolve(
   "..",
   "..",
 );
-const OUT = path.join(ROOT, "test/scratch/interact-routes");
+const revisionOnly = process.argv.includes("--revision-only");
+const engine = process.argv.includes("--webkit") ? "webkit" : "chromium";
+const OUT = path.join(ROOT, `test/scratch/interact-routes${revisionOnly ? "-revision" : ""}-${engine}`);
 fs.mkdirSync(OUT, { recursive: true });
 const viem = await import(
   pathToFileURL(path.join(ROOT, "web/node_modules/viem/_esm/index.js")).href
 );
-const { chromium } = await import(
+const engines = await import(
   process.env.IMD_PLAYWRIGHT
     ? pathToFileURL(process.env.IMD_PLAYWRIGHT).href
     : "playwright"
@@ -44,6 +48,7 @@ const {
 
 const {
   poolId,
+  candidatePaths,
   POOL_MANAGER,
   V4_QUOTER,
   STATE_VIEW,
@@ -205,6 +210,8 @@ const permits = new Map();
 const allowances = new Map();
 let readMode = "normal";
 let delayBalances = false;
+let receiptMode = "success";
+const quotedFees = [];
 const calls = [];
 let txCount = 0;
 let saleTxHash = null;
@@ -250,6 +257,10 @@ function ethCall({ to, data }) {
   if (target === V4_QUOTER) {
     const { functionName, args } = decodeFunctionData({ abi: quoterAbi, data });
     const t = args[0].exactCurrency.toLowerCase();
+    if (t === T.alpha && readMode === "late-route") {
+      quotedFees.push(args[0].path[0].fee);
+      if (args[0].path[0].fee !== 123) throw Error("execution reverted");
+    }
     if (readMode === "quote-offline") throw Error("RPC quote timeout");
     if (t === T.delta) throw Error("execution reverted");
     return encodeFunctionResult({
@@ -368,6 +379,7 @@ function ethCall({ to, data }) {
 }
 
 function receiptFor(hash) {
+  if (receiptMode === "pending") return null;
   const tx = sent.find((t) => t.hash === hash);
   const logs = [];
   if (tx && tx.to.toLowerCase() === EXIT) {
@@ -461,7 +473,7 @@ function receiptFor(hash) {
     contractAddress: null,
     logs,
     logsBloom: "0x" + "00".repeat(256),
-    status: "0x1",
+    status: receiptMode === "reverted" ? "0x0" : "0x1",
     effectiveGasPrice: "0x1",
     type: "0x2",
   };
@@ -564,7 +576,7 @@ function rpc({ method, params }) {
 }
 
 // --- static server for dist, under a subpath so relative URLs are exercised ---
-const dist = path.join(ROOT, "dist");
+const dist = path.resolve(process.argv.find(arg => arg.startsWith("--dist="))?.slice(7) ?? path.join(ROOT, "dist"));
 const types = {
   ".html": "text/html",
   ".js": "text/javascript",
@@ -596,7 +608,12 @@ const server = http.createServer((req, res) => {
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
 const base = `http://127.0.0.1:${server.address().port}/preview/`;
 
-const browser = await chromium.launch();
+const webkitLibs = process.argv.find(arg => arg.startsWith("--webkit-libs="))?.slice(14);
+const browser = await engines[engine].launch(webkitLibs ? { env: {
+  LD_LIBRARY_PATH: path.resolve(webkitLibs),
+  LIBGL_DRIVERS_PATH: path.resolve(webkitLibs, "dri"),
+  LIBGL_ALWAYS_SOFTWARE: "1",
+} } : {});
 const failures = [];
 const checks = [];
 const measurements = {};
@@ -606,13 +623,20 @@ const check = (cond, msg) => {
   if (!cond) failures.push(msg);
 };
 
-async function openPage(width, height, { wallet = true, userAgent } = {}) {
+async function openPage(width, height, { wallet = true, userAgent, fastReceiptTimeout = false, connectionError = null } = {}) {
   const ctx = await browser.newContext({
     viewport: { width, height },
     hasTouch: width < 700,
     userAgent,
   });
   const page = await ctx.newPage();
+  if (fastReceiptTimeout) {
+    // Only shorten the receipt deadline inside this isolated browser fixture.
+    await page.addInitScript(() => {
+      const original = window.setTimeout.bind(window);
+      window.setTimeout = (fn, delay, ...args) => original(fn, delay === 180000 ? 1000 : delay, ...args);
+    });
+  }
   const errors = [];
   page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
   page.on("console", (m) => {
@@ -661,7 +685,7 @@ async function openPage(width, height, { wallet = true, userAgent } = {}) {
   );
   if (wallet) {
     await page.addInitScript(
-      ({ user }) => {
+      ({ user, connectionError }) => {
         const listeners = {};
         window.__walletChain = 1;
         window.__emit = (event, value) => {
@@ -671,6 +695,8 @@ async function openPage(width, height, { wallet = true, userAgent } = {}) {
         const provider = {
           isMockWallet: true,
           request: async ({ method, params }) => {
+            if (method === "eth_requestAccounts" && connectionError)
+              throw Object.assign(new Error(connectionError.message), { code: connectionError.code });
             if (method === "eth_chainId")
               return "0x" + window.__walletChain.toString(16);
             if (method === "wallet_switchEthereumChain") {
@@ -718,7 +744,7 @@ async function openPage(width, height, { wallet = true, userAgent } = {}) {
         announce();
         void user;
       },
-      { user: USER },
+      { user: USER, connectionError },
     );
   }
   await page.goto(base + "index.html");
@@ -727,6 +753,110 @@ async function openPage(width, height, { wallet = true, userAgent } = {}) {
 }
 
 try {
+  if (revisionOnly) {
+    const connect = async (page) => {
+      await page.getByRole("button", { name: "Connect wallet", exact: true }).click();
+      await page.getByRole("button", { name: "Mock Wallet", exact: true }).click();
+      await page.getByText(/Discovery complete:|Partial discovery:/).first().waitFor();
+    };
+    const refresh = async (page) => {
+      await page.getByRole("button", { name: "Refresh routes", exact: true }).click();
+      await page.getByText(/Discovery complete:|Partial discovery:/).first().waitFor();
+    };
+    const originalPools = poolSnapshot.pools;
+    const latePools = Array.from({ length: 25 }, (_, i) => {
+      const p = { ...pool(T.alpha, IMD), fee: 100 + i };
+      return { ...p, id: poolId(p) };
+    });
+    check(candidatePaths(T.alpha, latePools)[24][0].fee === 123, "executable fee 123 is candidate 25");
+    poolSnapshot.pools = [...latePools, ...originalPools.filter(p => p.currency0 !== T.alpha && p.currency1 !== T.alpha)];
+    readMode = "late-route";
+    {
+      const { ctx, page, errors } = await openPage(390, 844);
+      await connect(page);
+      measurements.initialQuoteFees = [...quotedFees];
+      check(await page.getByRole("checkbox", { name: "Select ALPHA", exact: true }).isEnabled(), "candidate 25 automatically enables token selection");
+      check(quotedFees.includes(123), "discovery quotes the executable candidate beyond 24");
+      await refresh(page);
+      measurements.refreshedQuoteFees = [...quotedFees];
+      check(await page.getByRole("checkbox", { name: "Select ALPHA", exact: true }).isEnabled(), "Refresh reaches candidate 25 again");
+      check(errors.length === 0, "late-candidate discovery has no browser errors");
+      await page.screenshot({ path: path.join(OUT, "390-late-route.png") });
+      await ctx.close();
+    }
+    poolSnapshot.pools = originalPools;
+    readMode = "normal";
+    const savedAlpha = { ...meta[T.alpha] };
+    meta[T.alpha] = { ...savedAlpha, symbol: "LongToken".repeat(7) + "X", decimals: 0, balance: (1n << 128n) - 1n, expected: (1n << 128n) - 1n };
+    for (const width of [320, 390]) {
+      const { ctx, page, errors } = await openPage(width, 844);
+      await connect(page);
+      await page.getByRole("checkbox", { name: `Select ${meta[T.alpha].symbol}`, exact: true }).check();
+      await page.getByRole("button", { name: "Review selected (1)", exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      await dialog.waitFor();
+      await dialog.getByRole("button", { name: "Sell 1 token", exact: true }).focus();
+      const dimensions = await dialog.evaluate(el => ({ clientWidth: el.clientWidth, scrollWidth: el.scrollWidth, tableX: el.querySelector(".plan").getBoundingClientRect().x }));
+      measurements[`longReview${width}`] = dimensions;
+      check(dimensions.scrollWidth <= dimensions.clientWidth, `${width}: long-value review has no horizontal overflow`);
+      check(dimensions.tableX >= 0, `${width}: focusing confirmation retains token identity on screen`);
+      check((await dialog.locator(".plan tbody td").first().textContent()).includes(meta[T.alpha].symbol), `${width}: full long symbol retained`);
+      check((await dialog.locator(".totals").textContent()).includes("Fee 2%"), `${width}: fee label retained`);
+      check(errors.length === 0, `${width}: long-value review has no browser errors`);
+      await page.screenshot({ path: path.join(OUT, `${width}-long-review.png`) });
+      await ctx.close();
+    }
+    meta[T.alpha] = savedAlpha;
+    allowances.clear();
+    permits.clear();
+    sent.length = 0;
+    receiptMode = "pending";
+    {
+      const { ctx, page, errors } = await openPage(390, 844, { fastReceiptTimeout: true });
+      await connect(page);
+      await page.getByRole("checkbox", { name: "Select ALPHA", exact: true }).check();
+      await page.getByRole("button", { name: "Review selected (1)", exact: true }).click();
+      await page.getByRole("dialog").getByRole("button", { name: "Sell 1 token", exact: true }).click();
+      await page.getByText("Confirmation pending", { exact: true }).waitFor();
+      const alpha = page.locator(".tokens tbody tr").filter({ has: page.locator(".token-name", { hasText: /^ALPHA$/ }) });
+      check(sent.length === 1, "approval timeout stops further transaction requests");
+      await refresh(page);
+      check(await alpha.getByRole("checkbox").count() === 0, "unresolved approval stays locked after Refresh");
+      receiptMode = "reverted";
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        await refresh(page);
+        const selectable = await alpha.getByRole("checkbox").count() === 1 && await alpha.getByRole("checkbox").isEnabled();
+        check(selectable, `confirmed revert restores selection after Refresh ${attempt}`);
+        check((await alpha.innerText()).includes("Transaction reverted"), `Refresh ${attempt} retains the completed outcome`);
+        if (selectable) {
+          await alpha.getByRole("checkbox").check();
+          await page.getByRole("button", { name: "Review selected (1)", exact: true }).click();
+          await page.getByRole("dialog").waitFor();
+          check((await page.locator(".plan tbody").innerText()).includes("ALPHA"), `Refresh ${attempt} allows a new review of the unsold balance`);
+          await page.keyboard.press("Escape");
+        }
+      }
+      check(sent.length === 1, "reconciliation and review send no extra transaction");
+      check(errors.length === 0, "pending receipt recovery has no browser errors");
+      await alpha.scrollIntoViewIfNeeded();
+      await page.screenshot({ path: path.join(OUT, "390-reverted-recovery.png") });
+      await ctx.close();
+    }
+    receiptMode = "success";
+    for (const connectionError of [null, { code: 4001, message: "User rejected the request." }, { code: -32603, message: "Wallet unavailable" }]) {
+      const missing = connectionError === null;
+      const { ctx, page } = await openPage(390, 844, { wallet: !missing, connectionError });
+      await page.getByRole("button", { name: "Connect wallet", exact: true }).click();
+      await page.getByRole("button", { name: missing ? "Browser wallet" : "Mock Wallet", exact: true }).click();
+      await page.waitForFunction(() => document.querySelector(".sheet-note")?.textContent);
+      const note = await page.locator(".sheet-note").innerText();
+      measurements[`connection-${connectionError?.code ?? "missing"}`] = note;
+      check(missing ? note.includes("No browser wallet detected") : connectionError.code === 4001 ? note.includes("declined") : !note.includes("declined"), missing ? "missing provider has an accurate explanation and recovery" : `connection error ${connectionError.code} is classified correctly`);
+      check(await page.getByRole("button", { name: "Coinbase Wallet", exact: true }).isEnabled(), "Coinbase alternative remains available");
+      if (missing) await page.screenshot({ path: path.join(OUT, "390-no-wallet.png") });
+      await ctx.close();
+    }
+  } else {
   for (const width of [320, 390, 768, 1440]) {
     readMode = "normal";
     allowances.clear();
@@ -948,9 +1078,10 @@ try {
     await ctx.close();
   }
   meta[T.alpha]=savedAlpha;
+  }
   fs.writeFileSync(
     path.join(OUT, "result.json"),
-    JSON.stringify({ checks, failures, measurements }, null, 2),
+    JSON.stringify({ engine, checks, failures, measurements }, null, 2),
   );
   if (failures.length) throw Error(`${failures.length} checks failed`);
 } finally {

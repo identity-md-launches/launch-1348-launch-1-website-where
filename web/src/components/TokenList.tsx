@@ -24,13 +24,14 @@ type Props = {
 };
 
 function StatusCell({ t }: { t: SwarmToken }) {
-  if (t.result?.kind === "pending")
+  const result = t.result ?? t.previousResult;
+  if (result?.kind === "pending")
     return (
       <>
         <span className="pill pill-muted">Confirmation pending</span>
-        <span className="note">{t.result.reason}</span>
+        <span className="note">{result.reason}</span>
         <a
-          href={`${EXPLORER_URL}/tx/${t.result.txHash}`}
+          href={`${EXPLORER_URL}/tx/${result.txHash}`}
           target="_blank"
           rel="noreferrer"
         >
@@ -38,21 +39,21 @@ function StatusCell({ t }: { t: SwarmToken }) {
         </a>
       </>
     );
-  if (t.result?.kind === "sold") {
+  if (result?.kind === "sold") {
     return (
       <>
         <span className="pill pill-ok">Sold</span>
         <span className="note">
-          {fmtAmount(t.result.imdOut)} {IMD_SYMBOL} gross
+          {fmtAmount(result.imdOut)} {IMD_SYMBOL} gross
         </span>
       </>
     );
   }
-  if (t.result?.kind === "unsold") {
+  if (result?.kind === "unsold") {
     return (
       <>
         <span className="pill pill-bad">Unsold</span>
-        <span className="note">{t.result.reason}</span>
+        <span className="note">{result.reason}</span>
       </>
     );
   }
@@ -192,14 +193,15 @@ export function TokenList({
             </tr>
           )}
           {tokens.map((t) => {
+            const result = t.result ?? t.previousResult;
             const usd = t.sellable ? usdValue(t.expectedImd, pricing) : null;
             const pickable = t.sellable && !busy && t.result === undefined;
             const id = `pick-${t.address}`;
             return (
               <tr
                 key={t.address}
-                className={t.sellable || t.result ? "" : "dim"}
-                data-result={t.result?.kind ?? ""}
+                className={t.sellable || result ? "" : "dim"}
+                data-result={result?.kind ?? ""}
               >
                 <td className="col-pick">
                   {t.result === undefined && (
@@ -282,10 +284,10 @@ export function TokenList({
                   ) : (
                     <StatusCell t={t} />
                   )}
-                  {t.result?.txHash && t.result.kind !== "pending" && (
+                  {result?.txHash && result.kind !== "pending" && (
                     <a
                       className="note"
-                      href={`${EXPLORER_URL}/tx/${t.result.txHash}`}
+                      href={`${EXPLORER_URL}/tx/${result.txHash}`}
                       target="_blank"
                       rel="noreferrer"
                     >

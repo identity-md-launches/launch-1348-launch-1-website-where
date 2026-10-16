@@ -8,7 +8,7 @@ The previous frontend read balances independently but still called SwarmExit `pr
 
 The new sale path reads actual Uniswap v4 pool initialization events, quotes routes through the deployed v4 Quoter, and sends reviewed swaps to Uniswap Universal Router. No token registration, owner configuration, new contract or deployment is needed. SwarmExit remains available only for existing refund claims and optional legacy USD pricing; neither gates route discovery or direct sales.
 
-At Ethereum block **26,203,183**, the supplied wallet `0x0acE1DBE8AAb293cd58D5e3Ea38814f0ccb74782` held **164** identified tokens. The new search returned **40 live quotes**, including **26 partial-balance quotes**, while SwarmExit still reported **zero registered tokens**. A quote is not a guarantee that execution will succeed. Pools with insufficient liquidity, unsupported hook rules or an incomplete bounded search stay visible with an explanation. See [VALIDATION.md](VALIDATION.md) for actual checks and limitations.
+In the previous implementation check, at Ethereum block **26,203,183**, the supplied wallet `0x0acE1DBE8AAb293cd58D5e3Ea38814f0ccb74782` held **164** identified tokens. The new search returned **40 live quotes**, including **26 partial-balance quotes**, while SwarmExit still reported **zero registered tokens**. A quote is not a guarantee that execution will succeed. Pools with insufficient liquidity, unsupported hook rules or unavailable RPC quotes stay visible with an explanation. See [VALIDATION.md](VALIDATION.md) for actual checks and limitations.
 
 ## Using the site
 
@@ -38,13 +38,13 @@ The build includes TypeScript checking and writes `../dist/`. Existing Vite conf
 
 `web/public/pools.json` contains 889 pool initialization records verified from Ethereum through block 26,203,159. It is an event index, not a token registration list or a saved quote. Its anchor hash and pool-key hashes are checked. Runtime discovery adds subsequent matching initialization events, checks launch receipts for new tokens, and reads current active liquidity to order alternatives. Historical holdings still come from `launches.json` and incremental official registry events.
 
-Every positive holding is searched for simple v4 paths to IMD, including ETH intermediaries. The search prefers fewer hops, then active liquidity, and tests at most 24 candidate paths of up to three pools. It returns the first positive live quote, not a claim of the globally best price. For the deployed Quoter's explicit `NotEnoughLiquidity(bytes32)` failure, it tries up to 12 successively halved amounts. These amounts are labelled partial; they are not advertised as the maximum sellable amount. Search exhaustion and RPC failures are disclosed rather than treated as proof that no pool exists.
+Every positive holding is searched for simple v4 paths to IMD, including ETH intermediaries. The search prefers fewer hops, then active liquidity, and checks paths of up to three pools in asynchronous batches of 24. It continues automatically until a route quotes successfully or every candidate has been checked; 24 is a batch size, not a search cutoff. Requests stay sequential for each token, with at most four tokens being searched concurrently. Progress reports candidates checked for the current token. It returns the first positive live quote, not a claim of the globally best price. For the deployed Quoter's explicit `NotEnoughLiquidity(bytes32)` failure, it tries up to 12 successively halved amounts. These amounts are labelled partial; they are not advertised as the maximum sellable amount. Search exhaustion and RPC failures are disclosed rather than treated as proof that no pool exists.
 
 Review refreshes the chosen route and verifies the balance. Each sale then obtains another quote, retains the **reviewed** 3% slippage floor, simulates complete execution, estimates gas and verifies the active account and chain before signing. Newly requested ERC-20 approval is for the needed amount to Permit2; the Permit2 authorization names Universal Router, the needed amount and a ten-minute expiration. Existing sufficient approvals can be reused.
 
 The encoded v4 actions are `SWAP_EXACT_IN`, `SETTLE_ALL`, `TAKE_PORTION` and `TAKE_ALL`. Each token sale is atomic. The fee is 200 basis points of that swap's IMD credit, sent to the existing treasury `0xFC3ad9C531e1736690b2d5f24FebD35ebf051cFB`, rounded down per transaction. Net IMD goes to the connected sender. There are no allow-revert commands, arbitrary external calldata or native ETH sale payments. A reverted sale leaves input tokens in the wallet and charges no sale fee; network gas still costs ETH. Multiple selected tokens require separate transactions and accumulate IMD in the wallet.
 
-Receipts must succeed and contain reconcilable IMD transfers from PoolManager to the account and treasury before showing Sold. Unknown receipts remain pending. A later rejection or failure preserves earlier confirmed results. Legacy SwarmExit held refunds keep their claim control.
+Receipts must succeed and contain reconcilable IMD transfers from PoolManager to the account and treasury before showing Sold. Unknown receipts remain pending and cannot be selected again. Refresh reconciles receipts and reads current holdings: confirmed reverts release the selection lock while keeping the completed outcome and transaction link visible. An unsold balance with a fresh route can then be selected and reviewed again. A later rejection or failure preserves earlier confirmed results. Legacy SwarmExit held refunds keep their claim control.
 
 ## Validation commands and results
 
@@ -52,14 +52,17 @@ From the repository root, with Playwright available:
 
 ```sh
 IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node --experimental-strip-types web/scripts/interact-routes.mjs
+# Add --revision-only for the four reported regressions; add --webkit when WebKit is installed.
 IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste
 node --experimental-strip-types web/scripts/verify-routes.mjs https://ethereum-rpc.publicnode.com test/scratch/live-routes.json
 node --experimental-strip-types web/scripts/verify-route-fork.mjs https://ethereum-rpc.publicnode.com test/scratch/fork-routes.json
 ```
 
+The exact revision commands, disposable dependency setup, before/after evidence and limitations are recorded in [VALIDATION.md](VALIDATION.md). Browser screenshots and JSON are written under `test/scratch/interact-routes[-revision]-<engine>/`.
+
 The fork check requires Anvil and the preceding live evidence file. It starts and closes its own disposable fork; all simulated transactions remain local. An archive-capable RPC may be needed. `web/scripts/browser-live.mjs` performs the production browser's read-only known-wallet check; it accepts an optional RPC transport argument. No script needs a private key.
 
-Completed checks: production build and typecheck; **58 unit/regression tests**; **101 Chromium interaction assertions** at 320, 390, 768 and 1440 pixels; **16/16 taste@1 checks**; real-chain wallet discovery and quotes; local-fork hook and ETH-bridge sales with exact input/fee reconciliation; local-fork reverted sale retaining tokens with no sale fee. The build reports a nonfatal JavaScript chunk-size warning (approximately 649 kB uncompressed). Browser tests use simulated wallets and explicitly mocked transactions; the separate mainnet browser check uses real chain responses and forbids signing.
+Revision checks: production build and typecheck; **61 unit/regression tests**; **101 general interaction checks plus 31 revision checks in each of Chromium and WebKit**; **16/16 taste@1 checks**. The checks cover automatic discovery of candidate 25, selection recovery after a confirmed revert, accurate missing-wallet/rejection messages, and long-value sale review at 320 and 390px. The general interactions also cover 768 and 1440px. Real-chain discovery and local-fork execution evidence below comes from the previous implementation; this revision used isolated RPC/wallet fixtures and sent no real transactions. The build reports a nonfatal JavaScript chunk-size warning (approximately 649 kB uncompressed). Browser tests use simulated wallets and explicitly mocked transactions; the separate mainnet browser check uses real chain responses and forbids signing.
 
 ## Updating the event indexes
 
@@ -76,7 +79,7 @@ Deliver both source indexes and the rebuilt copies in `dist/`. `update-pools.mjs
 - Ethereum and Uniswap v4 only. This searches all identified holdings, not all DEXs or every possible route. V2/V3, RFQs, token-specific hook inputs and split-routing are not implemented. Future factory changes need discovery configuration updates.
 - Quotes depend on live liquidity, RPC availability and hook behavior. Custom or taxed token transfers may still fail the final simulation. Some holdings have no usable quote even at reduced amounts.
 - Large wallets can take several minutes over browser RPC transport. Progress and discovered holdings remain visible. Estimates are refreshed before review and execution.
-- No real-wallet mainnet transaction, physical phone, WebKit, screen reader, native zoom or RTL session was tested. The worker's supplied Ethereum transport was used for real-chain checks; this run does not claim fresh public-browser CORS verification.
+- No real-wallet mainnet transaction, physical phone, screen reader, native zoom or RTL session was tested. Desktop WebKit checks exercise the Safari rendering engine but are not a physical iPhone session. The worker's supplied Ethereum transport was used for real-chain checks; this run does not claim fresh public-browser CORS verification.
 - Pending-transaction protection lasts within the current page session, including account/chain switches. After reloading the page, inspect any outstanding wallet transaction before starting another sale.
 - The site was built locally; remote publication is handled after this task and was not claimed or performed.
 

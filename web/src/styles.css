@@ -507,8 +507,13 @@ main {
   padding-block-end: calc(var(--space-4) + env(safe-area-inset-bottom));
   box-shadow: var(--shadow-sheet);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
   align-content: start;
+}
+
+.sheet > * {
+  min-width: 0;
 }
 
 .sheet-wide {
@@ -592,6 +597,7 @@ main {
 
 .plan {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
 }
 
@@ -639,11 +645,18 @@ main {
   font-size: var(--text-sm);
 }
 
+.totals div,
+.totals dt,
+.totals dd {
+  min-width: 0;
+}
+
 .totals dt {
   color: var(--color-text-secondary);
 }
 
 .totals dd {
+  word-break: break-word;
   font-variant-numeric: tabular-nums;
   text-align: end;
 }

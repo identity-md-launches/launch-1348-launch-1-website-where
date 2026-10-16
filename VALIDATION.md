@@ -1,4 +1,77 @@
-# Live sell-route implementation validation
+# SwarmSweep revision validation
+
+Date: 2026-10-16. Complete for this revision's four reported defects. This is worker-side evidence, not independent certification. The accepted application and its visual system were retained; build configuration, dependencies, addresses, ABIs and transaction encoding were not changed. No real transaction was sent.
+
+## Findings reproduced and repaired
+
+| Finding | Reproduction on the original export | Change and final check |
+| --- | --- | --- |
+| `c4b75b…e88a` — candidate cutoff | Chromium and WebKit each quoted the first 24 ALPHA paths, then the same 24 after Refresh; fee 123, candidate 25, was never tried. | `web/src/lib/routes.ts:420` continues automatically in asynchronous batches of 24 until a quote succeeds or every candidate has been checked. Existing per-request/partial-quote limits and four-token concurrency stay in place. Candidate progress is reported through `sweep.ts`. Both engines now discover candidate 25 initially and on Refresh. Unit checks also cover candidate 49, all candidates reverting, a late RPC failure, and stopping after an early quote. |
+| `85b205…3f1` — mobile review overflow | WebKit's long-symbol/uint128-max review had `scrollWidth=437` at both widths. At 320 its table moved to x=-101 after focus; at 390, x=-15. Chromium already fit. | `web/src/styles.css:498` and `.plan`/`.totals`: fixed table layout, a shrinkable sheet grid, zero minimum intrinsic widths and wrapping totals. Both engines now measure 320/320 and 390/390 scrollWidth/clientWidth, with table x=16. Screenshots retain the exact values and fee labels. At 320 the taller sheet scrolls vertically. |
+| `5880c6…8cc8` — reverted receipt blocks selection | An unavailable approval receipt later returned a revert. Two refreshes retained the unchanged ALPHA balance and quote but rendered no checkbox. | `web/src/App.tsx:61` keeps only unresolved receipts in `pendingRef`; completed outcomes are retained separately and attached as `previousResult` after fresh holdings. Both engines restore ALPHA's checkbox and allow review after both refreshes, keep the reverted outcome visible, and keep an unresolved approval locked. Reconciliation sends no additional transaction. |
+| `d92d0f…ba2` — missing wallet called a rejection | A clean context without an injected provider said the wallet declined. The generic error fixture received the same inaccurate message. | `web/src/wallet/connectionError.ts:5` classifies wrapped errors. Missing providers explain opening a wallet browser or choosing Coinbase; code 4001/user rejection alone says declined; other failures offer retry/another wallet. All three cases pass in both engines. |
+
+Full finding IDs and dispositions are in `.imd-responses.json`. Baseline measurements are in [route-fixes-baseline.json](docs/validation/route-fixes-baseline.json). This fixture result does not assert that any particular live wallet has a usable omitted pool.
+
+## Actual commands and results
+
+The existing dependency installation could not execute the typechecker. The unchanged `web/` source, manifest and lockfile were copied into `test/scratch/build/web/`, with dependencies excluded from the copy; `npm ci` installed the locked dependencies there. Only that disposable copy's dependency directory was written. Source/configuration equality and export equality were checked before delivery.
+
+Commands run from the repository root:
+
+```sh
+npm ci --prefix test/scratch/build/web --ignore-scripts --cache /tmp/swarm-revision-npm-cache
+npm --prefix test/scratch/build/web run typecheck
+npm --prefix test/scratch/build/web run build
+node --experimental-strip-types --test test/scratch/build/web/test/*.test.mjs
+IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node --experimental-strip-types test/scratch/build/web/scripts/interact-routes.mjs
+IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node --experimental-strip-types test/scratch/build/web/scripts/interact-routes.mjs --revision-only
+IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/tmp/swarm-revision-browsers PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 node --experimental-strip-types test/scratch/build/web/scripts/interact-routes.mjs --webkit --webkit-libs=test/scratch/webkit-runtime/libs/usr/lib/x86_64-linux-gnu
+IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/tmp/swarm-revision-browsers PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 node --experimental-strip-types test/scratch/build/web/scripts/interact-routes.mjs --revision-only --webkit --webkit-libs=test/scratch/webkit-runtime/libs/usr/lib/x86_64-linux-gnu
+IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste
+```
+
+The WebKit test runtime and its public runtime dependencies were downloaded into disposable directories; they are not application dependencies or submission assets. Its launcher was adjusted only to preserve the explicitly supplied test-library path. On a normal installation with WebKit available, `--webkit` is sufficient. The browser connector tool returned `Transport closed`; actual rendered checks instead ran through Playwright in the foreground validation scripts.
+
+- Typecheck and production build: passed. The existing nonfatal bundle-size warning remains (main JavaScript approximately 650 kB uncompressed).
+- Unit/regression suite: **61 passed**, zero failed. Three new route-search regressions supplement the accepted suite.
+- Chromium: **101 general interaction checks + 31 revision checks passed**. WebKit: **101 + 31 passed**. General interactions cover 320, 390, 768 and 1440px; focused mobile review checks cover 320 and 390px. Each export was served under `/preview/` to exercise relative assets.
+- The general flow covers connect, token discovery, individual/select-all/clear selection, selected-only review, keyboard selection, Escape/focus restoration, approvals, outcomes, empty/error/quote-failure states, Refresh and wrong-chain handling. Browser script/resource error assertions passed.
+- The isolated pending fixture shortens only the browser's 180,000ms receipt timeout to 1,000ms. Its mock receipt is initially absent, then reverted; no real approval or sale is broadcast.
+- The original export failed the expected regression assertions before edits. Final fixture records are [Chromium regressions](docs/validation/route-fixes-chromium-regressions.json), [WebKit regressions](docs/validation/route-fixes-webkit-regressions.json), [Chromium general interactions](docs/validation/route-fixes-chromium-interactions.json) and [WebKit general interactions](docs/validation/route-fixes-webkit-interactions.json).
+- The root export passed **16/16 taste@1 checks**: first-screen content, metadata, responsive layout, typography, motion and measured contrast. The probe excludes unresolved backgrounds from contrast; the connected-state scripts separately measured six solid token pairs. [Probe record](docs/validation/route-fixes-design-probe.json).
+
+## Better Interface coverage
+
+The pinned guide's six core domains informed these focused corrections; the existing palette, type scale, components and spacing remain intact. The product and connect/review actions are visible on the 390px first screen. `dist/index.html` retains title, favicon, description, `og:title` and `og:image`.
+
+| Domain | Checked in this revision | Limits |
+| --- | --- | --- |
+| Accessibility | Native labelled checkboxes, keyboard selection, Escape, restored focus, inert modal background and text statuses in both engines. Critical review text remains reachable after focusing confirmation. | No screen-reader or forced-colors session. |
+| Layout | First screen and primary interactions at 320/390/768/1440; long-symbol/uint128-max review reflow in Chromium and WebKit; screenshot inspection of phone sheets and recovery. | No physical-device, native 200% zoom, RTL or localization session. |
+| Writing | Missing-provider, user-rejection and other-error messages now describe the observed state and a recovery. Route progress and confirmed-revert outcomes stay explicit. | External wallet wording is outside this revision. |
+| Typography | Existing five-size/two-family/two-weight system retained. Fixed table/grid widths and wrapping preserve every digit and the long symbol. | Cross-platform font rendering is not exhaustively covered. |
+| Colors | Existing semantic tokens retained; six solid text/surface pairs pass 4.5:1 in both engines, with the probe's measurement exclusions retained. | Every composited/background state is not measured; there is no dark theme. |
+| UI | Loading, no route, valid route, disabled selection, review, pending, reverted, refreshed and connection-error states exercised. Unknown transactions remain locked. | No real wallet signature, Coinbase service session, or slow-motion animation replay. |
+
+Inspected final screenshots: [390 first screen](docs/validation/route-fixes-chromium-390-first.png), [missing-wallet recovery](docs/validation/route-fixes-chromium-390-no-wallet.png), [reverted-transaction recovery](docs/validation/route-fixes-chromium-390-reverted-recovery.png), [320 WebKit review](docs/validation/route-fixes-webkit-320-long-review.png) and [390 WebKit review](docs/validation/route-fixes-webkit-390-long-review.png). `DESIGN.md` documents the final source and responsive sheet behavior.
+
+## Delivery integrity
+
+The final production rebuild is byte-identical to the checked root `dist/`; all 44 build-copy source/configuration files match the submitted source. The nine export files include relative hashed assets and byte-identical launch/pool indexes, favicon and share image. Protected configuration, manifests and lockfiles have no changes; no ignore rule, submodule, dependency archive or runtime package was added. `git diff --check` passed. The source/export/documentation payload is approximately **5.14 MiB**, below 8 MiB. [Integrity record](docs/validation/route-fixes-integrity.json).
+
+## Scope and limitations
+
+All four reported findings were reproduced and fixed. Discovery still supports the existing Ethereum Uniswap v4 graph of up to three pools, without custom hook inputs or best-price optimization. It now considers every candidate in that graph; network failures can still make a search incomplete. A real pool or positive quote is not guaranteed for every token. Pending protection remains limited to the current page session.
+
+The chain/fork data below is historical evidence from the accepted implementation, not a fresh market measurement for this revision. No mainnet signing, fresh public-RPC CORS verification, physical iPhone, screen reader, native zoom or RTL session was performed. Source, locked dependencies and runtime assets remain complete; no browser/runtime package or test scaffolding is part of the submission. Publication occurs after review.
+
+---
+
+# Previous implementation validation (before this revision)
+
+The remainder is the retained historical record. Its old 24-candidate limit and WebKit coverage limitations are superseded by the revision above; its live-chain figures have not been remeasured.
+
 
 Date: 2026-10-16. This is the worker's own implementation and validation record, not an independent security audit or a certification by the structural verifier.
 

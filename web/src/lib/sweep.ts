@@ -72,6 +72,8 @@ export type SwarmToken = {
   heldRefund: bigint;
   /** Set after a sale transaction. */
   result?: SaleResult;
+  /** Completed outcome retained after fresh holdings release the selection lock. */
+  previousResult?: Exclude<SaleResult, { kind: "pending" }>;
 };
 
 export type SaleResult =
@@ -335,6 +337,9 @@ export async function loadWallet(
             token.balance,
             market.pools,
             blockNumber,
+            (pathsChecked, total) => options.progress?.(
+              `Checking ${token.symbol}: ${pathsChecked} of ${total} candidate paths; ${checked} of ${tokens.length} tokens checked…`,
+            ),
           );
           token.liveRoute = result.route ?? undefined;
           token.routeReason = result.reason ?? undefined;
