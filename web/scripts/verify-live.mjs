@@ -4,7 +4,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { createPublicClient, http, formatUnits } from "viem";
 import { mainnet } from "viem/chains";
 import { discoverLaunches, registryAbi } from "../src/lib/discovery.ts";
-import { loadWallet } from "../src/lib/sweep.ts";
+import { loadSwarmWallet as loadWallet } from "../src/lib/sweep.ts";
 import { erc20Abi } from "../src/abi/erc20.ts";
 import { swarmExitAbi } from "../src/abi/swarmExit.ts";
 import { SWARM_EXIT_ADDRESS } from "../src/deployment.ts";

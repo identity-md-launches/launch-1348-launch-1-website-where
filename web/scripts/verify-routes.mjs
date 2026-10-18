@@ -3,7 +3,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
-import { loadWallet } from "../src/lib/sweep.ts";
+import { loadSwarmWallet as loadWallet } from "../src/lib/sweep.ts";
 import { swarmExitAbi } from "../src/abi/swarmExit.ts";
 import { SWARM_EXIT_ADDRESS } from "../src/deployment.ts";
 const client = createPublicClient({

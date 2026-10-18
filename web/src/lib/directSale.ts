@@ -85,6 +85,7 @@ export async function resolvePending(
   result: SaleResult,
 ): Promise<SaleResult | undefined> {
   if (result.kind !== "pending") return result;
+  if (!result.txHash) return result;
   try {
     const receipt = await client.getTransactionReceipt({ hash: result.txHash });
     if (receipt.status === "reverted")

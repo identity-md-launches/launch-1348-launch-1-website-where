@@ -1,176 +1,137 @@
-# SwarmSweep revision validation
+# SweepDust validation and design review
 
-Date: 2026-10-16. Complete for this revision's four reported defects. This is worker-side evidence, not independent certification. The accepted application and its visual system were retained; build configuration, dependencies, addresses, ABIs and transaction encoding were not changed. No real transaction was sent.
+Worker record for the 2026-10-18 revision. These are actual local observations, not independent certification. Current source: `web/`; export: root `dist/`. Current evidence is in `artifacts/validation/` and `artifacts/screenshots/sweepdust-*`. Historical `docs/validation/` files belong to earlier jobs.
 
-## Findings reproduced and repaired
+## Outcome and requirements
 
-| Finding | Reproduction on the original export | Change and final check |
-| --- | --- | --- |
-| `c4b75b…e88a` — candidate cutoff | Chromium and WebKit each quoted the first 24 ALPHA paths, then the same 24 after Refresh; fee 123, candidate 25, was never tried. | `web/src/lib/routes.ts:420` continues automatically in asynchronous batches of 24 until a quote succeeds or every candidate has been checked. Existing per-request/partial-quote limits and four-token concurrency stay in place. Candidate progress is reported through `sweep.ts`. Both engines now discover candidate 25 initially and on Refresh. Unit checks also cover candidate 49, all candidates reverting, a late RPC failure, and stopping after an early quote. |
-| `85b205…3f1` — mobile review overflow | WebKit's long-symbol/uint128-max review had `scrollWidth=437` at both widths. At 320 its table moved to x=-101 after focus; at 390, x=-15. Chromium already fit. | `web/src/styles.css:498` and `.plan`/`.totals`: fixed table layout, a shrinkable sheet grid, zero minimum intrinsic widths and wrapping totals. Both engines now measure 320/320 and 390/390 scrollWidth/clientWidth, with table x=16. Screenshots retain the exact values and fee labels. At 320 the taller sheet scrolls vertically. |
-| `5880c6…8cc8` — reverted receipt blocks selection | An unavailable approval receipt later returned a revert. Two refreshes retained the unchanged ALPHA balance and quote but rendered no checkbox. | `web/src/App.tsx:61` keeps only unresolved receipts in `pendingRef`; completed outcomes are retained separately and attached as `previousResult` after fresh holdings. Both engines restore ALPHA's checkbox and allow review after both refreshes, keep the reverted outcome visible, and keep an unresolved approval locked. Reconciliation sends no additional transaction. |
-| `d92d0f…ba2` — missing wallet called a rejection | A clean context without an injected provider said the wallet declined. The generic error fixture received the same inaccurate message. | `web/src/wallet/connectionError.ts:5` classifies wrapped errors. Missing providers explain opening a wallet browser or choosing Coinbase; code 4001/user rejection alone says declined; other failures offer retry/another wallet. All three cases pass in both engines. |
-
-Full finding IDs and dispositions are in `.imd-responses.json`. Baseline measurements are in [route-fixes-baseline.json](docs/validation/route-fixes-baseline.json). This fixture result does not assert that any particular live wallet has a usable omitted pool.
-
-## Actual commands and results
-
-The existing dependency installation could not execute the typechecker. The unchanged `web/` source, manifest and lockfile were copied into `test/scratch/build/web/`, with dependencies excluded from the copy; `npm ci` installed the locked dependencies there. Only that disposable copy's dependency directory was written. Source/configuration equality and export equality were checked before delivery.
-
-Commands run from the repository root:
-
-```sh
-npm ci --prefix test/scratch/build/web --ignore-scripts --cache /tmp/swarm-revision-npm-cache
-npm --prefix test/scratch/build/web run typecheck
-npm --prefix test/scratch/build/web run build
-node --experimental-strip-types --test test/scratch/build/web/test/*.test.mjs
-IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node --experimental-strip-types test/scratch/build/web/scripts/interact-routes.mjs
-IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node --experimental-strip-types test/scratch/build/web/scripts/interact-routes.mjs --revision-only
-IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/tmp/swarm-revision-browsers PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 node --experimental-strip-types test/scratch/build/web/scripts/interact-routes.mjs --webkit --webkit-libs=test/scratch/webkit-runtime/libs/usr/lib/x86_64-linux-gnu
-IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/tmp/swarm-revision-browsers PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 node --experimental-strip-types test/scratch/build/web/scripts/interact-routes.mjs --revision-only --webkit --webkit-libs=test/scratch/webkit-runtime/libs/usr/lib/x86_64-linux-gnu
-IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste
-```
-
-The WebKit test runtime and its public runtime dependencies were downloaded into disposable directories; they are not application dependencies or submission assets. Its launcher was adjusted only to preserve the explicitly supplied test-library path. On a normal installation with WebKit available, `--webkit` is sufficient. The browser connector tool returned `Transport closed`; actual rendered checks instead ran through Playwright in the foreground validation scripts.
-
-- Typecheck and production build: passed. The existing nonfatal bundle-size warning remains (main JavaScript approximately 650 kB uncompressed).
-- Unit/regression suite: **61 passed**, zero failed. Three new route-search regressions supplement the accepted suite.
-- Chromium: **101 general interaction checks + 31 revision checks passed**. WebKit: **101 + 31 passed**. General interactions cover 320, 390, 768 and 1440px; focused mobile review checks cover 320 and 390px. Each export was served under `/preview/` to exercise relative assets.
-- The general flow covers connect, token discovery, individual/select-all/clear selection, selected-only review, keyboard selection, Escape/focus restoration, approvals, outcomes, empty/error/quote-failure states, Refresh and wrong-chain handling. Browser script/resource error assertions passed.
-- The isolated pending fixture shortens only the browser's 180,000ms receipt timeout to 1,000ms. Its mock receipt is initially absent, then reverted; no real approval or sale is broadcast.
-- The original export failed the expected regression assertions before edits. Final fixture records are [Chromium regressions](docs/validation/route-fixes-chromium-regressions.json), [WebKit regressions](docs/validation/route-fixes-webkit-regressions.json), [Chromium general interactions](docs/validation/route-fixes-chromium-interactions.json) and [WebKit general interactions](docs/validation/route-fixes-webkit-interactions.json).
-- The root export passed **16/16 taste@1 checks**: first-screen content, metadata, responsive layout, typography, motion and measured contrast. The probe excludes unresolved backgrounds from contrast; the connected-state scripts separately measured six solid token pairs. [Probe record](docs/validation/route-fixes-design-probe.json).
-
-## Better Interface coverage
-
-The pinned guide's six core domains informed these focused corrections; the existing palette, type scale, components and spacing remain intact. The product and connect/review actions are visible on the 390px first screen. `dist/index.html` retains title, favicon, description, `og:title` and `og:image`.
-
-| Domain | Checked in this revision | Limits |
-| --- | --- | --- |
-| Accessibility | Native labelled checkboxes, keyboard selection, Escape, restored focus, inert modal background and text statuses in both engines. Critical review text remains reachable after focusing confirmation. | No screen-reader or forced-colors session. |
-| Layout | First screen and primary interactions at 320/390/768/1440; long-symbol/uint128-max review reflow in Chromium and WebKit; screenshot inspection of phone sheets and recovery. | No physical-device, native 200% zoom, RTL or localization session. |
-| Writing | Missing-provider, user-rejection and other-error messages now describe the observed state and a recovery. Route progress and confirmed-revert outcomes stay explicit. | External wallet wording is outside this revision. |
-| Typography | Existing five-size/two-family/two-weight system retained. Fixed table/grid widths and wrapping preserve every digit and the long symbol. | Cross-platform font rendering is not exhaustively covered. |
-| Colors | Existing semantic tokens retained; six solid text/surface pairs pass 4.5:1 in both engines, with the probe's measurement exclusions retained. | Every composited/background state is not measured; there is no dark theme. |
-| UI | Loading, no route, valid route, disabled selection, review, pending, reverted, refreshed and connection-error states exercised. Unknown transactions remain locked. | No real wallet signature, Coinbase service session, or slow-motion animation replay. |
-
-Inspected final screenshots: [390 first screen](docs/validation/route-fixes-chromium-390-first.png), [missing-wallet recovery](docs/validation/route-fixes-chromium-390-no-wallet.png), [reverted-transaction recovery](docs/validation/route-fixes-chromium-390-reverted-recovery.png), [320 WebKit review](docs/validation/route-fixes-webkit-320-long-review.png) and [390 WebKit review](docs/validation/route-fixes-webkit-390-long-review.png). `DESIGN.md` documents the final source and responsive sheet behavior.
-
-## Delivery integrity
-
-The final production rebuild is byte-identical to the checked root `dist/`; all 44 build-copy source/configuration files match the submitted source. The nine export files include relative hashed assets and byte-identical launch/pool indexes, favicon and share image. Protected configuration, manifests and lockfiles have no changes; no ignore rule, submodule, dependency archive or runtime package was added. `git diff --check` passed. The source/export/documentation payload is approximately **5.14 MiB**, below 8 MiB. [Integrity record](docs/validation/route-fixes-integrity.json).
-
-## Scope and limitations
-
-All four reported findings were reproduced and fixed. Discovery still supports the existing Ethereum Uniswap v4 graph of up to three pools, without custom hook inputs or best-price optimization. It now considers every candidate in that graph; network failures can still make a search incomplete. A real pool or positive quote is not guaranteed for every token. Pending protection remains limited to the current page session.
-
-The chain/fork data below is historical evidence from the accepted implementation, not a fresh market measurement for this revision. No mainnet signing, fresh public-RPC CORS verification, physical iPhone, screen reader, native zoom or RTL session was performed. Source, locked dependencies and runtime assets remain complete; no browser/runtime package or test scaffolding is part of the submission. Publication occurs after review.
-
----
-
-# Previous implementation validation (before this revision)
-
-The remainder is the retained historical record. Its old 24-candidate limit and WebKit coverage limitations are superseded by the revision above; its live-chain figures have not been remeasured.
-
-
-Date: 2026-10-16. This is the worker's own implementation and validation record, not an independent security audit or a certification by the structural verifier.
-
-## Result and scope
-
-The finished SwarmSweep source is in `web/` and its static production export is in root `dist/`. Token selection and live Uniswap v4 routes no longer depend on SwarmExit registration. The existing deployment, fee recipient, launch-token discovery, wallet connectors, package manifests, lockfiles and build configurations were preserved. No contract was deployed, replaced or modified. No mainnet transaction was sent.
-
-The known wallet `0x0acE1DBE8AAb293cd58D5e3Ea38814f0ccb74782` had 164 positive holdings. At block 26,203,183, 40 returned live routes while SwarmExit's registered token count remained zero. Of those quotes, 26 were explicitly partial balances. The other results were 103 pool/quote failures, 18 exhausted bounded searches and three without a connected v4 path. These are disclosed unavailable routes, not fabricated successful quotes. The live-browser run checked all 222 discovered balances and displayed the same 164 holdings and 40 selectable routes.
-
-## Acceptance coverage
-
-| Requirement | Result | Evidence |
-| --- | --- | --- |
-| Working website and primary interactions | Implemented; selection, review, approvals, transaction outcomes and retries exercised | `route-interactions.json`, local-fork execution |
-| Automatic sell-route discovery without registration | Implemented for every positive identified holding within the declared v4 search scope | `live-routes.json`; zero registered, 40 quoted |
-| Select specific tokens | Visible named checkboxes, select all, clear, selected count and selected-only review | 320/390/768/1440 Chromium checks |
-| Static export with relative URLs | Built; `/preview/` subpath exercised, local assets and both indexes included | `dist/index.html` and integrity check |
-| Production build and typecheck | Passed from `web/` | Commands below |
-| Better Interface six-domain review | Completed with concrete fixes; limitations listed below | Coverage table and screenshots |
-| Product and main action on first 390px screen | Passed; connect control, summary and review actions visible | `routes-390-first.png` |
-| Title, favicon, description, og:title, og:image | Present and probe passed | `web/index.html`, `dist/index.html` |
-| Final DESIGN.md and rebuild instructions | Updated against final source | Root DESIGN.md and README.md |
-| Publication | After review, outside this worker task | No remote deployment claim |
-
-## Actual verification
-
-Commands ran from the repository root unless stated otherwise:
-
-```sh
-npm --prefix web run typecheck
-npm --prefix web run build
-node --experimental-strip-types --test web/test/*.test.mjs
-node --experimental-strip-types web/scripts/check-abi.mjs
-IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node --experimental-strip-types web/scripts/interact-routes.mjs
-IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste
-```
-
-- Typecheck and production build exited 0. Vite emitted a nonfatal warning for the approximately 649 kB main JavaScript chunk. No build configuration or dependency was changed to suppress it.
-- **58/58 unit and regression tests passed.** Coverage includes independent holdings, real viem multicall recovery, malformed event indexes, direct/bridge paths, liquidity-limited amounts, live RPC failures, exact approval destinations, expiry, slippage floors, simulated failures, account/chain changes, pending receipt reconciliation, spoofed receipt rejection, retained earlier successes and legacy held-refund semantics.
-- **101/101 Chromium interaction assertions passed.** Viewports: 320, 390, 768 and 1440 by 844. The exported page was served under `/preview/`. Checks exercise named EIP-6963 connection; visible unsupported tokens; per-token, all and clear selection; selected-only review; approval explanation; keyboard Space/Escape and focus return; real application transaction encoding against mocked RPC responses; confirmed output; empty, failed and retry states; wrong-chain invalidation; 64-character symbols and 39-digit values. No script/resource errors or horizontal overflow were recorded. Two desktop checks verify the checkbox label does not overlap the token name.
-- **16/16 taste@1 checks passed** on the production export at 320, 390 and 1440, plus reduced motion. Its disconnected first-screen copy budget was 47 prose words at 390. The automatic contrast check excluded 34 unresolved-background text boxes; it does not establish contrast for those boxes.
-- Separately, Chromium resolved the CSS color tokens through a canvas and measured six actual solid text/surface pairs: text/page **17.72:1**, secondary/surface **5.97:1**, primary-button text/fill **8.52:1**, route text/background **7.17:1**, success **7.43:1**, error **6.66:1**. All exceed 4.5:1. This is not a claim about every opacity, focus, image or forced-color combination.
-- The original SwarmExit ABI hash still matches its deployment record.
-
-### Real Ethereum checks
-
-`web/scripts/verify-routes.mjs` ran using the worker-provided Ethereum transport, representing the public source `https://ethereum-rpc.publicnode.com`. It read live balances and quotes, and wrote the sanitized [route evidence](docs/validation/live-routes.json). The final recorded scan took 75.409 seconds. Counts and detailed per-token pool IDs/input amounts are in that record. Prices were never copied from a quote cache.
-
-`web/scripts/browser-live.mjs` ran against the production export with the same real Ethereum transport and a read-only injected account. It displayed **164 holdings and 40 selectable routes**, successfully read all **222** discovered balances, and reported **zero page errors and zero failed requests**. The source labels discovery partial because some bounded route searches are incomplete. It does not call the wallet empty. [Browser evidence](docs/validation/route-browser-mainnet.json).
-
-This transport substitution tests browser application behavior with real chain data; it does not prove current CORS behavior of public RPC providers. No wallet signature was requested.
-
-### Disposable mainnet-fork execution
-
-`web/scripts/verify-route-fork.mjs` started its own Anvil fork at block 26,203,183, impersonated only the supplied public test account locally, and closed the fork afterwards. The exact application encoder, quote planner and execution code were used against forked deployed contracts; no application contracts were replaced.
-
-| Scenario | Observed result |
+| Area | Result |
 | --- | --- |
-| GENESIS hook pool, partial balance | Confirmed; net IMD 1,720,593,450,699,152 minor units; treasury 35,114,152,055,084; remaining input 89,790,723,981,900,452,488,689 minor units |
-| 1MD through ETH to IMD | Confirmed; net IMD 969,562,568,544,633 minor units; treasury 19,786,991,194,788; remaining input zero |
-| Deliberately impossible minimum | Transaction reverted; input balance unchanged and no treasury fee |
+| Faster wallet/route scanning | Implemented; live reads and actual production-browser reads passed |
+| USD minimum/maximum filters | Implemented; inclusive boundaries, invalid ranges, unpriced exclusion and reset passed |
+| Batch approvals and sales | Implemented; atomic wallet bundle or PermitBatch plus one combined sale per 20 tokens |
+| Tokens beyond Swarm | Implemented; wallet-wide index, on-chain balances, v2/v3/v4 routes and manual import |
+| Appealing, responsive dust tool | Implemented and inspected in Chromium and WebKit |
+| Requested domain | Source/metadata target `sweepdust.sites.imd.fun`; publication/domain binding is after this job |
+| Review and repairs | Completed for the frontend and tested transaction paths, with limits below |
+| Product/main action on first 390px screen | Yes; screenshot inspected |
+| Source, lockfile and complete static export | Present; existing dependency/build configuration unchanged |
+| Design probe | 16/16 passed |
+| Known unresolved required UI failures / faked features | None found |
+| Share metadata | Title, description, favicon, og:title and local 1200×630 og:image present |
 
-For both successful sales, the input debit equalled the reviewed amount and treasury receipts equalled `floor(gross * 200 / 10000)`. [Fork evidence](docs/validation/route-fork.json). These are local fork transactions, not real mainnet transactions.
+Idea: a readable Ethereum inventory with a mint sweep summary, making scan, select and review the product rather than a separate landing page.
 
-## Better Interface review
+## Commands and actual results
 
-The implemented visual idea remains a warm, compact wallet inventory with blue primary actions and explicit availability states. The pinned six-domain guide was used during implementation; the existing visual system was retained.
+Commands ran from the repository root unless stated. Final successful checks exited 0.
 
-| Domain | Coverage and evidence | Unperformed subchecks |
+| Check | Result |
+| --- | --- |
+| `npm ci --ignore-scripts --cache <temporary cache>` in `web/` | Existing lock installed; 46 packages audited, zero reported vulnerabilities at installation |
+| `npm --prefix web run typecheck` | Strict TypeScript passed |
+| `npm --prefix web run build` | TypeScript and Vite production export passed |
+| `node --experimental-strip-types --test web/test/*.test.mjs` | **91 passed, 0 failed** |
+| `node web/scripts/check-abi.mjs` | Deployment hash matched `f259fa26782bfa734371ae5b1cad46e56f29ea84e49c0b994e5a241087fd68a2` |
+| `node --experimental-strip-types web/scripts/interact-sweepdust.mjs`, with Playwright and axe | **151 interaction checks passed in Chromium** |
+| Same command with `--webkit` | **151 interaction checks passed in WebKit** |
+| `node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste --offline`, with Playwright | **16/16 passed** on the production export |
+| `node --experimental-strip-types web/scripts/verify-sweepdust.mjs --out=test/scratch/live-sweepdust-final.json` | Live public-service wallet/route reads passed, with explicit coverage limits |
+| `node web/scripts/browser-sweepdust-live.mjs`, with Playwright | Real production Chromium reads at `/preview/` passed, without a signer |
+| `node --experimental-strip-types web/scripts/verify-sweepdust-fork.mjs` | **19 checks passed** against deployed bytecode on a disposable Ethereum fork |
+
+The build has a nonfatal chunk-size warning: approximately 690 kB uncompressed / 207 kB gzip for the main script. No source maps, dependency directory, downloaded browser, npm archive or registry mirror is in the export. Assets and indexes are local; relative URLs were exercised under `/preview/`.
+
+Playwright 1.64.1 was temporary verification tooling outside the repository. The assigned browser MCP returned “Chromium distribution 'chrome' is not found”; rendered checks instead used Playwright Chromium and WebKit. WebKit used temporary runtime libraries and software rendering outside the deliverable. No browser tooling was vendored into Git.
+
+## Interaction and rendered coverage
+
+Both engines exercised **320, 390, 768 and 1440px** layouts using explicitly simulated EIP-6963, RPC and indexer fixtures. The fixture checker sends no real wallet transactions. It covered:
+
+- First-screen scanner, subpath assets, address validation and horizontal overflow.
+- Paginated all-token discovery, a non-Swarm holding, visible unpriced balances and legacy refunds.
+- Search; ready-only filter; inclusive USD bounds; invalid ranges; reset and empty states.
+- Filtered selection, flagged-token exclusion, hidden picks and selection preservation when connecting the inspected address.
+- Read-only ownership restrictions, wallet connection, wrong-network blocking/switch, exact amounts, fee/minimum receive and request counts.
+- Two-token standard flow: two exact approvals, one PermitBatch signature and one combined sale with distinct outcomes.
+- Atomic flow: one wallet request with five calls, required atomicity and no separate signature/fallback.
+- Rejection, revert, unknown approval receipt, persistent reload lock and successful receipt recovery.
+- RPC failure distinguished from an empty wallet; retry; manual contract import; honest cancellation.
+- Long symbols, full addresses and very large exact amounts at 320/390px.
+- MetaMask, Coinbase, Rabby and Phantom phone-browser links, plus Coinbase Smart Wallet.
+- Keyboard-only connection, selection and review; visible focus; forward/backward modal wrap; Escape; focus return and background scroll lock.
+- No script or missing-local-resource failures in the primary fixture flows.
+
+Axe WCAG A/AA checks in disconnected, connected and review states found **zero violations and zero incomplete checks** in each engine. This is automated evidence for those states, not a screen-reader session or full accessibility certification.
+
+## Live measurements and transaction audit
+
+At Ethereum block **26,217,487**, the supplied public wallet had **257 verified candidates**, **191 holdings/refund entries**, **42 live quotes** and **5 partial quotes**. First holdings: **2.474 s**. First quote: **4.213 s**. Full quick scan: **37.529 s**. The indexer had no usable IMD USD price; it remained unknown. Token-specific USD filtering and IMD quotes still worked.
+
+An earlier diagnostic run still waited for recent pool history: first quote **114.360 s**, full scan **178.958 s**, at block 26,217,409. Deferring that work and repairing the v2 target removed the bottleneck. These are observations under different public-service/current-block conditions, not a controlled benchmark or a latency promise. The final quick run disclosed **104 incomplete route searches**. The interface groups the coverage notice and retains each token's reason; deeper search remains available.
+
+The separate real production-browser check used no wallet fixture: visible holdings in **2.506 s**, first route in **4.837 s**, zero script/console errors or failed requests. It captured the first **40 displayed rows**, stopped the remaining scan after establishing the primary read interaction, and also inspected 1440px. The 191 total comes from the complete read-only scan, not the paginated visible row count.
+
+The local-fork checker generated a temporary signing account in memory and never saved/printed its key. Actual deployed-bytecode checks passed for:
+
+| Path/check | Observed result |
+| --- | --- |
+| Two held tokens in one router transaction | Exact inputs and separate canonical outcomes reconciled |
+| WETH → native ETH → v4 IMD | Passed |
+| v2 → WETH → native ETH → v4 IMD | Passed |
+| v3 → WETH → native ETH → v4 IMD | Passed |
+| Real PermitBatch typed authorization | Accepted by deployed Permit2 bytecode for each tested sale |
+| Recipient/treasury balances | Matched exact 2% per-token fee rounding and net IMD |
+| Impossible minimum on one input | Entire two-token batch reverted; both inputs and both IMD balances unchanged |
+
+**Mainnet writes: 0. Contracts deployed: 0.** All writes targeted loopback Anvil. IMD, treasury, SwarmExit, Permit2 and Universal Router were retained. Atomic smart-wallet UX/capability was checked with fixtures; standard-wallet cryptographic authorization and router execution were checked on the actual forked bytecode.
+
+## Better Interface: six-domain review
+
+The pinned contents/workflow and core principles for all six domains were read and applied during construction. Source and rendered checks are distinguished here.
+
+| Domain | Coverage | Evidence and limits |
 | --- | --- | --- |
-| Accessibility | Native labelled checkboxes/buttons; visible focus rule; keyboard selection; inert modal background; Escape and focus restoration; text status alongside colors; live progress and selected count | Screen-reader session, forced-colors inspection and full assistive-technology audit |
-| Layout | First-screen action, static subpath, 320/390/768/1440 interaction checks; 320/390/1440 real-wallet overflow checks; long-symbol and exact-number stress; inspected screenshots | Native 200% browser zoom, RTL and translated layouts |
-| Writing | Registration requirement removed; selection instructions next to controls; partial amount and remaining tokens explicit; quote versus execution distinction; per-token minimum, fee, approvals, atomic reverts and gas described | External/localized copy variants |
-| Typography | Existing five sizes and two system families retained; full addresses/amounts wrap; long symbol and amount reviewed in screenshots | Cross-platform system-font rendering |
-| Colors | Existing semantic palette reused; 16-check probe plus six computed token-pair contrast measurements | Every composited state, dark mode (not implemented), physical-device displays |
-| UI | Loading holdings and route progress, valid/no-path/failed-quote states, selected/disabled controls, review, approval, confirmation, failure, pending and retry covered by browser/unit/fork checks; reduced-motion probe passed | Slow-motion replay, physical phone wallets, WebKit and real signing |
+| Accessibility | **Checked**: native controls/disclosures, names, associated errors, live progress, touch labels, inert dialogs, keyboard flow, focus return and motion preferences | Both engines, keyboard screenshot and axe in three states. Physical screen reader, native zoom and real phone not performed. |
+| Layout | **Checked**: shared edges, grouped controls, responsive order, breakpoints, wrapping, long values and modal scrolling | 320/390/768/1440 interactions and inspected screenshots. RTL mirror/translation not performed. |
+| Writing | **Checked**: action labels, ownership, indexed USD versus quote, quick/deeper coverage, partial sales, fee/minimum terms, errors and pending states | Source and walkthrough. Repeated coverage warnings grouped; unknown/cancelled data does not claim success or zero holdings. |
+| Typography | **Checked**: six sizes, two weights, system sans/address mono, tabular figures, exact-value wrapping and hierarchy | Probe and stress screenshots. No remote font. OS rendering beyond tested engines is not certified. |
+| Colors | **Checked**: semantic tokens, redundant status text/icons, disabled/error/active states and actual solid contrast pairs | Thirteen pairs in each engine, all ≥4.5:1, plus axe. Not every composited backdrop/display measured. |
+| UI | **Checked**: restrained surfaces, coherent corners/icons and hover/pressed/focus/disabled/loading/empty/error/pending/success states | Both-engine flows/screenshots. Spinner is removed under reduced motion. No entrance system exists; 10%-speed animation replay and physical haptics not performed. |
 
-### Reproduced findings and fixes
+Not applicable: dark theme, translated UI, carousel, video, drag-and-drop and server-side routes. These are not part of this product.
 
-| Finding | Source | Fix and recheck |
+### Measured contrast
+
+Actual CSS colors were rendered through each browser's canvas conversion, rather than estimating OKLCH contrast. Solid pairs (rounded): primary/surface **16.69:1**; secondary/page **6.41:1**; secondary/surface **6.76:1**; secondary/mint **5.71:1**; button text/fill **8.41:1**; hover **10.92:1**; disabled/muted **5.92:1**; ready/surface **10.40:1**; ready/mint **8.79:1**; error/surface **8.76:1**; pending/notice **7.67:1**; focus/surface **16.69:1** and focus/mint **14.10:1**.
+
+The taste probe reports 121 background-resolution exclusions; its contrast pass alone is not the evidence for these pairs. It also reports six controls below its comfortable 44px target; they pass its 24px/spacing check and are disclosures/text links rather than scan, sale or wallet actions. Pair data and axe results are included separately.
+
+## Findings, corrections and rechecks
+
+No known required high/medium finding remains open. Locations reference final source. Construction failures were repaired and rechecked.
+
+| Severity / domain | Source | Finding, fix and evidence |
 | --- | --- | --- |
-| High: route eligibility still used an empty owner registry | `web/src/lib/sweep.ts:170`, `web/src/lib/routes.ts:187` | Added an on-chain pool index, incremental discovery and current-block quote search. Live check returned 40 routes with zero registered tokens. |
-| High: unavailable registration hid every checkbox | `web/src/components/TokenList.tsx:206`, `web/src/App.tsx:320` | Always show selection controls, disable only unavailable routes, add select-all/clear and selected-only review. All viewport interactions passed. |
-| High: full-balance liquidity failure hid executable smaller trades | `web/src/lib/routes.ts:429`, `web/src/components/TokenList.tsx:72` | Recognize the Quoter's wrapped insufficient-liquidity error, quote bounded smaller amounts, label partial inputs in list and review. Unit test and GENESIS fork execution passed. |
-| High: replacing only the label would leave the old sale transaction unusable | `web/src/lib/directSale.ts:113`, `web/src/lib/directSale.ts:281` | Encode and simulate direct atomic v4 swaps, scoped approvals, the existing 2% fee and net transfer. Hook and bridge fork sales passed. |
-| Medium: quote-loading disabled the trigger before the dialog captured focus | `web/src/App.tsx:139`, `web/src/components/ConfirmDialog.tsx:47` | Capture trigger before asynchronous planning, restore after close, use the token heading as completion fallback. Escape/focus checks passed at all four widths. |
-| Medium: visible Select label overlapped token name on desktop | `web/src/styles.css:141`, `.tokens .col-pick` | Stack checkbox/label and use a 72px desktop selection column; retain the 44px mobile grid track. Bounding-box checks and screenshots passed. |
-| Medium: successful-looking stale quotes or ambiguous receipts could invite a repeat sale | `web/src/lib/directSale.ts:82`, `web/src/App.tsx:59` | Re-quote and simulate before signing; preserve the reviewed minimum; keep pending hashes by account in the page session and reconcile on Refresh. Pending/rejection tests passed. |
+| High / data | `web/src/lib/inventory.ts:26`, `web/src/lib/holdings.ts:39` | Registry-only eligibility excluded ordinary tokens. Added paginated candidates, verified balances and import. Real scan found 191 holdings; non-Swarm fixtures and real v3 execution passed. |
+| Medium / performance | `web/src/lib/inventory.ts:50`, `web/src/lib/inventory.ts:126`, `web/src/lib/routes.ts:282` | Serial work/history gated results. Batched necessary reads, ranked concurrently, deferred recent-log expansion and skipped pool lookup for refund-only zero balances. First quote observed at 4.213 s; holdings stream first. |
+| High / transaction UX | `web/src/lib/batchSale.ts:82`, `web/src/lib/batchSale.ts:158` | Per-token approval/sale loops multiplied prompts. Added PermitBatch, combined sales and capability-gated atomic calls. Standard two-token=4 requests; atomic=1; both-engine and fork checks passed. |
+| High / route integrity | `web/src/lib/markets.ts:17` | A construction v2 router literal had 41 hex digits; the real fork refused it. Used canonical Router02, added target validation and reran successful v2 execution. |
+| Medium / filtering | `web/src/lib/filters.ts:5`, `web/src/components/TokenList.tsx:30` | Bounds/unknown values needed explicit semantics. Added inclusive bounds, field errors/reset and unpriced exclusion. Range/search/selection checks passed. |
+| High / layout | `web/src/styles.css:116` | A large USD total widened a 320px document to 415px. Constrained flex width, wrapped exact values and retained full token symbols. Both-engine stress checks now remain at viewport width. |
+| Medium / continuity | `web/src/App.tsx:116` | Connecting the inspected address restarted scanning and cleared picks. Preserve the existing view while review refreshes amounts. Four-width connection regression passed in both engines. |
+| Medium / accessibility | `web/src/components/ConfirmDialog.tsx:76`, `web/src/wallet/ConnectSheet.tsx:138` | Delayed focus return, missing connected trigger ref and background scroll. Restore to the live control immediately and lock scrolling. Keyboard-only flow, modal wrap, Escape and focus screenshot passed. |
+| High / recovery | `web/src/lib/batchSale.ts:40`, `web/src/lib/batchSale.ts:202`, `web/src/lib/batchSale.ts:371` | Batches required durable pending IDs and per-token attribution. Persist before waiting; reconcile ordered input/payout segments; block repeat sends and overlapping tabs. Reload, reject, revert and bad-fee tests passed. |
+| Medium / writing-data | `web/src/App.tsx:230`, `web/src/lib/inventory.ts:145` | Scan balances could appear current after sale; many repeated warnings obscured coverage. Label snapshots, request fresh scan, group coverage count and retain row reasons. Source/state checks passed. |
+| Medium / status honesty | `web/src/App.tsx:231`, `web/src/components/TokenList.tsx:20` | Cancelled or indexer-failed scans could imply empty; stopped rows could say “Checking”. Distinguish unscanned/stopped state and show “Not checked”. Cancellation checks passed. |
 
-No unresolved observed layout defect remains in the exercised states. Visual coverage is representative, not an exhaustive accessibility certification.
+`DESIGN.md` was extracted from the corrected source, including real values, responsive behavior and components. The Better Interface and Impeccable license notices are retained.
 
-## Evidence and delivery integrity
+## Limits and completion
 
-The current records are `docs/validation/route-interactions.json`, `route-design-probe.json`, `route-browser-mainnet.json`, `live-routes.json` and `route-fork.json`. Current inspected screenshots are `routes-390-first.png`, `routes-390-tokens.png`, `routes-390-review.png`, `routes-1440-tokens.png` and `routes-320-long-review.png`. Older files in that folder belong to preceding project work and are not claimed as evidence for this change.
+**Complete for the stated static-site and supported-route implementation scope.** Domain publication/binding is a later IdentityMD step. No real visitor-wallet mainnet sale, independent contract audit, formal proof, physical phone, screen-reader session, native 200% zoom session or RTL session was performed. Desktop WebKit is an engine check, not a physical iPhone check.
 
-The final export includes source-matching `launches.json` and `pools.json`, relative hashed assets, favicon and share card. `git diff --check` passed; protected configuration, package manifests and lockfiles have no changes. No ignore rule, dependency archive, submodule or credential file was added. The final file payload is approximately **4.69 MiB**, below the 8 MiB limit, including the complete export, source, unchanged lockfiles and evidence. The integrity check confirmed relative assets, required metadata and byte-identical source/export indexes. Details are in [route-integrity.json](docs/validation/route-integrity.json).
+Wallet-wide discovery uses indexed Ethereum ERC-20 candidates and chain verification, not protocol-level enumeration of every possible contract. Pagination is capped at 10,000 candidates with a warning. New/unindexed tokens can be imported. NFTs, native ETH balances, other chains/DEXs, split routing and custom hook data are excluded and disclosed.
 
-## Limitations and completion
+Quick search is bounded; deeper search can be slow and public services can refuse requests. Quotes can change or fail full execution. Pending state stays conservative if submission/receipt cannot be reconciled. Disabled storage removes reload persistence; Web Locks availability varies. Earlier completed batches and separate approvals remain if later work stops. A new scan updates post-sale balances.
 
-Complete for the implemented **Ethereum Uniswap v4** website scope, with the market/search limits disclosed in the UI and README. Every positive identified holding is considered; executable routes are not guaranteed for every token. Other DEXs, custom hook input formats, more than three hops and searches beyond 24 candidate paths are outside this implementation. Partial amounts are found by bounded halving rather than optimization. Large wallets can take several minutes over browser RPC transport.
-
-Real signing, mainnet execution, physical wallets, WebKit, screen readers, native zoom, RTL and public-provider CORS were not verified in this task. A fully reloaded page does not retain in-memory pending-transaction guards. Network publication occurs after the worker handoff and was not performed or claimed here.
+The export/source/lockfiles are present. No build/dependency file, environment file, Git metadata or submodule was changed. The only ignore change is an exact evidence allowlist, bounded by `artifacts/PATH-BUDGET.md` to 1,600,000 bytes; dependency and cache exclusions remain in place. Export hashes and payload-size checks are in `artifacts/validation/export.json` and `artifacts/validation/bundle-budget.json`.

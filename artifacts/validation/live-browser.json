@@ -1,0 +1,14 @@
+{
+  "kind": "production browser, live read-only public services",
+  "at": "2026-10-18T05:54:56.380Z",
+  "account": "0x0ace1dbe8aab293cd58d5e3ea38814f0ccb74782",
+  "width": 390,
+  "mainnetTransactionsSent": 0,
+  "held": 40,
+  "firstHoldingMs": 2506,
+  "firstRouteMs": 4837,
+  "passed": true,
+  "scriptErrors": [],
+  "consoleErrors": [],
+  "failedRequests": []
+}

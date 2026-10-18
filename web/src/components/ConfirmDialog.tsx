@@ -2,8 +2,10 @@ import { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { EXPLORER_URL, IMD_SYMBOL, TREASURY_ADDRESS } from "../config";
 import { fmtAmount, fmtUsd, short } from "../lib/format";
-import { usdValue, type Plan, type Pricing, type Progress } from "../lib/sweep";
+import { feeSplit, usdValue, type Plan, type Pricing, type Progress } from "../lib/sweep";
 import { minimumOut } from "../lib/directSale";
+import { Icon } from "./Icon";
+import { PERMIT2, UNIVERSAL_ROUTER } from "../lib/routes";
 
 type Props = {
   plan: Plan;
@@ -16,10 +18,13 @@ type Props = {
 };
 
 function progressText(p: Progress): string {
+  if (p.step === "permit") return `Authorize ${p.tokens} token${p.tokens === 1 ? "" : "s"} together in your wallet (batch ${p.batch} of ${p.batches}). This signature does not submit the sale.`;
+  if (p.step === "batch-sign") return `Confirm batch ${p.batch} of ${p.batches} in your wallet. It groups ${p.calls} approval and sale calls.`;
+  if (p.step === "batch-mine") return `Waiting for wallet batch ${p.batch} of ${p.batches} to confirm…`;
   if (p.step === "approve")
     return `${p.approval === "permit" ? "Authorize the router for" : "Approve Permit2 to spend"} ${p.token.symbol} in your wallet (${p.index} of ${p.total})…`;
   if (p.step === "sign")
-    return `Confirm sale ${p.batch} of ${p.batches} in your wallet.${p.gasWei ? ` Estimated gas: ${fmtAmount(p.gasWei)} ETH.` : ""}`;
+    return `Confirm sale batch ${p.batch} of ${p.batches} in your wallet.${p.gasWei ? ` Estimated gas: ${fmtAmount(p.gasWei)} ETH.` : ""}`;
   return p.batches > 1
     ? `Waiting for sale ${p.batch} of ${p.batches} to confirm…`
     : "Waiting for the transaction to confirm…";
@@ -68,16 +73,16 @@ export function ConfirmDialog({
       }
     };
     addEventListener("keydown", onKey);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     document.getElementById("page")?.setAttribute("inert", "");
     box.current?.querySelector<HTMLElement>("button")?.focus();
     return () => {
       removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
       document.getElementById("page")?.removeAttribute("inert");
-      requestAnimationFrame(() => {
-        if (previous?.isConnected && !previous.matches(":disabled"))
-          previous.focus();
-        else document.getElementById("tokens-heading")?.focus();
-      });
+      if (previous?.isConnected && !previous.matches(":disabled")) previous.focus();
+      else document.getElementById("tokens-heading")?.focus();
     };
   }, []);
 
@@ -94,7 +99,7 @@ export function ConfirmDialog({
       >
         <div className="sheet-head">
           <h2 id={titleId}>
-            {n === 1 ? "Sell 1 token for IMD?" : `Sell ${n} tokens for IMD?`}
+            Review your sweep
           </h2>
           <button
             className="x"
@@ -107,10 +112,9 @@ export function ConfirmDialog({
         </div>
 
         <p className="plan-note">
-          {plan.requiresApproval
-            ? "Live quote before approval. After approval, the complete sale is simulated before you sign."
-            : "Simulated quote. Network conditions can change before the transaction settles."}
+          {n} token{n === 1 ? "" : "s"} to sell for IMD. Quotes were refreshed for this review.
         </p>
+        {plan.batch && n > 0 && <div className="confirmation-summary"><Icon name="layers" /><div><strong>About {plan.batch.confirmations} wallet request{plan.batch.confirmations === 1 ? "" : "s"}</strong><p>{plan.batch.mode === "atomic" ? `${plan.batch.batches} atomic batch${plan.batch.batches === 1 ? "" : "es"}, with approvals and sales together.` : `${plan.batch.tokenApprovals} token approval${plan.batch.tokenApprovals === 1 ? "" : "s"}, ${plan.batch.permitSignatures} batch authorization${plan.batch.permitSignatures === 1 ? "" : "s"}, ${plan.batch.batches} sale transaction${plan.batch.batches === 1 ? "" : "s"}.`}</p></div></div>}
         {n > 0 ? (
           <table className="plan">
             <thead>
@@ -125,6 +129,7 @@ export function ConfirmDialog({
                 <tr key={token.address}>
                   <td>
                     {token.symbol}
+                    <a className="note mono" href={`${EXPLORER_URL}/token/${token.address}`} target="_blank" rel="noreferrer">{token.address}</a>
                     {token.liveRoute &&
                       token.liveRoute.amountIn < token.balance && (
                         <span className="note">Partial balance</span>
@@ -202,6 +207,7 @@ export function ConfirmDialog({
                 )}
               </dd>
             </div>
+            <div><dt>Minimum you receive</dt><dd>{fmtAmount(plan.items.reduce((sum, item) => sum + feeSplit(minimumOut(item.imdOut)).net, 0n))} IMD</dd></div>
           </dl>
         )}
 
@@ -211,11 +217,11 @@ export function ConfirmDialog({
           {plan.gasNote}
         </p>
         <p className="plan-note">
-          Your wallet may ask for a token approval to Permit2 and a separate
-          router authorization, limited to this amount and 10 minutes. Then
-          confirm one sale per token. Minimum proceeds are 3% below each quote.
-          A reverted sale charges no sale fee; network gas is still paid.
+          {plan.batch?.simulation} Minimum gross proceeds are 3% below each reviewed quote.
+          Every batch of up to 20 tokens completes together or reverts together.
+          A reverted batch charges no sale fee; network gas is still paid.
         </p>
+        <details className="authorization-details"><summary>Approval amounts &amp; destinations</summary><p>New approvals use only the displayed token amounts. Router authorization expires after 10 minutes. Existing sufficient allowances can be reused. Separate approvals remain if a later request is declined.</p><p>Token spender: <a className="mono" href={`${EXPLORER_URL}/address/${PERMIT2}`} target="_blank" rel="noreferrer">Permit2 · {PERMIT2}</a></p><p>Sale router: <a className="mono" href={`${EXPLORER_URL}/address/${UNIVERSAL_ROUTER}`} target="_blank" rel="noreferrer">{UNIVERSAL_ROUTER}</a></p><p>Recipient: <span className="mono">{plan.account}</span></p></details>
 
         <p className="status-line" role="status" aria-live="polite">
           {error ? error : progress ? progressText(progress) : ""}
@@ -237,8 +243,8 @@ export function ConfirmDialog({
             {running
               ? "Selling…"
               : n === 1
-                ? "Sell 1 token"
-                : `Sell ${n} tokens`}
+                ? "Confirm sweep · 1 token"
+                : `Confirm sweep · ${n} tokens`}
           </button>
         </div>
       </div>

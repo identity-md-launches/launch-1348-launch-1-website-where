@@ -1,0 +1,7 @@
+{
+  "domain": "sweepdust.sites.imd.fun",
+  "exportDirectory": "dist",
+  "assetBase": "./",
+  "routing": "single static page with hash anchors",
+  "publication": "IdentityMD publishing step after submission; no publication or DNS action performed by the worker"
+}

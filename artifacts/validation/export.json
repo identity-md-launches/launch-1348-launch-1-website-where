@@ -1,0 +1,52 @@
+{
+  "base": "./",
+  "domain": "sweepdust.sites.imd.fun",
+  "files": [
+    {
+      "path": "dist/assets/ccip-jHT2dZ7u.js",
+      "bytes": 2840,
+      "sha256": "c3377c36a54470e326f23c934a1f4af0733cadf8ad815e0da5b3ddff4353243d"
+    },
+    {
+      "path": "dist/assets/connectors-D_ZJoJJG.js",
+      "bytes": 106,
+      "sha256": "e2276078d6eb38c54f8064d654ee82f10113c838d7e640509aaabc5f13e2bd32"
+    },
+    {
+      "path": "dist/assets/index-CH62ALWF.css",
+      "bytes": 25840,
+      "sha256": "545579381875dd984c2a3d83705a9ab4a464d92905d6462802d8d4ae56b3d69c"
+    },
+    {
+      "path": "dist/assets/index-DAhPL72U.js",
+      "bytes": 689845,
+      "sha256": "955b10b9846c98cb2a46d50cf64aa2123bfb8a7cd299656aa6efeacb494da651"
+    },
+    {
+      "path": "dist/favicon.svg",
+      "bytes": 298,
+      "sha256": "2abc32bd7e8c7cf889045c758e27575e0ae5cf9d91c7f33c44ea89535af0578d"
+    },
+    {
+      "path": "dist/index.html",
+      "bytes": 1488,
+      "sha256": "ba8e608c7268192e93bdac30ac5eaa39c70475b4f379459059fcdab1622916b7"
+    },
+    {
+      "path": "dist/launches.json",
+      "bytes": 63747,
+      "sha256": "4cb283f2575941c3cf9ad5fd8baf49d70d95f1e245ee37fc367597d4ae5e12b1"
+    },
+    {
+      "path": "dist/og.png",
+      "bytes": 50294,
+      "sha256": "c6b637cd3fc52fe5786817a802f160e4758365e83d6f8b470fcf0eea23c17cb7"
+    },
+    {
+      "path": "dist/pools.json",
+      "bytes": 404812,
+      "sha256": "4841cd6d036741b5f8cb62b56e17c7d389c01895200ba85fe58954593e121e14"
+    }
+  ],
+  "totalBytes": 1239270
+}

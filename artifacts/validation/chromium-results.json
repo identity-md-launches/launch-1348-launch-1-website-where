@@ -1,0 +1,612 @@
+{
+  "engine": "chromium",
+  "productionSubpath": "/preview/",
+  "simulated": true,
+  "mainnetTransactionsSent": 0,
+  "checks": [
+    {
+      "label": "320: product title",
+      "passed": true
+    },
+    {
+      "label": "320: scanner action on first screen",
+      "passed": true
+    },
+    {
+      "label": "320: no initial horizontal overflow",
+      "passed": true
+    },
+    {
+      "label": "320: invalid address explained",
+      "passed": true
+    },
+    {
+      "label": "320: all indexed holdings plus legacy refund listed",
+      "passed": true
+    },
+    {
+      "label": "320: token outside Swarm is discovered",
+      "passed": true
+    },
+    {
+      "label": "320: unpriced balance remains visible",
+      "passed": true
+    },
+    {
+      "label": "320: maximum USD filter",
+      "passed": true
+    },
+    {
+      "label": "320: minimum USD filter",
+      "passed": true
+    },
+    {
+      "label": "320: invalid bounds are explained",
+      "passed": true
+    },
+    {
+      "label": "320: case-insensitive search",
+      "passed": true
+    },
+    {
+      "label": "320: ready-only filter",
+      "passed": true
+    },
+    {
+      "label": "320: select shown skips flagged tokens",
+      "passed": true
+    },
+    {
+      "label": "320: read-only scan cannot sell",
+      "passed": true
+    },
+    {
+      "label": "320: connecting the inspected wallet preserves selections",
+      "passed": true
+    },
+    {
+      "label": "320: hidden selections disclosed",
+      "passed": true
+    },
+    {
+      "label": "320: accurate standard request estimate",
+      "passed": true
+    },
+    {
+      "label": "320: minimum net proceeds disclosed",
+      "passed": true
+    },
+    {
+      "label": "320: review makes background inert",
+      "passed": true
+    },
+    {
+      "label": "320: review has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "label": "320: review returns keyboard focus",
+      "passed": true
+    },
+    {
+      "label": "320: wrong network blocks sale",
+      "passed": true
+    },
+    {
+      "label": "320: both tokens use one sale transaction",
+      "passed": true
+    },
+    {
+      "label": "320: both router authorizations use one PermitBatch signature",
+      "passed": true
+    },
+    {
+      "label": "320: only required token approvals sent",
+      "passed": true
+    },
+    {
+      "label": "320: no script or local-resource errors",
+      "passed": true
+    },
+    {
+      "label": "390: product title",
+      "passed": true
+    },
+    {
+      "label": "390: scanner action on first screen",
+      "passed": true
+    },
+    {
+      "label": "390: no initial horizontal overflow",
+      "passed": true
+    },
+    {
+      "label": "390: invalid address explained",
+      "passed": true
+    },
+    {
+      "label": "390: all indexed holdings plus legacy refund listed",
+      "passed": true
+    },
+    {
+      "label": "390: token outside Swarm is discovered",
+      "passed": true
+    },
+    {
+      "label": "390: unpriced balance remains visible",
+      "passed": true
+    },
+    {
+      "label": "390: maximum USD filter",
+      "passed": true
+    },
+    {
+      "label": "390: minimum USD filter",
+      "passed": true
+    },
+    {
+      "label": "390: invalid bounds are explained",
+      "passed": true
+    },
+    {
+      "label": "390: case-insensitive search",
+      "passed": true
+    },
+    {
+      "label": "390: ready-only filter",
+      "passed": true
+    },
+    {
+      "label": "390: select shown skips flagged tokens",
+      "passed": true
+    },
+    {
+      "label": "390: read-only scan cannot sell",
+      "passed": true
+    },
+    {
+      "label": "390: connecting the inspected wallet preserves selections",
+      "passed": true
+    },
+    {
+      "label": "390: hidden selections disclosed",
+      "passed": true
+    },
+    {
+      "label": "390: accurate standard request estimate",
+      "passed": true
+    },
+    {
+      "label": "390: minimum net proceeds disclosed",
+      "passed": true
+    },
+    {
+      "label": "390: review makes background inert",
+      "passed": true
+    },
+    {
+      "label": "390: review has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "label": "390: review returns keyboard focus",
+      "passed": true
+    },
+    {
+      "label": "390: wrong network blocks sale",
+      "passed": true
+    },
+    {
+      "label": "390: both tokens use one sale transaction",
+      "passed": true
+    },
+    {
+      "label": "390: both router authorizations use one PermitBatch signature",
+      "passed": true
+    },
+    {
+      "label": "390: only required token approvals sent",
+      "passed": true
+    },
+    {
+      "label": "390: no script or local-resource errors",
+      "passed": true
+    },
+    {
+      "label": "768: product title",
+      "passed": true
+    },
+    {
+      "label": "768: scanner action on first screen",
+      "passed": true
+    },
+    {
+      "label": "768: no initial horizontal overflow",
+      "passed": true
+    },
+    {
+      "label": "768: invalid address explained",
+      "passed": true
+    },
+    {
+      "label": "768: all indexed holdings plus legacy refund listed",
+      "passed": true
+    },
+    {
+      "label": "768: token outside Swarm is discovered",
+      "passed": true
+    },
+    {
+      "label": "768: unpriced balance remains visible",
+      "passed": true
+    },
+    {
+      "label": "768: maximum USD filter",
+      "passed": true
+    },
+    {
+      "label": "768: minimum USD filter",
+      "passed": true
+    },
+    {
+      "label": "768: invalid bounds are explained",
+      "passed": true
+    },
+    {
+      "label": "768: case-insensitive search",
+      "passed": true
+    },
+    {
+      "label": "768: ready-only filter",
+      "passed": true
+    },
+    {
+      "label": "768: select shown skips flagged tokens",
+      "passed": true
+    },
+    {
+      "label": "768: read-only scan cannot sell",
+      "passed": true
+    },
+    {
+      "label": "768: connecting the inspected wallet preserves selections",
+      "passed": true
+    },
+    {
+      "label": "768: hidden selections disclosed",
+      "passed": true
+    },
+    {
+      "label": "768: accurate standard request estimate",
+      "passed": true
+    },
+    {
+      "label": "768: minimum net proceeds disclosed",
+      "passed": true
+    },
+    {
+      "label": "768: review makes background inert",
+      "passed": true
+    },
+    {
+      "label": "768: review has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "label": "768: review returns keyboard focus",
+      "passed": true
+    },
+    {
+      "label": "768: wrong network blocks sale",
+      "passed": true
+    },
+    {
+      "label": "768: both tokens use one sale transaction",
+      "passed": true
+    },
+    {
+      "label": "768: both router authorizations use one PermitBatch signature",
+      "passed": true
+    },
+    {
+      "label": "768: only required token approvals sent",
+      "passed": true
+    },
+    {
+      "label": "768: no script or local-resource errors",
+      "passed": true
+    },
+    {
+      "label": "1440: product title",
+      "passed": true
+    },
+    {
+      "label": "1440: scanner action on first screen",
+      "passed": true
+    },
+    {
+      "label": "1440: no initial horizontal overflow",
+      "passed": true
+    },
+    {
+      "label": "1440: invalid address explained",
+      "passed": true
+    },
+    {
+      "label": "1440: all indexed holdings plus legacy refund listed",
+      "passed": true
+    },
+    {
+      "label": "1440: token outside Swarm is discovered",
+      "passed": true
+    },
+    {
+      "label": "1440: unpriced balance remains visible",
+      "passed": true
+    },
+    {
+      "label": "1440: maximum USD filter",
+      "passed": true
+    },
+    {
+      "label": "1440: minimum USD filter",
+      "passed": true
+    },
+    {
+      "label": "1440: invalid bounds are explained",
+      "passed": true
+    },
+    {
+      "label": "1440: case-insensitive search",
+      "passed": true
+    },
+    {
+      "label": "1440: ready-only filter",
+      "passed": true
+    },
+    {
+      "label": "1440: select shown skips flagged tokens",
+      "passed": true
+    },
+    {
+      "label": "1440: read-only scan cannot sell",
+      "passed": true
+    },
+    {
+      "label": "1440: connecting the inspected wallet preserves selections",
+      "passed": true
+    },
+    {
+      "label": "1440: hidden selections disclosed",
+      "passed": true
+    },
+    {
+      "label": "1440: accurate standard request estimate",
+      "passed": true
+    },
+    {
+      "label": "1440: minimum net proceeds disclosed",
+      "passed": true
+    },
+    {
+      "label": "1440: review makes background inert",
+      "passed": true
+    },
+    {
+      "label": "1440: review has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "label": "1440: review returns keyboard focus",
+      "passed": true
+    },
+    {
+      "label": "1440: wrong network blocks sale",
+      "passed": true
+    },
+    {
+      "label": "1440: both tokens use one sale transaction",
+      "passed": true
+    },
+    {
+      "label": "1440: both router authorizations use one PermitBatch signature",
+      "passed": true
+    },
+    {
+      "label": "1440: only required token approvals sent",
+      "passed": true
+    },
+    {
+      "label": "1440: no script or local-resource errors",
+      "passed": true
+    },
+    {
+      "label": "atomic: estimate is one request for two tokens",
+      "passed": true
+    },
+    {
+      "label": "atomic: one wallet_sendCalls with required atomicity",
+      "passed": true
+    },
+    {
+      "label": "atomic: no separate typed signatures",
+      "passed": true
+    },
+    {
+      "label": "atomic: two token approvals, two router allowances, one sale",
+      "passed": true
+    },
+    {
+      "label": "atomic: no script errors",
+      "passed": true
+    },
+    {
+      "label": "rejection: stops with no sale or approval",
+      "passed": true
+    },
+    {
+      "label": "rejection: no pending lock remains",
+      "passed": true
+    },
+    {
+      "label": "RPC failure: not reported as empty wallet",
+      "passed": true
+    },
+    {
+      "label": "RPC failure: retry recovers holdings",
+      "passed": true
+    },
+    {
+      "label": "manual import: verifies a token absent from index",
+      "passed": true
+    },
+    {
+      "label": "phone: MetaMask deep link available",
+      "passed": true
+    },
+    {
+      "label": "phone: Coinbase Wallet deep link available",
+      "passed": true
+    },
+    {
+      "label": "phone: Rabby deep link available",
+      "passed": true
+    },
+    {
+      "label": "phone: Phantom deep link available",
+      "passed": true
+    },
+    {
+      "label": "phone: passkey wallet available",
+      "passed": true
+    },
+    {
+      "label": "phone: Escape dismisses connect sheet",
+      "passed": true
+    },
+    {
+      "label": "phone: connect focus restored",
+      "passed": true
+    },
+    {
+      "label": "pending: unresolved approval is disclosed",
+      "passed": true
+    },
+    {
+      "label": "pending: no later approval or sale is sent",
+      "passed": true
+    },
+    {
+      "label": "pending: reload retains the lock",
+      "passed": true
+    },
+    {
+      "label": "pending: input cannot be selected again",
+      "passed": true
+    },
+    {
+      "label": "pending: a confirmed approval releases the lock",
+      "passed": true
+    },
+    {
+      "label": "pending: fresh quote can be selected after receipt recovery",
+      "passed": true
+    },
+    {
+      "label": "revert: failed batch is not reported as pending or sold",
+      "passed": true
+    },
+    {
+      "label": "cancel: interrupted scan is explained",
+      "passed": true
+    },
+    {
+      "label": "cancel: unknown wallet is not called empty",
+      "passed": true
+    },
+    {
+      "label": "320: long symbols and exact values reflow",
+      "passed": true
+    },
+    {
+      "label": "320: complete token address available in review",
+      "passed": true
+    },
+    {
+      "label": "320: complete long symbol is retained",
+      "passed": true
+    },
+    {
+      "label": "390: long symbols and exact values reflow",
+      "passed": true
+    },
+    {
+      "label": "390: complete token address available in review",
+      "passed": true
+    },
+    {
+      "label": "390: complete long symbol is retained",
+      "passed": true
+    },
+    {
+      "label": "contrast: all 13 rendered solid token pairs meet 4.5:1",
+      "passed": true
+    },
+    {
+      "label": "keyboard: first focus is the visible skip link",
+      "passed": true
+    },
+    {
+      "label": "keyboard: header connect is reachable",
+      "passed": true
+    },
+    {
+      "label": "keyboard: wallet row is reachable",
+      "passed": true
+    },
+    {
+      "label": "keyboard: connection restores focus to the connected control",
+      "passed": true
+    },
+    {
+      "label": "keyboard: tokens selected without a pointer",
+      "passed": true
+    },
+    {
+      "label": "keyboard: modal locks background scrolling",
+      "passed": true
+    },
+    {
+      "label": "keyboard: modal wraps backwards",
+      "passed": true
+    },
+    {
+      "label": "keyboard: modal wraps forwards",
+      "passed": true
+    },
+    {
+      "label": "keyboard: Escape returns focus to review",
+      "passed": true
+    },
+    {
+      "label": "index failure: zero fallback balances do not imply an empty wallet",
+      "passed": true
+    },
+    {
+      "label": "index failure: retry recovers the full indexed inventory",
+      "passed": true
+    },
+    {
+      "label": "accessibility: no automated violations in disconnected",
+      "passed": true
+    },
+    {
+      "label": "accessibility: no automated violations in connected",
+      "passed": true
+    },
+    {
+      "label": "accessibility: no automated violations in review",
+      "passed": true
+    }
+  ]
+}

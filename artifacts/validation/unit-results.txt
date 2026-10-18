@@ -1,0 +1,556 @@
+TAP version 13
+# Subtest: official history is deduplicated by address, never by symbol
+ok 1 - official history is deduplicated by address, never by symbol
+  ---
+  duration_ms: 3.388688
+  type: 'test'
+  ...
+# Subtest: positive holding remains visible when the sale registry is empty
+ok 2 - positive holding remains visible when the sale registry is empty
+  ---
+  duration_ms: 7.956867
+  type: 'test'
+  ...
+# Subtest: positive tokens without sell routes are retained and disabled
+ok 3 - positive tokens without sell routes are retained and disabled
+  ---
+  duration_ms: 2.923757
+  type: 'test'
+  ...
+# Subtest: zero balances produce a complete empty wallet only after successful reads
+ok 4 - zero balances produce a complete empty wallet only after successful reads
+  ---
+  duration_ms: 4.308267
+  type: 'test'
+  ...
+# Subtest: failed balances never become a zero-token success
+ok 5 - failed balances never become a zero-token success
+  ---
+  duration_ms: 1.690015
+  type: 'test'
+  ...
+# Subtest: one failed balance marks partial discovery while keeping successful holdings
+ok 6 - one failed balance marks partial discovery while keeping successful holdings
+  ---
+  duration_ms: 2.170972
+  type: 'test'
+  ...
+# Subtest: decimals failure shows raw units instead of assuming 18
+ok 7 - decimals failure shows raw units instead of assuming 18
+  ---
+  duration_ms: 1.641501
+  type: 'test'
+  ...
+# Subtest: decimal formatting is exact for zero, six, twenty-four and 255 decimals
+ok 8 - decimal formatting is exact for zero, six, twenty-four and 255 decimals
+  ---
+  duration_ms: 0.436192
+  type: 'test'
+  ...
+# Subtest: RPC chain mismatch blocks discovery
+ok 9 - RPC chain mismatch blocks discovery
+  ---
+  duration_ms: 1.288716
+  type: 'test'
+  ...
+# Subtest: snapshot hash mismatch fails closed
+ok 10 - snapshot hash mismatch fails closed
+  ---
+  duration_ms: 1.106214
+  type: 'test'
+  ...
+# Subtest: invalid snapshot provenance is rejected
+ok 11 - invalid snapshot provenance is rejected
+  ---
+  duration_ms: 0.416049
+  type: 'test'
+  ...
+# Subtest: multicall transport failure falls back to isolated token reads
+ok 12 - multicall transport failure falls back to isolated token reads
+  ---
+  duration_ms: 2.267547
+  type: 'test'
+  ...
+# Subtest: route RPC failure preserves balances and reports incomplete data
+ok 13 - route RPC failure preserves balances and reports incomplete data
+  ---
+  duration_ms: 7.612237
+  type: 'test'
+  ...
+# Subtest: new launches use registry event and token role, excluding hooks
+ok 14 - new launches use registry event and token role, excluding hooks
+  ---
+  duration_ms: 1.071126
+  type: 'test'
+  ...
+# Subtest: silent log truncation is detected by comparing registry count
+ok 15 - silent log truncation is detected by comparing registry count
+  ---
+  duration_ms: 0.495965
+  type: 'test'
+  ...
+# Subtest: registry RPC failure retains historical records as partial coverage
+ok 16 - registry RPC failure retains historical records as partial coverage
+  ---
+  duration_ms: 2.572846
+  type: 'test'
+  ...
+# Subtest: legacy sale settings no longer gate permissionless routes
+ok 17 - legacy sale settings no longer gate permissionless routes
+  ---
+  duration_ms: 2.529781
+  type: 'test'
+  ...
+# Subtest: real viem rejected aggregate recovers exact balances and decimals through isolated RPC
+ok 18 - real viem rejected aggregate recovers exact balances and decimals through isolated RPC
+  ---
+  duration_ms: 47.322736
+  type: 'test'
+  ...
+# Subtest: real viem retries only failed aggregate entries, preserving successful reads
+ok 19 - real viem retries only failed aggregate entries, preserving successful reads
+  ---
+  duration_ms: 23.431179
+  type: 'test'
+  ...
+# Subtest: real viem isolated failures still report partial holdings or unknown wallet
+ok 20 - real viem isolated failures still report partial holdings or unknown wallet
+  ---
+  duration_ms: 20.540324
+  type: 'test'
+  ...
+# Subtest: real viem unrecoverable decimals retain raw units and disable selling
+ok 21 - real viem unrecoverable decimals retain raw units and disable selling
+  ---
+  duration_ms: 14.205223
+  type: 'test'
+  ...
+# Subtest: route graph connects direct, ETH bridge and three-hop paths without cycles
+ok 22 - route graph connects direct, ETH bridge and three-hop paths without cycles
+  ---
+  duration_ms: 3.605796
+  type: 'test'
+  ...
+# Subtest: forged pool key, duplicate id, wrong chain and future provenance are refused
+ok 23 - forged pool key, duplicate id, wrong chain and future provenance are refused
+  ---
+  duration_ms: 1.749655
+  type: 'test'
+  ...
+# Subtest: live route discovery has no registry or SwarmExit dependency
+ok 24 - live route discovery has no registry or SwarmExit dependency
+  ---
+  duration_ms: 1.155397
+  type: 'test'
+  ...
+# Subtest: no path, reverted quote and RPC outage remain distinct
+ok 25 - no path, reverted quote and RPC outage remain distinct
+  ---
+  duration_ms: 1.454648
+  type: 'test'
+  ...
+# Subtest: route search continues beyond 24 candidates and reports progress without concurrent quotes
+ok 26 - route search continues beyond 24 candidates and reports progress without concurrent quotes
+  ---
+  duration_ms: 106.073818
+  type: 'test'
+  ...
+# Subtest: a search exhausted after multiple batches is complete; late RPC failures remain incomplete
+ok 27 - a search exhausted after multiple batches is complete; late RPC failures remain incomplete
+  ---
+  duration_ms: 25.511972
+  type: 'test'
+  ...
+# Subtest: successful early quote stops discovery before later paths
+ok 28 - successful early quote stops discovery before later paths
+  ---
+  duration_ms: 12.544787
+  type: 'test'
+  ...
+# Subtest: insufficient full-balance liquidity yields an explicit smaller quoted amount
+ok 29 - insufficient full-balance liquidity yields an explicit smaller quoted amount
+  ---
+  duration_ms: 5.689882
+  type: 'test'
+  ...
+# Subtest: encoded swap atomically settles exact input, takes 2% credit and transfers net to sender
+ok 30 - encoded swap atomically settles exact input, takes 2% credit and transfers net to sender
+  ---
+  duration_ms: 4.987595
+  type: 'test'
+  ...
+# Subtest: review deduplicates tokens, refreshes quotes and preserves partial amounts
+ok 31 - review deduplicates tokens, refreshes quotes and preserves partial amounts
+  ---
+  duration_ms: 3.264614
+  type: 'test'
+  ...
+# Subtest: changed balance excludes a token before approval
+ok 32 - changed balance excludes a token before approval
+  ---
+  duration_ms: 0.898665
+  type: 'test'
+  ...
+# Subtest: exact Permit2 and router approvals precede a fully simulated sale
+ok 33 - exact Permit2 and router approvals precede a fully simulated sale
+  ---
+  duration_ms: 7.708308
+  type: 'test'
+  ...
+# Subtest: price deterioration never lowers the reviewed slippage floor
+ok 34 - price deterioration never lowers the reviewed slippage floor
+  ---
+  duration_ms: 2.435224
+  type: 'test'
+  ...
+# Subtest: failed full execution simulation sends no sale
+ok 35 - failed full execution simulation sends no sale
+  ---
+  duration_ms: 3.293756
+  type: 'test'
+  ...
+# Subtest: wrong chain and account changes stop signatures
+ok 36 - wrong chain and account changes stop signatures
+  ---
+  duration_ms: 2.231145
+  type: 'test'
+  ...
+# Subtest: approval timeout stays pending and stops subsequent prompts
+ok 37 - approval timeout stays pending and stops subsequent prompts
+  ---
+  duration_ms: 1.777579
+  type: 'test'
+  ...
+# Subtest: reverted receipt is unsold; spoofed transfer source is never counted
+ok 38 - reverted receipt is unsold; spoofed transfer source is never counted
+  ---
+  duration_ms: 4.538638
+  type: 'test'
+  ...
+# Subtest: confirmed earlier sale survives a later wallet rejection
+ok 39 - confirmed earlier sale survives a later wallet rejection
+  ---
+  duration_ms: 7.116494
+  type: 'test'
+  ...
+# Subtest: refresh reconciles pending approvals and sales without inventing confirmation
+ok 40 - refresh reconciles pending approvals and sales without inventing confirmation
+  ---
+  duration_ms: 2.319444
+  type: 'test'
+  ...
+# Subtest: fee is exactly floor(2% of successful gross), including zero
+ok 41 - fee is exactly floor(2% of successful gross), including zero
+  ---
+  duration_ms: 2.531649
+  type: 'test'
+  ...
+# Subtest: pre-approval preview explicitly says approval is required and has no invented gas
+ok 42 - pre-approval preview explicitly says approval is required and has no invented gas
+  ---
+  duration_ms: 0.930486
+  type: 'test'
+  ...
+# Subtest: failed sale simulation rejects instead of substituting old quotes
+ok 43 - failed sale simulation rejects instead of substituting old quotes
+  ---
+  duration_ms: 0.820549
+  type: 'test'
+  ...
+# Subtest: failed outcomes are excluded and never charged a preview fee
+ok 44 - failed outcomes are excluded and never charged a preview fee
+  ---
+  duration_ms: 0.511675
+  type: 'test'
+  ...
+# Subtest: gas estimate uses RPC gas units times gas price
+ok 45 - gas estimate uses RPC gas units times gas price
+  ---
+  duration_ms: 0.515456
+  type: 'test'
+  ...
+# Subtest: chain switch prevents every signature
+ok 46 - chain switch prevents every signature
+  ---
+  duration_ms: 0.860895
+  type: 'test'
+  ...
+# Subtest: changed account invalidates the confirmation
+ok 47 - changed account invalidates the confirmation
+  ---
+  duration_ms: 0.500396
+  type: 'test'
+  ...
+# Subtest: approval receipts are checked and a reverted approval sends no sale
+ok 48 - approval receipts are checked and a reverted approval sends no sale
+  ---
+  duration_ms: 2.586257
+  type: 'test'
+  ...
+# Subtest: nonzero insufficient allowance is reset then set to exact balance
+ok 49 - nonzero insufficient allowance is reset then set to exact balance
+  ---
+  duration_ms: 5.129145
+  type: 'test'
+  ...
+# Subtest: reverted sale is unsold and never a fabricated success
+ok 50 - reverted sale is unsold and never a fabricated success
+  ---
+  duration_ms: 1.401758
+  type: 'test'
+  ...
+# Subtest: receipt timeout remains pending and blocks a second batch
+ok 51 - receipt timeout remains pending and blocks a second batch
+  ---
+  duration_ms: 1.050453
+  type: 'test'
+  ...
+# Subtest: forged TokenSold events from another emitter do not show Sold
+ok 52 - forged TokenSold events from another emitter do not show Sold
+  ---
+  duration_ms: 1.531505
+  type: 'test'
+  ...
+# Subtest: another users event cannot claim success
+ok 53 - another users event cannot claim success
+  ---
+  duration_ms: 1.856328
+  type: 'test'
+  ...
+# Subtest: post-approval simulation failure sends no sale transaction
+ok 54 - post-approval simulation failure sends no sale transaction
+  ---
+  duration_ms: 0.876576
+  type: 'test'
+  ...
+# Subtest: later batch rejection preserves confirmed earlier results
+ok 55 - later batch rejection preserves confirmed earlier results
+  ---
+  duration_ms: 1.999216
+  type: 'test'
+  ...
+# Subtest: reverted refund receipt does not report claimed
+ok 56 - reverted refund receipt does not report claimed
+  ---
+  duration_ms: 0.618494
+  type: 'test'
+  ...
+# Subtest: sale preview batches large selections within the contract limit
+ok 57 - sale preview batches large selections within the contract limit
+  ---
+  duration_ms: 1.598291
+  type: 'test'
+  ...
+# Subtest: changed balance cannot sell an amount absent from the preview
+ok 58 - changed balance cannot sell an amount absent from the preview
+  ---
+  duration_ms: 0.449255
+  type: 'test'
+  ...
+# Subtest: held refund takes precedence with events in order: RefundHeld, TokenRefunded
+ok 59 - held refund takes precedence with events in order: RefundHeld, TokenRefunded
+  ---
+  duration_ms: 3.551835
+  type: 'test'
+  ...
+# Subtest: held refund takes precedence with events in order: TokenRefunded, RefundHeld
+ok 60 - held refund takes precedence with events in order: TokenRefunded, RefundHeld
+  ---
+  duration_ms: 2.510855
+  type: 'test'
+  ...
+# Subtest: successful refund is not marked held by unrelated RefundHeld logs
+ok 61 - successful refund is not marked held by unrelated RefundHeld logs
+  ---
+  duration_ms: 2.669345
+  type: 'test'
+  ...
+# Subtest: USD filters include both boundaries and zero; unpriced holdings remain until a range is active
+ok 62 - USD filters include both boundaries and zero; unpriced holdings remain until a range is active
+  ---
+  duration_ms: 9.636564
+  type: 'test'
+  ...
+# Subtest: invalid and inverted USD bounds do not silently pass tokens
+ok 63 - invalid and inverted USD bounds do not silently pass tokens
+  ---
+  duration_ms: 2.124143
+  type: 'test'
+  ...
+# Subtest: search handles a contract address, name, case and a ready-only selection
+ok 64 - search handles a contract address, name, case and a ready-only selection
+  ---
+  duration_ms: 3.210013
+  type: 'test'
+  ...
+# Subtest: prices are finite and decimals are respected; missing metadata is never guessed
+ok 65 - prices are finite and decimals are respected; missing metadata is never guessed
+  ---
+  duration_ms: 1.133173
+  type: 'test'
+  ...
+# Subtest: wallet-wide index follows all pages, deduplicates addresses, and ignores NFTs
+ok 66 - wallet-wide index follows all pages, deduplicates addresses, and ignores NFTs
+  ---
+  duration_ms: 3.440614
+  type: 'test'
+  ...
+# Subtest: index failures retain successful pages and explicitly mark incomplete coverage
+ok 67 - index failures retain successful pages and explicitly mark incomplete coverage
+  ---
+  duration_ms: 1.599013
+  type: 'test'
+  ...
+# Subtest: a repeated pagination cursor cannot loop forever or claim completion
+ok 68 - a repeated pagination cursor cannot loop forever or claim completion
+  ---
+  duration_ms: 1.306858
+  type: 'test'
+  ...
+# Subtest: global limiter respects its cap even when callers enqueue more work as tasks finish
+ok 69 - global limiter respects its cap even when callers enqueue more work as tasks finish
+  ---
+  duration_ms: 34.665785
+  type: 'test'
+  ...
+# Subtest: parallel route search reaches candidate 25 and does not keep a sequential bottleneck
+ok 70 - parallel route search reaches candidate 25 and does not keep a sequential bottleneck
+  ---
+  duration_ms: 43.109721
+  type: 'test'
+  ...
+# Subtest: quick route search discloses its limit and leaves a deeper search available
+ok 71 - quick route search discloses its limit and leaves a deeper search available
+  ---
+  duration_ms: 6.217537
+  type: 'test'
+  ...
+# Subtest: two-token standard sweep uses two exact approvals, one PermitBatch signature, and one sale
+ok 72 - two-token standard sweep uses two exact approvals, one PermitBatch signature, and one sale
+  ---
+  duration_ms: 22.84901
+  type: 'test'
+  ...
+# Subtest: an atomic wallet sends exact approvals and both sales in one request with no fallback
+ok 73 - an atomic wallet sends exact approvals and both sales in one request with no fallback
+  ---
+  duration_ms: 11.947543
+  type: 'test'
+  ...
+# Subtest: already sufficient allowances reuse authorization and need only one sale request
+ok 74 - already sufficient allowances reuse authorization and need only one sale request
+  ---
+  duration_ms: 7.824349
+  type: 'test'
+  ...
+# Subtest: nonzero insufficient token approval resets to zero before approving the exact amount
+ok 75 - nonzero insufficient token approval resets to zero before approving the exact amount
+  ---
+  duration_ms: 6.285178
+  type: 'test'
+  ...
+# Subtest: rejection of an atomic request releases the pending lock and never triggers standard prompts
+ok 76 - rejection of an atomic request releases the pending lock and never triggers standard prompts
+  ---
+  duration_ms: 6.294669
+  type: 'test'
+  ...
+# Subtest: unknown sale receipt is stored across reload and prevents another sale
+ok 77 - unknown sale receipt is stored across reload and prevents another sale
+  ---
+  duration_ms: 6.46831
+  type: 'test'
+  ...
+# Subtest: the approval hash is persisted before waiting, protecting reload during an approval
+ok 78 - the approval hash is persisted before waiting, protecting reload during an approval
+  ---
+  duration_ms: 2.606971
+  type: 'test'
+  ...
+# Subtest: unreconciled fee or wrong payout source cannot be reported as sold
+ok 79 - unreconciled fee or wrong payout source cannot be reported as sold
+  ---
+  duration_ms: 6.808605
+  type: 'test'
+  ...
+# Subtest: a reverted atomic transaction releases all inputs and charges no sale fee
+ok 80 - a reverted atomic transaction releases all inputs and charges no sale fee
+  ---
+  duration_ms: 6.355326
+  type: 'test'
+  ...
+# Subtest: price deterioration after review preserves the reviewed floor and sends no wallet request
+ok 81 - price deterioration after review preserves the reviewed floor and sends no wallet request
+  ---
+  duration_ms: 1.970935
+  type: 'test'
+  ...
+# Subtest: account, chain and complete simulation failures prevent sale submission
+ok 82 - account, chain and complete simulation failures prevent sale submission
+  ---
+  duration_ms: 5.456103
+  type: 'test'
+  ...
+# Subtest: atomic readiness does not silently upgrade an account; standard mode can be chosen explicitly
+ok 83 - atomic readiness does not silently upgrade an account; standard mode can be chosen explicitly
+  ---
+  duration_ms: 1.707658
+  type: 'test'
+  ...
+# Subtest: batch calldata bounds tokens, rejects duplicate inputs and pays the original treasury
+ok 84 - batch calldata bounds tokens, rejects duplicate inputs and pays the original treasury
+  ---
+  duration_ms: 5.595915
+  type: 'test'
+  ...
+# Subtest: v2, v3 and WETH bridging encode native credit settlement with a gross output floor
+ok 85 - v2, v3 and WETH bridging encode native credit settlement with a gross output floor
+  ---
+  duration_ms: 4.921056
+  type: 'test'
+  ...
+# Subtest: new inventory scans all indexed ERC-20s, batches refunds, streams balances before quotes, and retains unpriced tokens
+ok 86 - new inventory scans all indexed ERC-20s, batches refunds, streams balances before quotes, and retains unpriced tokens
+  ---
+  duration_ms: 5.966
+  type: 'test'
+  ...
+# Subtest: cancelled inventory scans stop before token/indexer work
+ok 87 - cancelled inventory scans stop before token/indexer work
+  ---
+  duration_ms: 0.521813
+  type: 'test'
+  ...
+# Subtest: every execution and quote target is a valid Ethereum address
+ok 88 - every execution and quote target is a valid Ethereum address
+  ---
+  duration_ms: 1.361242
+  type: 'test'
+  ...
+# Subtest: explicit rejection of unsupported atomic RPC releases its request lock without fallback
+ok 89 - explicit rejection of unsupported atomic RPC releases its request lock without fallback
+  ---
+  duration_ms: 4.022767
+  type: 'test'
+  ...
+# Subtest: a definitive wallet batch failure is reported as failed rather than unknown
+ok 90 - a definitive wallet batch failure is reported as failed rather than unknown
+  ---
+  duration_ms: 5.213718
+  type: 'test'
+  ...
+# Subtest: quick-search coverage limits are grouped once while each token retains its detailed reason
+ok 91 - quick-search coverage limits are grouped once while each token retains its detailed reason
+  ---
+  duration_ms: 19.615825
+  type: 'test'
+  ...
+1..91
+# tests 91
+# suites 0
+# pass 91
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1549.094558

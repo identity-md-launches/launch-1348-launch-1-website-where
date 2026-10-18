@@ -61,10 +61,13 @@ export function ConnectSheet({
       }
     };
     addEventListener("keydown", onKey);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     document.getElementById("page")?.setAttribute("inert", "");
     sheet.current?.querySelector<HTMLElement>("button, a")?.focus();
     return () => {
       removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
       document.getElementById("page")?.removeAttribute("inert");
       trigger.current?.focus();
     };
@@ -132,6 +135,7 @@ export function ConnectSheet({
           </button>
         )}
         <button
+          ref={trigger}
           className="btn btn-secondary"
           onClick={() => disconnect()}
           aria-label={`Connected as ${short(address)}. Disconnect`}
@@ -147,7 +151,7 @@ export function ConnectSheet({
     <>
       <button
         ref={trigger}
-        className="btn btn-primary"
+        className="btn btn-secondary connect-button"
         onClick={() => setOpen(true)}
       >
         Connect wallet

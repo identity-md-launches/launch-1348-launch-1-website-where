@@ -12,6 +12,7 @@ import {
 import { IMD_ADDRESS } from "../deployment.ts";
 import { message, type LaunchToken } from "./discovery.ts";
 import { mainnet } from "viem/chains";
+import { mapConcurrent } from "./async.ts";
 
 // Ethereum deployments: https://docs.uniswap.org/contracts/v4/deployments
 // This router uses the original v4 ABI (no minHopPriceX36 field).
@@ -60,6 +61,13 @@ export type LiveRoute = {
   amountOut: bigint;
   blockNumber: bigint;
   quotedAt: number;
+  /** Optional first leg: ERC-20 to WETH, followed by native ETH to IMD. */
+  bridge?: {
+    kind: "v2" | "v3" | "weth";
+    path: Address[];
+    fees: number[];
+    amountOut: bigint;
+  };
 };
 export type RouteResult = {
   route: LiveRoute | null;
@@ -189,6 +197,7 @@ export async function loadPools(
   launches: LaunchToken[],
   blockNumber: bigint,
   snapshot?: PoolSnapshot,
+  options: { currencies?: Address[]; rankLiquidity?: boolean; recent?: boolean; progress?: (text: string) => void } = {},
 ) {
   const warnings: string[] = [];
   const pools = new Map<string, Pool>();
@@ -244,13 +253,14 @@ export async function loadPools(
         }
       }),
     );
-  if (start <= blockNumber) {
+  if (start <= blockNumber && options.recent !== false) {
+    options.progress?.("Checking recent pool events…");
     const currencies = [
       ...new Set(
         [
           IMD_ADDRESS,
           ...launches.map((t) => t.address),
-          ...[...pools.values()].flatMap((p) => [p.currency0, p.currency1]),
+          ...(options.currencies ?? [...pools.values()].flatMap((p) => [p.currency0, p.currency1])),
         ].map((a) => a.toLowerCase()),
       ),
     ].filter((a) => a !== NATIVE) as Address[];
@@ -265,11 +275,12 @@ export async function loadPools(
     }
   }
   const list = [...pools.values()];
+  options.progress?.("Ranking known pools by live liquidity…");
   // Rank alternatives by current active liquidity. Zero liquidity is not excluded: a swap
   // can cross into another tick range. A missing state read does not invent a zero balance.
-  for (let i = 0; i < list.length; i += 64) {
+  const chunks = options.rankLiquidity === false ? [] : Array.from({ length: Math.ceil(list.length / 64) }, (_, i) => list.slice(i * 64, i * 64 + 64));
+  await mapConcurrent(chunks, 4, async (chunk) => {
     try {
-      const chunk = list.slice(i, i + 64);
       const reads = await client.multicall({
         contracts: chunk.map((p) => ({
           address: STATE_VIEW,
@@ -287,7 +298,7 @@ export async function loadPools(
     } catch {
       /* Quoting still determines whether each candidate can trade. */
     }
-  }
+  });
   return { pools: list, warnings };
 }
 
@@ -298,15 +309,19 @@ export function candidatePaths(
   target: Address = IMD_ADDRESS,
 ): Pool[][] {
   const paths: Pool[][] = [];
+  const edges = new Map<string, { pool: Pool; next: Address }[]>();
+  for (const pool of pools) {
+    for (const [from, next] of [[pool.currency0, pool.currency1], [pool.currency1, pool.currency0]] as const) {
+      const key = from.toLowerCase();
+      const list = edges.get(key) ?? [];
+      list.push({ pool, next });
+      edges.set(key, list);
+    }
+  }
   const walk = (currency: Address, path: Pool[], seen: Set<string>) => {
     if (path.length >= 3) return;
-    for (const pool of pools) {
-      const next = sameAddress(pool.currency0, currency)
-        ? pool.currency1
-        : sameAddress(pool.currency1, currency)
-          ? pool.currency0
-          : null;
-      if (!next || seen.has(next.toLowerCase())) continue;
+    for (const { pool, next } of edges.get(currency.toLowerCase()) ?? []) {
+      if (seen.has(next.toLowerCase())) continue;
       if (sameAddress(next, target)) paths.push([...path, pool]);
       else walk(next, [...path, pool], new Set([...seen, next.toLowerCase()]));
     }

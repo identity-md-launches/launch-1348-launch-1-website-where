@@ -1,0 +1,18 @@
+{
+  "limitBytes": 8388608,
+  "gitVisiblePayloadFiles": 162,
+  "payloadBytes": 6384437,
+  "storedZipBytes": 6406561,
+  "remainingBytesAgainstStoredZip": 1982047,
+  "passed": true,
+  "method": "Git tracked + nonignored untracked regular files; task inputs and disposable scratch excluded. Stored ZIP is a conservative uncompressed payload check.",
+  "exportBytes": 1239270,
+  "protectedBuildAndDependencyFilesUnchanged": true,
+  "ignoreFileChanged": true,
+  "evidencePathBudgetDocument": "artifacts/PATH-BUDGET.md",
+  "evidenceBytes": 821790,
+  "evidenceLimitBytes": 1600000,
+  "allowlistedEvidencePaths": 26,
+  "dependencyOrCacheDirectoriesIncluded": false,
+  "submodules": 0
+}

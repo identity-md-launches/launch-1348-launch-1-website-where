@@ -1,0 +1,29 @@
+{
+  "kind": "observations, not a controlled benchmark",
+  "wallet": "0x0ace1dbe8aab293cd58d5e3ea38814f0ccb74782",
+  "diagnosticBeforeDeferringRecentHistory": {
+    "block": 26217409,
+    "firstHoldingsMs": 2665,
+    "firstQuoteMs": 114360,
+    "fullQuickScanMs": 178958,
+    "quotes": 14
+  },
+  "finalReadOnlyRun": {
+    "block": 26217487,
+    "firstHoldingsMs": 2474,
+    "firstQuoteMs": 4213,
+    "fullQuickScanMs": 37529,
+    "holdings": 191,
+    "quotes": 42,
+    "partialQuotes": 5,
+    "incompleteRouteSearches": 104
+  },
+  "productionBrowserReadOnly": {
+    "firstVisibleRowsMs": 2506,
+    "firstRouteMs": 4837,
+    "visibleRowsAtCapture": 40,
+    "scriptErrors": 0,
+    "consoleErrors": 0,
+    "failedRequests": 0
+  }
+}

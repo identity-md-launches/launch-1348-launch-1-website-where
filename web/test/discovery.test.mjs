@@ -15,7 +15,7 @@ import {
   registryAbi,
   validateSnapshot,
 } from "../src/lib/discovery.ts";
-import { loadWallet as actualLoadWallet } from "../src/lib/sweep.ts";
+import { loadSwarmWallet as actualLoadWallet } from "../src/lib/sweep.ts";
 import { fmtAmount } from "../src/lib/format.ts";
 import { erc20Abi } from "../src/abi/erc20.ts";
 import { swarmExitAbi } from "../src/abi/swarmExit.ts";

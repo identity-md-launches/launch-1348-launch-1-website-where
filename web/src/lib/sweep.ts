@@ -34,7 +34,7 @@ import {
   type LiveRoute,
   type PoolSnapshot,
 } from "./routes.ts";
-import { planDirectSale, executeDirectSale } from "./directSale.ts";
+import { planBatchSale, executeBatchSale, type BatchDetails } from "./batchSale.ts";
 
 /** SwarmExit.Status, in declaration order. */
 export const STATUS_TEXT = [
@@ -74,6 +74,11 @@ export type SwarmToken = {
   result?: SaleResult;
   /** Completed outcome retained after fresh holdings release the selection lock. */
   previousResult?: Exclude<SaleResult, { kind: "pending" }>;
+  name?: string;
+  usdPrice?: number | null;
+  usdValue?: number | null;
+  routeChecked?: boolean;
+  unverified?: boolean;
 };
 
 export type SaleResult =
@@ -83,10 +88,14 @@ export type SaleResult =
       kind: "pending";
       phase?: "approval" | "sale";
       reason: string;
-      txHash: Hash;
+      txHash?: Hash;
+      batchId?: string;
+      amountIn?: bigint;
+      minimumGross?: bigint;
+      batchTokens?: Address[];
     };
 
-export type Pricing = { imdUsd: number; ethUsd: number };
+export type Pricing = { imdUsd: number; ethUsd: number | null };
 
 export type WalletState = {
   tokens: SwarmToken[];
@@ -102,6 +111,10 @@ export type WalletState = {
   snapshotBlock: number;
   warnings: string[];
   complete: boolean;
+  indexed?: boolean;
+  scannedAt?: number;
+  durationMs?: number;
+  incompleteRoutes?: number;
 };
 
 export type PlanItem = { token: SwarmToken; imdOut: bigint };
@@ -115,6 +128,7 @@ export type Plan = {
   requiresApproval: boolean;
   gasWei: bigint | null;
   gasNote: string;
+  batch?: BatchDetails;
 };
 
 const exit = { address: SWARM_EXIT_ADDRESS, abi: swarmExitAbi } as const;
@@ -169,7 +183,7 @@ async function loadPricing(
 }
 
 /** Discover provenance first; the sale registry must never decide which holdings exist. */
-export async function loadWallet(
+export async function loadSwarmWallet(
   client: PublicClient,
   account: Address,
   options: {
@@ -499,6 +513,9 @@ export async function planLegacySale(
 }
 
 export type Progress =
+  | { step: "permit"; batch: number; batches: number; tokens: number }
+  | { step: "batch-sign"; batch: number; batches: number; calls: number }
+  | { step: "batch-mine"; batch: number; batches: number; id: string }
   | {
       step: "approve";
       token: SwarmToken;
@@ -773,8 +790,10 @@ export async function planSale(
   chosen: SwarmToken[],
   _minImdOut = 1n,
   _maxPerSale = 1,
+  wallet?: WalletClient,
+  preferAtomic = true,
 ): Promise<Plan> {
-  return planDirectSale(client, account, chosen);
+  return planBatchSale(client, account, chosen, wallet, preferAtomic);
 }
 export async function executeSale(
   wallet: WalletClient,
@@ -784,5 +803,8 @@ export async function executeSale(
   _maxPerSale: number,
   onProgress: (p: Progress) => void,
 ) {
-  return executeDirectSale(wallet, client, account, plan, onProgress);
+  return executeBatchSale(wallet, client, account, plan, onProgress);
 }
+
+/** Default discovery scans all indexed Ethereum ERC-20s; legacy registry audits are explicit. */
+export { scanWallet as loadWallet } from "./inventory.ts";

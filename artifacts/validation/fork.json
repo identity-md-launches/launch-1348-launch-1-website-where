@@ -1,0 +1,127 @@
+{
+  "kind": "disposable local Ethereum fork",
+  "at": "2026-10-18T05:48:30.279Z",
+  "blockNumber": "26217433",
+  "mainnetTransactionsSent": 0,
+  "contractsDeployed": 0,
+  "checks": [
+    {
+      "name": "two-token-batch: actual IMD recipient and exact 2% per-token treasury fee",
+      "passed": true
+    },
+    {
+      "name": "two-token-batch: one combined sale transaction",
+      "passed": true
+    },
+    {
+      "name": "two-token-batch: one real PermitBatch typed signature",
+      "passed": true
+    },
+    {
+      "name": "two-token-batch: only the exact reviewed input balances spent",
+      "passed": true
+    },
+    {
+      "name": "wrapped-eth-bridge: actual IMD recipient and exact 2% per-token treasury fee",
+      "passed": true
+    },
+    {
+      "name": "wrapped-eth-bridge: one combined sale transaction",
+      "passed": true
+    },
+    {
+      "name": "wrapped-eth-bridge: one real PermitBatch typed signature",
+      "passed": true
+    },
+    {
+      "name": "wrapped-eth-bridge: only the exact reviewed input balances spent",
+      "passed": true
+    },
+    {
+      "name": "v2-to-v4-bridge: actual IMD recipient and exact 2% per-token treasury fee",
+      "passed": true
+    },
+    {
+      "name": "v2-to-v4-bridge: one combined sale transaction",
+      "passed": true
+    },
+    {
+      "name": "v2-to-v4-bridge: one real PermitBatch typed signature",
+      "passed": true
+    },
+    {
+      "name": "v2-to-v4-bridge: only the exact reviewed input balances spent",
+      "passed": true
+    },
+    {
+      "name": "v3-to-v4-bridge: actual IMD recipient and exact 2% per-token treasury fee",
+      "passed": true
+    },
+    {
+      "name": "v3-to-v4-bridge: one combined sale transaction",
+      "passed": true
+    },
+    {
+      "name": "v3-to-v4-bridge: one real PermitBatch typed signature",
+      "passed": true
+    },
+    {
+      "name": "v3-to-v4-bridge: only the exact reviewed input balances spent",
+      "passed": true
+    },
+    {
+      "name": "one failed output floor reverts the entire batch",
+      "passed": true
+    },
+    {
+      "name": "reverted batch leaves both input tokens in the wallet",
+      "passed": true
+    },
+    {
+      "name": "reverted batch changes no IMD balance and charges no sale fee",
+      "passed": true
+    }
+  ],
+  "two-token-batch": {
+    "tokens": [
+      "0x8daedf407696693cbfb4c33b33e3a62dbae7ceaf",
+      "0x7a427b94547232356cf212fd1c668e8eb4069a46"
+    ],
+    "receivedImd": "46146008137798",
+    "treasuryImd": "941755268117",
+    "transactionHashes": [
+      "0xdcd9b6bb850da6bb4c9965940bf3fcf69bf1fe9e1dd4385011fc8f7c89422853"
+    ]
+  },
+  "wrapped-eth-bridge": {
+    "tokens": [
+      "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+    ],
+    "receivedImd": "476727420523779",
+    "treasuryImd": "9729131031097",
+    "transactionHashes": [
+      "0x041289e3d15cdfd7abee4f08da106397d6ed8dafb1eca592fdfd72c8d72ecde2"
+    ]
+  },
+  "v2-to-v4-bridge": {
+    "tokens": [
+      "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+    ],
+    "receivedImd": "4738550007701396",
+    "treasuryImd": "96705102197987",
+    "transactionHashes": [
+      "0x7d513060c434fe4ccaae41a74434e98fb7d111616e6d2a5923538e32393fed1c"
+    ]
+  },
+  "v3-to-v4-bridge": {
+    "tokens": [
+      "0xd4419c2d3daa986dc30444fa333a846be44fd1eb"
+    ],
+    "receivedImd": "3061407602927",
+    "treasuryImd": "62477706182",
+    "transactionHashes": [
+      "0x11b8e66c5695c59c409d2aa391ba4b8044a979dd9b928f0c2b5f64519f2e6664"
+    ]
+  },
+  "passed": true
+}
